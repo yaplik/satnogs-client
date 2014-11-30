@@ -1,0 +1,3 @@
+# SatNOGS Client
+
+LICENSE: [MPL-2.0](LICENSE)
