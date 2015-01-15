@@ -79,7 +79,7 @@ class SignalSerializer():
         self.pipe = os.pipe()
         self.output = open(self.get_output_path(), 'w')
 
-        self.consumer = Popen(self.get_decoding_cmd(), stdin=self.pipe[0])
+        self.consumer = Popen(self.get_decoding_cmd(), stdin=self.pipe[0], stdout=self.output)
         self.producer = Popen(self.get_demodulation_cmd(), stdout=self.pipe[1])
 
         self.consumer.wait()
