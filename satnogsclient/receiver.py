@@ -23,7 +23,7 @@ class SignalSerializer():
         'SCOPE'
     ]
 
-    def __init__(self, observation_id, frequency, decoding=None):
+    def __init__(self, observation_id, frequency, decoding, **kwargs):
 
         # Check input values
         if not observation_id:
@@ -31,18 +31,44 @@ class SignalSerializer():
         if not frequency:
             raise LookupError('arg not found: frequency')
 
-        if decoding not in self._decoding_values and decoding not None:
+        if decoding not in self._decoding_values and decoding is not None:
             raise LookupError('arg not found: decoding')
 
         self.observation_id = observation_id
         self.frequency = frequency
-        self.decoding = decoding
+        self.decoding = kwargs.get('decoding', None)
+        self.ppm_error = kwargs.get('ppm_error', 100)
+        self.demodulator = kwargs.get('demodulator', 'AFSK1200')
+        self.modulation = kwargs.get('modulation', 'fm')
+        self.sample_rate = kwargs.get('sample_rate', 22050)
+        self.aprs = kwargs.get('aprs', True)
 
     def get_decoding_cmd(self):
-        raise NotImplementedError()
+        params = {
+            '-t': 'raw',
+            '-a': self.demodulator,
+        }
+
+        args = ['{0}{1}'.format(key, params[key]) for key in params]
+
+        if self.aprs:
+            args.append('-A')
+
+        args.append('-')
+
+        return [settings.DECODING_COMMAND] + args
 
     def get_demodulation_cmd(self):
-        raise NotImplementedError()
+        params = {
+            '-f': self.frequency,
+            '-p': self.ppm_error,
+            '-s': self.sample_rate,
+            '-M': self.modulation
+        }
+
+        args = ['{0} {1}'.format(key, params[key]) for key in params]
+
+        return [settings.DEMODULATION_COMMAND] + args
 
     def get_output_path(self):
         timestamp = datetime.now().isoformat()
