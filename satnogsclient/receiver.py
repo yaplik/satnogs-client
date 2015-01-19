@@ -6,7 +6,7 @@ from subprocess import Popen
 import settings
 
 
-class SignalSerializer():
+class SignalReceiver():
 
     _decoding_values = [
         'POCSAG512',
