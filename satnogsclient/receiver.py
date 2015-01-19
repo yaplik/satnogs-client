@@ -59,16 +59,18 @@ class SignalReceiver():
         return [settings.DECODING_COMMAND] + args
 
     def get_demodulation_cmd(self):
-        params = {
-            '-f': self.frequency,
-            '-p': self.ppm_error,
-            '-s': self.sample_rate,
-            '-M': self.modulation
-        }
+        if self.decoding:
+            params = {
+                '-f': self.frequency,
+                '-p': self.ppm_error,
+                '-s': self.sample_rate,
+                '-M': self.modulation
+            }
 
-        args = ['{0} {1}'.format(key, params[key]) for key in params]
+            args = ['{0} {1}'.format(key, params[key]) for key in params]
 
-        return [settings.DEMODULATION_COMMAND] + args
+            return [settings.DEMODULATION_COMMAND] + args
+        raise NotImplementedError
 
     def get_output_path(self):
         timestamp = datetime.now().isoformat()
