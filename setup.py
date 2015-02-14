@@ -5,4 +5,5 @@ setup(name='SatNOGS client',
       packages=['satnogsclient'],
       version='0.1',
       description='SatNOGS Client',
-      install_requires=['APScheduler', 'SQLAlchemy', 'requests', 'validators', 'python-dateutil'])
+      install_requires=['APScheduler', 'SQLAlchemy', 'requests', 'validators', 'python-dateutil'],
+      scripts=['satnogsclient/bin/satnogs-poller'])

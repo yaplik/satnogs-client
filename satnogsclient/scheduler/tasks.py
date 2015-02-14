@@ -12,7 +12,6 @@ def spawn_observation(*args, **kwargs):
     raise NotImplementedError
 
 
-@scheduler.scheduled_job('interval', minutes=settings.NETWORK_API_QUERY_INTERVAL)
 def get_jobs():
     """Query SatNOGS Network API to GET jobs."""
     url = urljoin(settings.NETWORK_API_URL, 'jobs')

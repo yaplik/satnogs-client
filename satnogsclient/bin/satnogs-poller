@@ -1,0 +1,18 @@
+import time
+
+from satnogsclient import settings
+from satnogsclient.scheduler import scheduler
+from satnogsclient.scheduler.tasks import get_jobs
+
+
+if __name__ == '__main__':
+    minutes = settings.NETWORK_API_QUERY_INTERVAL
+    scheduler.add_job(get_jobs, 'interval', minutes=minutes)
+    scheduler.start()
+
+    try:
+	print('Press Ctrl+C to exit SatNOGS poller')
+	while True:
+            time.sleep(settings.SCHEDULER_SLEEP_TIME)
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()

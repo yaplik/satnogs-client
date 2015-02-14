@@ -8,3 +8,4 @@ DECODING_COMMAND = environ.get('SATNOGS_DECODING_COMMAND', 'multimon-ng')
 OUTPUT_PATH = environ.get('SATNOGS_OUTPUT_PATH', '/tmp')
 NETWORK_API_URL = environ.get('SATNOGS_API_URL', 'https://dev.satnogs.org/api/')
 NETWORK_API_QUERY_INTERVAL = 5  # In minutes
+SCHEDULER_SLEEP_TIME = 10  # In seconds
