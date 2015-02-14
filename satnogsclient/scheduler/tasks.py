@@ -18,6 +18,13 @@ def get_jobs():
     params = {'ground_station': settings.GROUND_STATION_ID}
     response = requests.get(url, params=params)
 
+    if not response.status_code == 200:
+        raise Exception('Status code: {0} on request: {1}'.format(response.status_code, url))
+
+    for job in scheduler.get_jobs():
+        if job.name == spawn_observation.__name__:
+            job.remove()
+
     for obj in response.json():
         start = parser.parse(obj['start'])
         job_id = str(obj['id'])
