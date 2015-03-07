@@ -6,11 +6,21 @@ import requests
 from dateutil import parser
 
 from satnogsclient import settings
+from satnogsclient.observer import Observer
 from satnogsclient.scheduler import scheduler
 
 
 def spawn_observation(*args, **kwargs):
-    raise NotImplementedError
+    obj = kwargs.pop('obj')
+    observer = Observer()
+    tle = {
+        'tle0': obj['tle0'],
+        'tle1': obj['tle1'],
+        'tle2': obj['tle2']
+    }
+    end = parser.parse(obj['end'])
+    observer.setup(tle=tle, observation_end=end, frequency=obj['frequency'])
+    observer.observe()
 
 
 def get_jobs():
@@ -29,4 +39,5 @@ def get_jobs():
     for obj in response.json():
         start = parser.parse(obj['start'])
         job_id = str(obj['id'])
-        scheduler.add_job(spawn_observation, 'date', run_date=start, id=job_id, kwargs=obj)
+        kwargs = {'obj': obj}
+        scheduler.add_job(spawn_observation, 'date', run_date=start, id=job_id, kwargs=kwargs)
