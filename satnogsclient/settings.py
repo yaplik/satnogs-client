@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from os import environ
 
 GROUND_STATION_ID = int(environ.get('SATNOGS_STATION_ID', None))

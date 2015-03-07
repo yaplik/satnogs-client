@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pytz import utc
 
 from apscheduler.executors.pool import ThreadPoolExecutor
