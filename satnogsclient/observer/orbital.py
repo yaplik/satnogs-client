@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 
 import ephem
+import pytz
 
 
 def pinpoint(observer_dict, satellite_dict, timestamp=None):
@@ -45,7 +46,7 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
 
     # time of observation
     if not timestamp:
-        timestamp = datetime.now()
+        timestamp = datetime.now(pytz.utc)
 
     # observation calculation
     observer.date = timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')

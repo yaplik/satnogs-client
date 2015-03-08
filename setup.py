@@ -10,5 +10,6 @@ setup(name='SatNOGS client',
                         'requests',
                         'validators',
                         'python-dateutil',
-                        'pyephem'],
+                        'pyephem',
+                        'pytz'],
       scripts=['satnogsclient/bin/satnogs-poller'])

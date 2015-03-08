@@ -4,6 +4,8 @@ import time
 
 from datetime import datetime
 
+import pytz
+
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 
@@ -113,7 +115,7 @@ class Worker:
         self._stay_alive = False
 
     def check_observation_end_reached(self):
-        if datetime.now() > self._observation_end:
+        if datetime.now(pytz.utc) > self._observation_end:
             self.trackstop()
 
 
