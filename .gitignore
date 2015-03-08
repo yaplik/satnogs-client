@@ -3,6 +3,7 @@
 *.sqlite
 *.egg-info
 build/
+dist/
 env.sh
 *.pickle
 _build/
