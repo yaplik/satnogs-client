@@ -2,6 +2,10 @@
 from os import environ
 
 GROUND_STATION_ID = int(environ.get('SATNOGS_STATION_ID', None))
+GROUND_STATION_LAT = float(environ.get('SATNOGS_STATION_LAT', None))
+GROUND_STATION_LON = float(environ.get('SATNOGS_STATION_LON', None))
+GROUND_STATION_ELEV = float(environ.get('SATNOGS_STATION_ELEV', None))
+
 SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///jobs.sqlite')
 DEMODULATION_COMMAND = environ.get('SATNOGS_DEMODULATION_COMMAND', 'rtl_fm')
 ENCODING_COMMAND = environ.get('SATNOGS_ENCODING_COMMAND', 'oggenc')
