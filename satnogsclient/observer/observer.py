@@ -86,11 +86,13 @@ class Observer:
         returns True if setup is ok
         returns False if setup had problems
         """
-        checks = [tle == self.tle(tle),
-                  observation_end == self.observation_end(observation_end),
-                  frequency == self.frequency(frequency)]
 
-        return all(checks)
+        # Set attributes
+        self.tle = tle
+        self.observation_end = observation_end
+        self.frequency = frequency
+
+        return all([self.tle, self.observation_end, self.frequency])
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
@@ -103,11 +105,11 @@ class Observer:
 
     def run_rot(self):
         self.tracker_rot = WorkerTrack(time_to_stop=self._observation_end)
-        self.tracker_rot.trackobject(self._location, self._tle)
+        self.tracker_rot.trackobject(self.location, self.tle)
         self.tracker_rot.trackstart()
 
     def run_rig(self):
         self.tracker_freq = WorkerFreq(frequency=self._frequency,
                                        time_to_stop=self._observation_end)
-        self.tracker_freq.trackobject(self._location, self._tle)
+        self.tracker_freq.trackobject(self.location, self.tle)
         self.tracker_freq.trackstart()

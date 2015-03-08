@@ -62,7 +62,7 @@ class Worker:
         """
         self._stay_alive = True
 
-        if not all([self.observer_dict, self.sattelite_dict]):
+        if not all([self.observer_dict, self.satellite_dict]):
             raise ValueError('Satellite or observer dictionary not defined.')
 
         t = threading.Thread(target=self._communicate_tracking_info)

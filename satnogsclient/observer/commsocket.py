@@ -61,7 +61,7 @@ class Commsocket:
         return True
 
     def send(self, message):
-        if not self.connected:
+        if not self.is_connected:
             self.connect()
         self.s.send(message)
         self.s.recv(self._BUFFER_SIZE)
