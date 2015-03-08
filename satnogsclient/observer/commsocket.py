@@ -21,22 +21,28 @@ class Commsocket:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     @property
-    def ip(self, new_ip=None):
-        if new_ip:
-            self._TCP_IP = new_ip
+    def ip(self):
         return self._TCP_IP
 
-    @property
-    def port(self, new_port=None):
-        if new_port:
-            self._TCP_PORT = new_port
-        return self._TCP_PORT
+    @ip.setter
+    def ip(self, new_ip):
+        self._TCP_IP = new_ip
 
     @property
-    def buffer_size(self, new_buffer_size=None):
-        if new_buffer_size:
-            self._BUFFER_SIZE = new_buffer_size
+    def port(self):
+        return self._TCP_PORT
+
+    @port.setter
+    def port(self, new_port):
+        self._TCP_PORT = new_port
+
+    @property
+    def buffer_size(self):
         return self._BUFFER_SIZE
+
+    @buffer_size.setter
+    def buffer_size(self, new_buffer_size):
+        self._BUFFER_SIZE = new_buffer_size
 
     @property
     def is_connected(self):

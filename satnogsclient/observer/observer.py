@@ -17,52 +17,68 @@ class Observer:
     _rig_port = settings.RIG_PORT
 
     @property
+    def location(self):
+        return self._location
+
+    @location.setter
     def location(self, location):
-        if location:
-            self._location = location
-        return location
+        self._location = location
 
     @property
-    def tle(self, tle):
-        if tle:
-            self._tle = tle
+    def tle(self):
         return self._tle
 
+    @tle.setter
+    def tle(self, tle):
+        self._tle = tle
+
     @property
-    def rot_ip(self, ip):
-        if ip:
-            self._rot_ip = ip
+    def rot_ip(self):
         return self._rot_ip
 
+    @rot_ip.setter
+    def rot_ip(self, ip):
+        self._rot_ip = ip
+
     @property
-    def rot_port(self, port):
-        if port:
-            self._rot_port = port
+    def rot_port(self):
         return self._rot_port
 
+    @rot_port.setter
+    def rot_port(self, port):
+        self._rot_port = port
+
     @property
-    def rig_ip(self, ip):
-        if ip:
-            self._rig_ip = ip
+    def rig_ip(self):
         return self._rig_ip
 
+    @rig_ip.setter
+    def rig_ip(self, ip):
+        self._rig_ip = ip
+
     @property
-    def rig_port(self, port):
-        if port:
-            self._rig_port = port
+    def rig_port(self):
         return self._rig_port
 
-    @property
-    def observation_end(self, timestamp):
-        if timestamp:
-            self._observation_end = timestamp
-        return self._observation_end
+    @rig_port.setter
+    def rig_port(self, port):
+        self._rig_port = port
 
     @property
-    def frequency(self, frequency):
-        if frequency:
-            self._frequency = frequency
+    def observation_end(self):
+        return self._observation_end
+
+    @observation_end.setter
+    def observation_end(self, timestamp):
+        self._observation_end = timestamp
+
+    @property
+    def frequency(self):
         return self._frequency
+
+    @frequency.setter
+    def frequency(self, frequency):
+        self._frequency = frequency
 
     def setup(self, tle, observation_end, frequency):
         """
