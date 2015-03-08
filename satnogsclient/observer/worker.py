@@ -4,6 +4,8 @@ import time
 
 from datetime import datetime
 
+import pytz
+
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 
@@ -62,7 +64,7 @@ class Worker:
         """
         self._stay_alive = True
 
-        if not all([self.observer_dict, self.sattelite_dict]):
+        if not all([self.observer_dict, self.satellite_dict]):
             raise ValueError('Satellite or observer dictionary not defined.')
 
         t = threading.Thread(target=self._communicate_tracking_info)
@@ -113,7 +115,7 @@ class Worker:
         self._stay_alive = False
 
     def check_observation_end_reached(self):
-        if datetime.now() > self._observation_end:
+        if datetime.now(pytz.utc) > self._observation_end:
             self.trackstop()
 
 

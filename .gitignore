@@ -3,3 +3,5 @@
 *.sqlite
 *.egg-info
 build/
+env.sh
+*.pickle
