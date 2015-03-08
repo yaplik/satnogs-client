@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from satnogsclient import settings
-from satnogclient.observer.worker import WorkerFreq, WorkerTrack
+from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
 
 
 class Observer:

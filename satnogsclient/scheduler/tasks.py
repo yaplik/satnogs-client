@@ -6,7 +6,7 @@ import requests
 from dateutil import parser
 
 from satnogsclient import settings
-from satnogsclient.observer import Observer
+from satnogsclient.observer.observer import Observer
 from satnogsclient.scheduler import scheduler
 
 
