@@ -19,6 +19,11 @@ def spawn_observation(*args, **kwargs):
         'tle2': obj['tle2']
     }
     end = parser.parse(obj['end'])
+    observer.location = {
+        'lon': settings.GROUND_STATION_LON,
+        'lat': settings.GROUND_STATION_LAT,
+        'elev': settings.GROUND_STATION_ELEV
+    }
     observer.setup(tle=tle, observation_end=end, frequency=obj['frequency'])
     observer.observe()
 
