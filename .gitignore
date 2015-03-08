@@ -5,3 +5,4 @@
 build/
 env.sh
 *.pickle
+_build/
