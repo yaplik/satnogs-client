@@ -6,6 +6,7 @@ from datetime import datetime
 
 import pytz
 
+from satnogsclient import settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 
@@ -14,7 +15,7 @@ class Worker:
     """Class to facilitate as a worker for rotctl/rigctl."""
 
     # socket to connect to
-    _IP = '127.0.0.1'  # default is localhost
+    _IP = None
     _PORT = None
 
     # sleep time of loop
@@ -120,17 +121,20 @@ class Worker:
 
 
 class WorkerTrack(Worker):
+    _IP = settings.ROT_IP
+    _PORT = settings.ROT_PORT
+
     def send_to_socket(self, p, sock):
-        if p['alt'] < 0:
-            self._stay_alive = False
-        else:
-            az = p['az'].conjugate()
-            alt = p['alt'].conjugate()
-            msg = 'P {0} {1}\n'.format(az, alt)
-            sock.send(msg)
+        az = p['az'].conjugate()
+        alt = p['alt'].conjugate()
+        msg = 'P {0} {1}\n'.format(az, alt)
+        sock.send(msg)
 
 
 class WorkerFreq(Worker):
+    _IP = settings.RIG_IP
+    _PORT = settings.RIG_PORT
+
     def send_to_socket(self, p, sock):
         msg = '{0}\n'.format(self._frequency)
         sock.send(msg)

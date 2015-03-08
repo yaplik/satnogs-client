@@ -104,12 +104,16 @@ class Observer:
         self.run_rig()
 
     def run_rot(self):
-        self.tracker_rot = WorkerTrack(time_to_stop=self.observation_end)
+        self.tracker_rot = WorkerTrack(ip=self.rot_ip,
+                                       port=self.rot_port,
+                                       time_to_stop=self.observation_end)
         self.tracker_rot.trackobject(self.location, self.tle)
         self.tracker_rot.trackstart()
 
     def run_rig(self):
-        self.tracker_freq = WorkerFreq(frequency=self._frequency,
+        self.tracker_freq = WorkerFreq(ip=self.rig_ip,
+                                       port=self.rig_port,
+                                       frequency=self.frequency,
                                        time_to_stop=self.observation_end)
         self.tracker_freq.trackobject(self.location, self.tle)
         self.tracker_freq.trackstart()
