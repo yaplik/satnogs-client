@@ -98,7 +98,7 @@ class SignalReceiver():
                 '-C': '1',
                 '-q': '4'
             }
-            args = '--raw-endianess=0 -r '
+            args = ['--raw-endianess=0 -r ']
             args += ['{0} {1}'.format(key, params[key]) for key in params]
         return [settings.DEMODULATION_COMMAND] + args
 
