@@ -37,7 +37,7 @@ class SignalReceiver():
         'SCOPE'
     ]
 
-    def __init__(self, observation_id, frequency, decoding, **kwargs):
+    def __init__(self, observation_id, frequency, decoding=None, **kwargs):
         """ Initialises receiver """
 
         ##  Check input values
@@ -89,11 +89,18 @@ class SignalReceiver():
                 '-s': self.sample_rate,
                 '-M': self.modulation
             }
-
             args = ['{0} {1}'.format(key, params[key]) for key in params]
-
-            return [settings.DEMODULATION_COMMAND] + args
-        raise NotImplementedError
+        else:
+            # oggenc --raw-endianess=0 -R 24k -B 16 -C 1 -r -q 4<br/>
+            params = {
+                '-R': '24k',
+                '-B': '16',
+                '-C': '1',
+                '-q': '4'
+            }
+            args = '--raw-endianess=0 -r '
+            args += ['{0} {1}'.format(key, params[key]) for key in params]
+        return [settings.DEMODULATION_COMMAND] + args
 
     def get_output_path(self):
         """ Provides output path for serialisation of output."""
