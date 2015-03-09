@@ -38,29 +38,37 @@ class SignalReceiver():
     ]
 
     def __init__(self, observation_id, frequency, decoding, **kwargs):
+        """ Initialises receiver """
 
-        # Check input values
+        ##  Check input values
+
+        # we need the observation_id so that it accompanies the serialised output
         if not observation_id:
             raise LookupError('arg not found: observation_id')
+        # frequency is needed to pass to rtl_fm
         if not frequency:
             raise LookupError('arg not found: frequency')
 
+        # decoding can be None (PCM encoding/compression) or any predefined value (multmon-ng decoding)
         if decoding not in self._decoding_values and decoding is not None:
             raise LookupError('arg not found: decoding')
 
+        ## Initialise variables
         self.observation_id = observation_id
         self.frequency = frequency
         self.decoding = kwargs.get('decoding', None)
-        self.ppm_error = kwargs.get('ppm_error', 100)
-        self.demodulator = kwargs.get('demodulator', 'AFSK1200')
-        self.modulation = kwargs.get('modulation', 'fm')
-        self.sample_rate = kwargs.get('sample_rate', 22050)
-        self.aprs = kwargs.get('aprs', True)
+        self.ppm_error = kwargs.get('ppm_error', 100)  # sliding error of receiver. It is normally "about" 100. Part of calibration
+        self.pcm_demodulator = kwargs.get('demodulator', 'AFSK1200')  # demodulation of pcm in order to get decoded
+        self.modulation = kwargs.get('modulation', 'fm')  # mode of received signal
+        self.sample_rate = kwargs.get('sample_rate', 22050)  # sample rate of wav file produced by rtl_fm
+        self.aprs = kwargs.get('aprs', True)  # APRS: final decoding format (only available
+        ## NOTE: if aprs is True, multimon-ng sets pcm_demodulator to 'AFSK1200' automagically
 
     def get_decoding_cmd(self):
+        """ Provides decoding command."""
         params = {
-            '-t': 'raw',
-            '-a': self.demodulator,
+            '-t': 'raw',  # always raw
+            '-a': self.pcm_demodulator,
         }
 
         args = ['{0}{1}'.format(key, params[key]) for key in params]
@@ -73,6 +81,7 @@ class SignalReceiver():
         return [settings.DECODING_COMMAND] + args
 
     def get_demodulation_cmd(self):
+        """ Provides decoding command."""
         if self.decoding:
             params = {
                 '-f': self.frequency,
@@ -87,11 +96,13 @@ class SignalReceiver():
         raise NotImplementedError
 
     def get_output_path(self):
-        timestamp = datetime.now().isoformat()
-        filename = '{0}_{1}.out'.format(self.observation_id, timestamp)
+        """ Provides output path for serialisation of output."""
+        timestamp = datetime.utcnow().isoformat()
+        filename = 'satnogs_{0}_{1}.out'.format(self.observation_id, timestamp)
         return os.path.join(settings.OUTPUT_PATH, filename)
 
     def run(self):
+        """ Runs the receiver. Orchestrates data piping between precompiled utilities. """
         self.pipe = os.pipe()
         self.output = open(self.get_output_path(), 'w')
 
@@ -102,6 +113,7 @@ class SignalReceiver():
         self.producer.wait()
 
     def stop(self):
+        """ Stops the receiver pipelines."""
         self.consumer.kill()
         self.producer.kill()
         self.output.close()
