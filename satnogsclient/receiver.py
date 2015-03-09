@@ -66,46 +66,49 @@ class SignalReceiver():
 
     def get_decoding_cmd(self):
         """ Provides decoding command."""
-        params = {
-            '-t': 'raw',  # always raw
-            '-a': self.pcm_demodulator,
-        }
-
-        args = ['{0}{1}'.format(key, params[key]) for key in params]
-
-        if self.aprs:
-            args.append('-A')
-
-        args.append('-')
-
-        return [settings.DECODING_COMMAND] + args
-
-    def get_demodulation_cmd(self):
-        """ Provides decoding command."""
         if self.decoding:
             params = {
-                '-f': self.frequency,
-                '-p': self.ppm_error,
-                '-s': self.sample_rate,
-                '-M': self.modulation
+                '-t': 'raw',  # always raw
+                '-a': self.pcm_demodulator,
             }
-            args = ['{0} {1}'.format(key, params[key]) for key in params]
+
+            args = ['{0}{1}'.format(key, params[key]) for key in params]
+
+            if self.aprs:
+                args.append('-A')
+
+            args.append('-')
+            ret = [settings.ENCODING_COMMAND] + args
         else:
-            # oggenc --raw-endianess=0 -R 24k -B 16 -C 1 -r -q 4<br/>
+            # oggenc --raw-endianess=0 -R 24k -B 16 -C 1 -r -q 4
             params = {
-                '-R': '24k',
+                '-R': '24000',
                 '-B': '16',
                 '-C': '1',
                 '-q': '4'
             }
-            args = ['--raw-endianess=0 -r ']
+            args = ['--raw-endianness=0', '-r']
             args += ['{0} {1}'.format(key, params[key]) for key in params]
+            args += ['-']
+            ret = [settings.ENCODING_COMMAND] + args
+        return ret
+
+    def get_demodulation_cmd(self):
+        """ Provides decoding command."""
+        params = {
+            '-f': self.frequency,
+            '-p': self.ppm_error,
+            '-s': self.sample_rate,
+            '-M': self.modulation
+        }
+        args = ['{0} {1}'.format(key, params[key]) for key in params]
         return [settings.DEMODULATION_COMMAND] + args
 
     def get_output_path(self):
         """ Provides output path for serialisation of output."""
         timestamp = datetime.utcnow().isoformat()
-        filename = 'satnogs_{0}_{1}.out'.format(self.observation_id, timestamp)
+        file_extension = 'ogg' if self.decoding else 'out'
+        filename = 'satnogs_{0}_{1}.{2}'.format(self.observation_id, timestamp, file_extension)
         return os.path.join(settings.OUTPUT_PATH, filename)
 
     def run(self):

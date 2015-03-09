@@ -67,7 +67,7 @@ class Observer:
     def observation_id(self):
         return self._observation_id
 
-    @tle.setter
+    @observation_id.setter
     def observation_id(self, observation_id):
         self._observation_id = observation_id
 
