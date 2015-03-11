@@ -1,0 +1,41 @@
+import argparse
+import sys
+import time
+
+from datetime import datetime, timedelta
+
+import pytz
+
+from satnogsclient.scheduler.tasks import spawn_observation
+
+
+description = 'Manually trigger observation task.'
+
+parser = argparse.ArgumentParser(description=description)
+parser.add_argument('tle0', type=str, help='First tle line')
+parser.add_argument('tle1', type=str, help='Second tle line')
+parser.add_argument('tle2', type=str, help='Third tle line')
+parser.add_argument('sec', type=int, help='Task duration')
+parser.add_argument('freq', type=float, help='Observation frequency')
+
+args = parser.parse_args()
+
+end = datetime.now(pytz.utc) + timedelta(seconds=args.sec)
+
+kwargs = {
+    'obj': {
+        'tle0': args.tle0,
+        'tle1': args.tle1,
+        'tle2': args.tle2,
+        'end': end.strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+        'frequency': args.freq
+    }
+}
+
+spawn_observation(**kwargs)
+
+while True:
+    if not datetime.now(pytz.utc) > end:
+        time.sleep(1)
+    else:
+        sys.exit()
