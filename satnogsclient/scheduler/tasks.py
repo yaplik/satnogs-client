@@ -24,7 +24,7 @@ def spawn_observation(*args, **kwargs):
         'lat': settings.GROUND_STATION_LAT,
         'elev': settings.GROUND_STATION_ELEV
     }
-    observer.setup(tle=tle, observation_end=end, frequency=obj['frequency'])
+    observer.setup(observation_id=obj['id'], tle=tle, observation_end=end, frequency=obj['frequency'])
     observer.observe()
 
 

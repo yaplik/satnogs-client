@@ -5,16 +5,21 @@ from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
 
 class Observer:
 
-    _location = None
+    _observation_id = None
     _tle = None
     _observation_end = None
     _frequency = None
+
+    _location = None
 
     _rot_ip = settings.ROT_IP
     _rot_port = settings.ROT_PORT
 
     _rig_ip = settings.RIG_IP
     _rig_port = settings.RIG_PORT
+
+    ## Variables from settings
+    ## Mainly present so we can support multiple ground stations from the client
 
     @property
     def location(self):
@@ -23,14 +28,6 @@ class Observer:
     @location.setter
     def location(self, location):
         self._location = location
-
-    @property
-    def tle(self):
-        return self._tle
-
-    @tle.setter
-    def tle(self, tle):
-        self._tle = tle
 
     @property
     def rot_ip(self):
@@ -64,6 +61,24 @@ class Observer:
     def rig_port(self, port):
         self._rig_port = port
 
+    ## Passed variables
+
+    @property
+    def observation_id(self):
+        return self._observation_id
+
+    @observation_id.setter
+    def observation_id(self, observation_id):
+        self._observation_id = observation_id
+
+    @property
+    def tle(self):
+        return self._tle
+
+    @tle.setter
+    def tle(self, tle):
+        self._tle = tle
+
     @property
     def observation_end(self):
         return self._observation_end
@@ -80,7 +95,7 @@ class Observer:
     def frequency(self, frequency):
         self._frequency = frequency
 
-    def setup(self, tle, observation_end, frequency):
+    def setup(self, observation_id, tle, observation_end, frequency):
         """
         Sets up required internal variables.
         returns True if setup is ok
@@ -88,14 +103,16 @@ class Observer:
         """
 
         # Set attributes
+        self.observation_id = observation_id
         self.tle = tle
         self.observation_end = observation_end
         self.frequency = frequency
 
-        return all([self.tle, self.observation_end, self.frequency])
+        return all([self.observation_id, self.tle, self.observation_end, self.frequency])
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
+        # Instantiate receiver
 
         # start thread for rotctl
         self.run_rot()
