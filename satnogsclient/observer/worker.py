@@ -136,5 +136,5 @@ class WorkerFreq(Worker):
     _PORT = settings.RIG_PORT
 
     def send_to_socket(self, p, sock):
-        msg = '{0}\n'.format(self._frequency)
+        msg = 'F{0}\n'.format(self._frequency)
         sock.send(msg)

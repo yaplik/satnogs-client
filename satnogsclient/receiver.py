@@ -119,13 +119,10 @@ class SignalReceiver():
         self.consumer = Popen(self.get_decoding_cmd(), stdin=self.pipe[0], stdout=self.output)
         self.producer = Popen(self.get_demodulation_cmd(), stdout=self.pipe[1])
 
-        self.consumer.wait()
-        self.producer.wait()
-
     def stop(self):
         """ Stops the receiver pipelines."""
-        self.consumer.kill()
         self.producer.kill()
+        self.consumer.kill()
         self.output.close()
-        self.pipe[0].close()
-        self.pipe[1].close()
+        os.close(self.pipe[0])
+        os.close(self.pipe[1])
