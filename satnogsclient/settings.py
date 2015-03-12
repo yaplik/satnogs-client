@@ -27,7 +27,7 @@ if not os.path.exists(OUTPUT_PATH):
     os.makedirs(COMPLETE_OUTPUT_PATH)
     os.makedirs(INCOMPLETE_OUTPUT_PATH)
 
-VERIFY_SSL = strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True'))
+VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
 DEFAULT_SQLITE_PATH = path.join(OUTPUT_PATH, 'jobs.sqlite')
 SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQLITE_PATH)
 DEMODULATION_COMMAND = environ.get('SATNOGS_DEMODULATION_COMMAND', 'rtl_fm')
@@ -57,7 +57,7 @@ DEFAULT_LOGGING = {
     'loggers': {
         'satnogsclient': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'apscheduler.executors.default': {
             'handlers': ['console'],
