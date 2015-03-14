@@ -18,8 +18,8 @@ class Observer:
     _rig_ip = settings.RIG_IP
     _rig_port = settings.RIG_PORT
 
-    ## Variables from settings
-    ## Mainly present so we can support multiple ground stations from the client
+    # Variables from settings
+    # Mainly present so we can support multiple ground stations from the client
 
     @property
     def location(self):
@@ -61,7 +61,7 @@ class Observer:
     def rig_port(self, port):
         self._rig_port = port
 
-    ## Passed variables
+    # Passed variables
 
     @property
     def observation_id(self):
