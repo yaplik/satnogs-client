@@ -1,9 +1,12 @@
 from setuptools import find_packages, setup
 
 
-setup(name='SatNOGS client',
+setup(name='satnogsclient',
       packages=find_packages(),
-      version='0.1',
+      version='0.2',
+      author='SatNOGS team',
+      author_email='client-dev@satnogs.org',
+      url='https://github.com/satnogs/satnogs-client/',
       description='SatNOGS Client',
       install_requires=['APScheduler',
                         'SQLAlchemy',
