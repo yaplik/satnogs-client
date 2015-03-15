@@ -6,7 +6,6 @@ from datetime import datetime
 
 import pytz
 
-from satnogsclient import settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 
@@ -14,12 +13,8 @@ from satnogsclient.observer.orbital import pinpoint
 class Worker:
     """Class to facilitate as a worker for rotctl/rigctl."""
 
-    # socket to connect to
-    _IP = None
-    _PORT = None
-
-    # sleep time of loop
-    SLEEP_TIME = 0.1  # in seconds
+    # sleep time of loop (in seconds)
+    SLEEP_TIME = 0.1
 
     # loop flag
     _stay_alive = False
@@ -36,24 +31,31 @@ class Worker:
     observer_dict = {}
     satellite_dict = {}
 
-    def __init__(self, ip=None, port=None, frequency=None, time_to_stop=None):
-        if ip:
-            self._IP = ip
-        if port:
-            self._PORT = port
+    def __init__(self, ip, port, time_to_stop=None, frequency=None, debug=None):
+        """Initialize worker class."""
+        self._IP = ip
+        self._PORT = port
         if frequency:
             self._frequency = frequency
         if time_to_stop:
             self._observation_end = time_to_stop
+        if debug:
+            self._debugmode = debug
 
-    def isalive(self):
+    @property
+    def is_alive(self):
         """Returns if tracking loop is alive or not."""
         return self._stay_alive
+
+    @is_alive.setter
+    def is_alive(self, value):
+        """Sets value if tracking loop is alive or not."""
+        self._stay_alive = value
 
     def trackobject(self, observer_dict, satellite_dict):
         """
         Sets tracking object.
-        Can also be called while tracking, to manipulate observation.
+        Can also be called while tracking to manipulate observation.
         """
         self.observer_dict = observer_dict
         self.satellite_dict = satellite_dict
@@ -63,20 +65,20 @@ class Worker:
         Starts the thread that communicates tracking info to remote socket.
         Stops by calling trackstop()
         """
-        self._stay_alive = True
+        self.is_alive = True
 
         if not all([self.observer_dict, self.satellite_dict]):
             raise ValueError('Satellite or observer dictionary not defined.')
 
-        t = threading.Thread(target=self._communicate_tracking_info)
-        t.daemon = True
-        t.start()
+        self.t = threading.Thread(target=self._communicate_tracking_info)
+        self.t.daemon = True
+        self.t.start()
 
-        return True
+        return self.is_alive
 
     def send_to_socket(self):
-        # Need to be implemented in freq/track workers implicitly
-        pass
+        # Needs to be implemented in freq/track workers implicitly
+        raise NotImplementedError
 
     def _communicate_tracking_info(self):
         """
@@ -85,20 +87,20 @@ class Worker:
         Will exit when observation_end timestamp is reached.
         """
         if self._debugmode:
-            print(('alive:', self._stay_alive))
+            print(('alive:', self.is_alive))
         else:
-            sock = Commsocket()
-            sock.connect(self._IP, self._PORT)  # change to correct address
+            sock = Commsocket(self._IP, self._PORT)
+            sock.connect()
 
         # track satellite
-        while self._stay_alive:
+        while self.is_alive:
 
             # check if we need to exit
             self.check_observation_end_reached()
 
             if self._debugmode:
-                print(('Tracking', self.satellite_dict['tle0']))
-                print('from', self.observer_dict['elev'])
+                print('Tracking', self.satellite_dict)
+                print('From', self.observer_dict)
             else:
                 p = pinpoint(self.observer_dict, self.satellite_dict)
                 if p['ok']:
@@ -111,9 +113,11 @@ class Worker:
             sock.disconnect()
 
     def trackstop(self):
-        """ Sets object flag to false and stops the tracking thread.
         """
-        self._stay_alive = False
+        Sets object flag to false and stops the tracking thread.
+        """
+        self.is_alive = False
+        self.t.join()
 
     def check_observation_end_reached(self):
         if datetime.now(pytz.utc) > self._observation_end:
@@ -121,9 +125,6 @@ class Worker:
 
 
 class WorkerTrack(Worker):
-    _IP = settings.ROT_IP
-    _PORT = settings.ROT_PORT
-
     def send_to_socket(self, p, sock):
         az = p['az'].conjugate()
         alt = p['alt'].conjugate()
@@ -132,9 +133,6 @@ class WorkerTrack(Worker):
 
 
 class WorkerFreq(Worker):
-    _IP = settings.RIG_IP
-    _PORT = settings.RIG_PORT
-
     def send_to_socket(self, p, sock):
         msg = 'F{0}\n'.format(self._frequency)
         sock.send(msg)

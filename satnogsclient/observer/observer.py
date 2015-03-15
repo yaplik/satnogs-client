@@ -98,8 +98,8 @@ class Observer:
     def setup(self, observation_id, tle, observation_end, frequency):
         """
         Sets up required internal variables.
-        returns True if setup is ok
-        returns False if setup had problems
+        * returns True if setup is ok
+        * returns False if issue is encountered
         """
 
         # Set attributes
@@ -112,8 +112,6 @@ class Observer:
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
-        # Instantiate receiver
-
         # start thread for rotctl
         self.run_rot()
 
