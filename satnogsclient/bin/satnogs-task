@@ -22,7 +22,7 @@ parser.add_argument('freq', type=float, help='Observation frequency')
 args = parser.parse_args()
 
 end = datetime.now(pytz.utc) + timedelta(seconds=args.sec)
-job_id = 0  # Dummy vaule for manually triggered jobs
+job_id = 1  # Dummy value for manually triggered jobs, 0 will fail in receiver so 1
 
 kwargs = {
     'obj': {

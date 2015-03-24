@@ -22,5 +22,5 @@ if not environ.get('READTHEDOCS', False):
     if not GROUND_STATION_LON:
         raise Exception('GROUND_STATION_LON not configured')
 
-    if not GROUND_STATION_ELEV:
+    if GROUND_STATION_ELEV is None:
         raise Exception('GROUND_STATION_ELEV not configured')

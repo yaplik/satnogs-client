@@ -7,3 +7,4 @@ dist/
 env.sh
 *.pickle
 _build/
+.idea/
