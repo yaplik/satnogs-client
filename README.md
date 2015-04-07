@@ -6,4 +6,4 @@ LICENSE: [MPL-2.0](LICENSE)
     python setup.py install
 
 # Documentation
-You can find more information in our [documentation](http://satnogs-client.readthedocs.org/en/latest/)
+You can find more information in our [documentation](https://satnogs.readthedocs.org/client/index.html)
