@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
+import sys
+import time
+from datetime import datetime, timedelta
+from dateutil import parser
 from urlparse import urljoin
 
+import pytz
 import requests
-
-from dateutil import parser
 
 from satnogsclient import settings
 from satnogsclient.observer.observer import Observer
+from satnogsclient.receiver import SignalReceiver
 from satnogsclient.scheduler import scheduler
 
 
-def spawn_observation(*args, **kwargs):
+def spawn_observer(*args, **kwargs):
     obj = kwargs.pop('obj')
     tle = {
         'tle0': obj['tle0'],
@@ -41,6 +45,20 @@ def spawn_observation(*args, **kwargs):
         raise RuntimeError('Error in observer setup.')
 
 
+def spawn_receiver(*args, **kwargs):
+    obj = kwargs.pop('obj')
+    receiver = SignalReceiver(obj['id'], obj['frequency'])
+    receiver.run()
+    end = parser.parse(obj['end'])
+
+    while True:
+        if datetime.now(pytz.utc) < end:
+            time.sleep(1)
+        else:
+            receiver.stop()
+            sys.exit()
+
+
 def get_jobs():
     """Query SatNOGS Network API to GET jobs."""
     url = urljoin(settings.NETWORK_API_URL, 'jobs')
@@ -51,11 +69,21 @@ def get_jobs():
         raise Exception('Status code: {0} on request: {1}'.format(response.status_code, url))
 
     for job in scheduler.get_jobs():
-        if job.name == spawn_observation.__name__:
+        if job.name in [spawn_observer.__name__, spawn_receiver.__name__]:
             job.remove()
 
     for obj in response.json():
         start = parser.parse(obj['start'])
         job_id = str(obj['id'])
         kwargs = {'obj': obj}
-        scheduler.add_job(spawn_observation, 'date', run_date=start, id=job_id, kwargs=kwargs)
+        receiver_start = start - timedelta(seconds=settings.DEMODULATOR_INIT_TIME)
+        scheduler.add_job(spawn_observer,
+                          'date',
+                          run_date=start,
+                          id='observer_{0}'.format(job_id),
+                          kwargs=kwargs)
+        scheduler.add_job(spawn_receiver,
+                          'date',
+                          run_date=receiver_start,
+                          id='receiver_{0}'.format(job_id),
+                          kwargs=kwargs)
