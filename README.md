@@ -1,9 +1,13 @@
 # SatNOGS Client
-LICENSE: [MPL-2.0](LICENSE)
 
-# Installation
-    python setup.py build
-    python setup.py install
+Ground Station Client software
 
-# Documentation
-You can find more information in our [documentation](https://satnogs.readthedocs.org/client/index.html)
+## Install and Contribute
+
+See the [documentation](http://docs.satnogs.org/client/).
+
+## License
+
+&copy; 2014-2015 [Libre Space Foundation](http://librespacefoundation.org).
+
+Licensed under the [AGPLv3](LICENSE).
