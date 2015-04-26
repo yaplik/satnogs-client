@@ -7,17 +7,13 @@ class Commsocket:
     Handles connectivity with remote ctl demons
     Namely: rotctl and rigctl
     """
-    _TCP_IP = '127.0.0.1'
-    _TCP_PORT = 5005
-    _BUFFER_SIZE = 2048
 
+    _BUFFER_SIZE = 2048
     _connected = False
 
-    def __init__(self, ip=None, port=None):
-        if not ip:
-            self.TCP_IP = ip
-        if not port:
-            self.TCP_PORT = port
+    def __init__(self, ip, port):
+        self._TCP_IP = ip
+        self._TCP_PORT = port
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     @property
@@ -48,17 +44,13 @@ class Commsocket:
     def is_connected(self):
         return self._connected
 
-    def connect(self, ip=None, port=None):
-        if not ip:
-            ip = self._TCP_IP
-        if not port:
-            port = self._TCP_PORT
+    def connect(self):
         try:
-            self.s.connect((ip, port))
+            self.s.connect((self.ip, self.port))
             self._connected = True
         except:
-            return False
-        return True
+            self._connected = False
+        return self.is_connected
 
     def send(self, message):
         if not self.is_connected:

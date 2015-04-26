@@ -12,20 +12,33 @@ from satnogsclient.scheduler import scheduler
 
 def spawn_observation(*args, **kwargs):
     obj = kwargs.pop('obj')
-    observer = Observer()
     tle = {
         'tle0': obj['tle0'],
         'tle1': obj['tle1'],
         'tle2': obj['tle2']
     }
     end = parser.parse(obj['end'])
+
+    observer = Observer()
     observer.location = {
         'lon': settings.GROUND_STATION_LON,
         'lat': settings.GROUND_STATION_LAT,
         'elev': settings.GROUND_STATION_ELEV
     }
-    observer.setup(observation_id=obj['id'], tle=tle, observation_end=end, frequency=obj['frequency'])
-    observer.observe()
+
+    setup_kwargs = {
+        'observation_id': obj['id'],
+        'tle': tle,
+        'observation_end': end,
+        'frequency': obj['frequency']
+    }
+
+    setup = observer.setup(**setup_kwargs)
+
+    if setup:
+        observer.observe()
+    else:
+        raise RuntimeError('Error in observer setup.')
 
 
 def get_jobs():
