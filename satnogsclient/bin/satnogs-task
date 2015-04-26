@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import pytz
 
 from satnogsclient.receiver import SignalReceiver
-from satnogsclient.scheduler.tasks import spawn_observation
+from satnogsclient.scheduler.tasks import spawn_observer
 
 
 description = 'Manually trigger observation task.'
@@ -41,7 +41,7 @@ receiver.run()
 # Wait until receiver stack gets initialized
 time.sleep(5)
 
-spawn_observation(**kwargs)
+spawn_observer(**kwargs)
 
 while True:
     if datetime.now(pytz.utc) < end:
