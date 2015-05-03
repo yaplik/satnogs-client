@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import math
 import threading
 import time
 
@@ -126,8 +127,10 @@ class Worker:
 
 class WorkerTrack(Worker):
     def send_to_socket(self, p, sock):
-        az = p['az'].conjugate()
-        alt = p['alt'].conjugate()
+        # Read az/alt and convert to radians
+        az = p['az'].conjugate() * 180 / math.pi
+        alt = p['alt'].conjugate() * 180 / math.pi
+
         msg = 'P {0} {1}\n'.format(az, alt)
         sock.send(msg)
 
