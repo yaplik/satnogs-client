@@ -107,7 +107,7 @@ class SignalReceiver():
 
     def get_output_path(self):
         """Provides path to observation output file."""
-        timestamp = datetime.utcnow().isoformat()
+        timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S-%f%z')
         file_extension = 'ogg' if self.decoding else 'out'
         filename = 'satnogs_{0}_{1}.{2}'.format(self.observation_id, timestamp, file_extension)
         return os.path.join(settings.OUTPUT_PATH, filename)
