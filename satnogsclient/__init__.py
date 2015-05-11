@@ -3,7 +3,7 @@ from os import environ
 from validators.url import url
 
 from satnogsclient.settings import (NETWORK_API_URL, GROUND_STATION_ID, GROUND_STATION_LAT,
-                                    GROUND_STATION_LON, GROUND_STATION_ELEV)
+                                    GROUND_STATION_LON, GROUND_STATION_ELEV, API_TOKEN)
 
 
 # Avoid validation when building docs
@@ -24,3 +24,6 @@ if not environ.get('READTHEDOCS', False):
 
     if GROUND_STATION_ELEV is None:
         raise Exception('GROUND_STATION_ELEV not configured')
+
+    if not API_TOKEN:
+        raise Exception('API_TOKEN not configured')

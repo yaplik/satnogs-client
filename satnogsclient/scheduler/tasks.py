@@ -64,7 +64,8 @@ def get_jobs():
 
     url = urljoin(settings.NETWORK_API_URL, 'jobs')
     params = {'ground_station': settings.GROUND_STATION_ID}
-    response = requests.get(url, params=params, verify=settings.VERIFY_SSL)
+    headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
+    response = requests.get(url, params=params, headers=headers, verify=settings.VERIFY_SSL)
 
     if not response.status_code == 200:
         raise Exception('Status code: {0} on request: {1}'.format(response.status_code, url))
