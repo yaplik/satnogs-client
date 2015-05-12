@@ -1,13 +1,13 @@
 import time
 
-from satnogsclient import settings
+from satnogsclient.settings import NETWORK_API_QUERY_INTERVAL, NETWORK_API_POST_INTERVAL
 from satnogsclient.scheduler import scheduler
-from satnogsclient.scheduler.tasks import get_jobs
+from satnogsclient.scheduler.tasks import get_jobs, post_data
 
 
 if __name__ == '__main__':
-    minutes = settings.NETWORK_API_QUERY_INTERVAL
-    scheduler.add_job(get_jobs, 'interval', minutes=minutes)
+    scheduler.add_job(get_jobs, 'interval', minutes=NETWORK_API_QUERY_INTERVAL)
+    scheduler.add_job(post_data, 'interval', minutes=NETWORK_API_POST_INTERVAL)
     scheduler.start()
 
     try:
