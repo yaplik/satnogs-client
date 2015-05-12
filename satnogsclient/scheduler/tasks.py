@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import sys
 import time
 from datetime import datetime, timedelta
@@ -57,6 +58,23 @@ def spawn_receiver(*args, **kwargs):
         else:
             receiver.stop()
             sys.exit()
+
+
+def post_data():
+    """PUT observation data back to Network API."""
+    base_url = urljoin(settings.NETWORK_API_URL, 'data/')
+    headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
+    for root, dirs, files in os.walk(settings.OUTPUT_PATH):
+        for f in files:
+            observation_id = f.split('_')[1]
+            observation = {'payload': open(f, 'rb')}
+            url = urljoin(base_url, observation_id)
+            response = requests.put(url, headers=headers, files=observation)
+            if response.status_code == 200:
+                dst = os.path.join(settings.COMPLETE_OUTPUT_PATH, f)
+            else:
+                dst = os.path.join(settings.INCOMPLETE_OUTPUT_PATH, f)
+            os.rename(f, dst)
 
 
 def get_jobs():
