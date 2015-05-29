@@ -118,7 +118,6 @@ class Worker:
         Sets object flag to false and stops the tracking thread.
         """
         self.is_alive = False
-        self.t.join()
 
     def check_observation_end_reached(self):
         if datetime.now(pytz.utc) > self._observation_end:
