@@ -136,5 +136,5 @@ class WorkerTrack(Worker):
 
 class WorkerFreq(Worker):
     def send_to_socket(self, p, sock):
-        msg = 'F{0}\n'.format(self._frequency)
+        msg = 'F {0}\n'.format(self._frequency)
         sock.send(msg)
