@@ -67,9 +67,10 @@ def post_data():
     for root, dirs, files in os.walk(settings.OUTPUT_PATH):
         for f in files:
             observation_id = f.split('_')[1]
-            observation = {'payload': open(f, 'rb')}
+            file_path = os.path.join(*[settings.OUTPUT_PATH, f])
+            observation = {'payload': open(file_path, 'rb')}
             url = urljoin(base_url, observation_id)
-            response = requests.put(url, headers=headers, files=observation)
+            response = requests.put(url, headers=headers, files=observation, verify=settings.VERIFY_SSL)
             if response.status_code == 200:
                 dst = os.path.join(settings.COMPLETE_OUTPUT_PATH, f)
             else:
@@ -80,7 +81,7 @@ def post_data():
 def get_jobs():
     """Query SatNOGS Network API to GET jobs."""
 
-    url = urljoin(settings.NETWORK_API_URL, 'jobs')
+    url = urljoin(settings.NETWORK_API_URL, 'jobs/')
     params = {'ground_station': settings.GROUND_STATION_ID}
     headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
     response = requests.get(url, params=params, headers=headers, verify=settings.VERIFY_SSL)
