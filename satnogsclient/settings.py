@@ -24,6 +24,8 @@ INCOMPLETE_OUTPUT_PATH = environ.get('SATNOGS_INCOMPLETE_PATH', '/tmp/.satnogs/i
 
 if not os.path.exists(OUTPUT_PATH):
     os.makedirs(OUTPUT_PATH)
+    os.makedirs(COMPLETE_OUTPUT_PATH)
+    os.makedirs(INCOMPLETE_OUTPUT_PATH)
 
 VERIFY_SSL = strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True'))
 DEFAULT_SQLITE_PATH = path.join(OUTPUT_PATH, 'jobs.sqlite')
