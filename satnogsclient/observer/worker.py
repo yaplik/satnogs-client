@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 import math
 import threading
 import time
@@ -9,6 +10,9 @@ import pytz
 
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
+
+
+logger = logging.getLogger('satnogsclient')
 
 
 class Worker:
@@ -62,7 +66,7 @@ class Worker:
         Stops by calling trackstop()
         """
         self.is_alive = True
-
+        logger.info('Tracking initiated')
         if not all([self.observer_dict, self.satellite_dict]):
             raise ValueError('Satellite or observer dictionary not defined.')
 
@@ -102,6 +106,7 @@ class Worker:
         """
         Sets object flag to false and stops the tracking thread.
         """
+        logger.info('Tracking stopped.')
         self.is_alive = False
 
     def check_observation_end_reached(self):
@@ -116,10 +121,12 @@ class WorkerTrack(Worker):
         alt = p['alt'].conjugate() * 180 / math.pi
 
         msg = 'P {0} {1}\n'.format(az, alt)
+        logger.debug('Rotctld msg: {0}'.format(msg))
         sock.send(msg)
 
 
 class WorkerFreq(Worker):
     def send_to_socket(self, p, sock):
         msg = 'F {0}\n'.format(self._frequency)
+        logger.debug('Rigctld msg: {0}'.format(msg))
         sock.send(msg)

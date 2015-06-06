@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+import logging
 import os
 
 from datetime import datetime
 from subprocess import Popen
 
 import settings
+
+
+logger = logging.getLogger('satnogsclient')
 
 
 class SignalReceiver():
@@ -114,6 +118,7 @@ class SignalReceiver():
 
     def run(self):
         """Runs the receiver. Orchestrates data piping between precompiled utilities."""
+        logger.info('Initiate receiver')
         self.pipe = os.pipe()
         self.output = open(self.get_output_path(), 'w')
 
@@ -122,6 +127,7 @@ class SignalReceiver():
 
     def stop(self):
         """Stops the receiver pipelines."""
+        logger.info('Stop receiver')
         self.producer.kill()
         self.consumer.kill()
         self.output.close()

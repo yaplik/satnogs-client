@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from satnogsclient import settings
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
+
+
+logger = logging.getLogger('satnogsclient')
 
 
 class Observer:
@@ -113,15 +118,19 @@ class Observer:
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
         # start thread for rotctl
+        logger.info('Start rotctrl thread.')
         self.run_rot()
 
         # start thread for rigctl
+        logger.info('Start rigctrl thread.')
         self.run_rig()
 
     def run_rot(self):
         self.tracker_rot = WorkerTrack(ip=self.rot_ip,
                                        port=self.rot_port,
                                        time_to_stop=self.observation_end)
+        logger.debug('TLE: {0}'.format(self.tle))
+        logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_rot.trackobject(self.location, self.tle)
         self.tracker_rot.trackstart()
 
@@ -130,5 +139,7 @@ class Observer:
                                        port=self.rig_port,
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end)
+        logger.debug('Frequency {0}'.format(self.frequency))
+        logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_freq.trackobject(self.location, self.tle)
         self.tracker_freq.trackstart()

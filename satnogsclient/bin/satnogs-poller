@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 import time
 
 from satnogsclient.settings import (SCHEDULER_SLEEP_TIME, NETWORK_API_QUERY_INTERVAL,
@@ -7,13 +8,25 @@ from satnogsclient.scheduler import scheduler
 from satnogsclient.scheduler.tasks import get_jobs, post_data
 
 
+logger = logging.getLogger('satnogsclient')
+
+
 if __name__ == '__main__':
-    scheduler.add_job(get_jobs, 'interval', minutes=NETWORK_API_QUERY_INTERVAL)
-    scheduler.add_job(post_data, 'interval', minutes=NETWORK_API_POST_INTERVAL)
+    interval = NETWORK_API_QUERY_INTERVAL
+    msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
+    logger.info(msg)
+    scheduler.add_job(get_jobs, 'interval', minutes=interval)
+
+    interval = NETWORK_API_POST_INTERVAL
+    msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
+    logger.info(msg)
+    scheduler.add_job(post_data, 'interval', minutes=interval)
+
+    logger.info('Starting scheduler...')
     scheduler.start()
 
     try:
-        print('Press Ctrl+C to exit SatNOGS poller')
+        logger.info('Press Ctrl+C to exit SatNOGS poller')
         while True:
             time.sleep(SCHEDULER_SLEEP_TIME)
     except (KeyboardInterrupt, SystemExit):

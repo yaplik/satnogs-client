@@ -58,6 +58,10 @@ DEFAULT_LOGGING = {
         'satnogsclient': {
             'handlers': ['console'],
             'level': 'INFO',
+        },
+        'apscheduler.executors.default': {
+            'handlers': ['console'],
+            'level': 'INFO',
         }
     },
     'formatters': {
