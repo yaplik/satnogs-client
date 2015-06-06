@@ -10,12 +10,14 @@ def _cast_or_none(func, value):
     except:
         return None
 
+# Ground station information
 API_TOKEN = environ.get('SATNOGS_API_TOKEN', None)
 GROUND_STATION_ID = _cast_or_none(int, environ.get('SATNOGS_STATION_ID', None))
 GROUND_STATION_LAT = _cast_or_none(float, environ.get('SATNOGS_STATION_LAT', None))
 GROUND_STATION_LON = _cast_or_none(float, environ.get('SATNOGS_STATION_LON', None))
 GROUND_STATION_ELEV = _cast_or_none(float, environ.get('SATNOGS_STATION_ELEV', None))
 
+# Output paths
 OUTPUT_PATH = environ.get('SATNOGS_OUTPUT_PATH', '/tmp/.satnogs')
 COMPLETE_OUTPUT_PATH = environ.get('SATNOGS_COMPLETE_PATH', '/tmp/.satnogs/complete')
 INCOMPLETE_OUTPUT_PATH = environ.get('SATNOGS_INCOMPLETE_PATH', '/tmp/.satnogs/incomplete')
@@ -40,3 +42,25 @@ ROT_IP = environ.get('SATNOGS_ROT_IP', '127.0.0.1')
 ROT_PORT = int(environ.get('SATNOGS_ROT_PORT', 4533))
 RIG_IP = environ.get('SATNOGS_RIG_IP', '127.0.0.1')
 RIG_PORT = int(environ.get('SATNOGS_RIG_PORT', 4532))
+
+# Logging configuration
+DEFAULT_LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'clientFormatter'
+        }
+    },
+    'loggers': {
+        'satnogsclient': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
+    },
+    'formatters': {
+        'clientFormatter': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        }
+    }
+}

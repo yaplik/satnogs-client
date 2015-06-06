@@ -20,9 +20,6 @@ class Worker:
     # loop flag
     _stay_alive = False
 
-    # debug flag
-    _debugmode = False
-
     # end when this timestamp is reached
     _observation_end = None
 
@@ -32,7 +29,7 @@ class Worker:
     observer_dict = {}
     satellite_dict = {}
 
-    def __init__(self, ip, port, time_to_stop=None, frequency=None, debug=None):
+    def __init__(self, ip, port, time_to_stop=None, frequency=None):
         """Initialize worker class."""
         self._IP = ip
         self._PORT = port
@@ -40,8 +37,6 @@ class Worker:
             self._frequency = frequency
         if time_to_stop:
             self._observation_end = time_to_stop
-        if debug:
-            self._debugmode = debug
 
     @property
     def is_alive(self):
@@ -87,11 +82,8 @@ class Worker:
         Uses observer and satellite objects set by trackobject().
         Will exit when observation_end timestamp is reached.
         """
-        if self._debugmode:
-            print(('alive:', self.is_alive))
-        else:
-            sock = Commsocket(self._IP, self._PORT)
-            sock.connect()
+        sock = Commsocket(self._IP, self._PORT)
+        sock.connect()
 
         # track satellite
         while self.is_alive:
@@ -99,19 +91,12 @@ class Worker:
             # check if we need to exit
             self.check_observation_end_reached()
 
-            if self._debugmode:
-                print('Tracking', self.satellite_dict)
-                print('From', self.observer_dict)
-            else:
-                p = pinpoint(self.observer_dict, self.satellite_dict)
-                if p['ok']:
-                    self.send_to_socket(p, sock)
-                    time.sleep(self.SLEEP_TIME)
+            p = pinpoint(self.observer_dict, self.satellite_dict)
+            if p['ok']:
+                self.send_to_socket(p, sock)
+                time.sleep(self.SLEEP_TIME)
 
-        if self._debugmode:
-            print('Worker thread exited.')
-        else:
-            sock.disconnect()
+        sock.disconnect()
 
     def trackstop(self):
         """
