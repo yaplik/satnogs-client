@@ -70,7 +70,9 @@ def post_data():
             file_path = os.path.join(*[settings.OUTPUT_PATH, f])
             observation = {'payload': open(file_path, 'rb')}
             url = urljoin(base_url, observation_id)
-            response = requests.put(url, headers=headers, files=observation, verify=settings.VERIFY_SSL)
+            response = requests.put(url, headers=headers,
+                                    files=observation,
+                                    verify=settings.VERIFY_SSL)
             if response.status_code == 200:
                 dst = os.path.join(settings.COMPLETE_OUTPUT_PATH, f)
             else:
