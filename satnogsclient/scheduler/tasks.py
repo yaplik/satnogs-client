@@ -93,7 +93,7 @@ def post_data():
             else:
                 logger.error('Bad status code: {0}'.format(response.status_code))
                 dst = os.path.join(settings.INCOMPLETE_OUTPUT_PATH, f)
-            os.rename(f, dst)
+            os.rename(os.path.join(settings.OUTPUT_PATH, f), dst)
 
 
 def get_jobs():
