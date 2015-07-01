@@ -86,7 +86,7 @@ def post_data():
         logger.debug('Headers: {0}'.format(headers))
         logger.debug('Observation file: {0}'.format(observation))
         response = requests.put(url, headers=headers,
-                                data=observation,
+                                files=observation,
                                 verify=settings.VERIFY_SSL)
         if response.status_code == 200:
             logger.info('Success: status code 200')
