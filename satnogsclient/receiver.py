@@ -104,7 +104,8 @@ class SignalReceiver():
             '-f': self.frequency,
             '-p': self.ppm_error,
             '-s': self.sample_rate,
-            '-M': self.modulation
+            '-M': self.modulation,
+            '-g': '40'
         }
         args = ['{0} {1}'.format(key, params[key]) for key in params]
         return [settings.DEMODULATION_COMMAND] + args
