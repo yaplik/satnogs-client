@@ -73,27 +73,28 @@ def post_data():
     base_url = urljoin(settings.NETWORK_API_URL, 'data/')
     headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
 
-    for root, dirs, files in os.walk(settings.OUTPUT_PATH):
-        for f in files:
-            observation_id = f.split('_')[1]
-            logger.info('Trying to PUT observation data for id: {0}'.format(observation_id))
-            file_path = os.path.join(*[settings.OUTPUT_PATH, f])
-            observation = {'payload': open(file_path, 'rb')}
-            url = urljoin(base_url, observation_id)
-            logger.debug('PUT file {0} to network API'.format(f))
-            logger.debug('URL: {0}'.format(url))
-            logger.debug('Headers: {0}'.format(headers))
-            logger.debug('Observation file: {0}'.format(observation))
-            response = requests.put(url, headers=headers,
-                                    files=observation,
-                                    verify=settings.VERIFY_SSL)
-            if response.status_code == 200:
-                logger.info('Success: status code 200')
-                dst = os.path.join(settings.COMPLETE_OUTPUT_PATH, f)
-            else:
-                logger.error('Bad status code: {0}'.format(response.status_code))
-                dst = os.path.join(settings.INCOMPLETE_OUTPUT_PATH, f)
-            os.rename(os.path.join(settings.OUTPUT_PATH, f), dst)
+    for f in os.walk(settings.OUTPUT_PATH).next()[2]:
+        observation_id = f.split('_')[1]
+        logger.info('Trying to PUT observation data for id: {0}'.format(observation_id))
+        file_path = os.path.join(*[settings.OUTPUT_PATH, f])
+        observation = {'payload': open(file_path, 'rb')}
+        url = urljoin(base_url, observation_id)
+        if not url.endswith('/'):
+            url += '/'
+        logger.debug('PUT file {0} to network API'.format(f))
+        logger.debug('URL: {0}'.format(url))
+        logger.debug('Headers: {0}'.format(headers))
+        logger.debug('Observation file: {0}'.format(observation))
+        response = requests.put(url, headers=headers,
+                                files=observation,
+                                verify=settings.VERIFY_SSL)
+        if response.status_code == 200:
+            logger.info('Success: status code 200')
+            dst = os.path.join(settings.COMPLETE_OUTPUT_PATH, f)
+        else:
+            logger.error('Bad status code: {0}'.format(response.status_code))
+            dst = os.path.join(settings.INCOMPLETE_OUTPUT_PATH, f)
+        os.rename(os.path.join(settings.OUTPUT_PATH, f), dst)
 
 
 def get_jobs():

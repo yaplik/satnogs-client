@@ -18,7 +18,8 @@ executors = {
 
 job_defaults = {
     'coalesce': True,
-    'max_instances': 3
+    'max_instances': 3,
+    'misfire_grace_time': 5
 }
 
 scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults,

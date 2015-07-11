@@ -13,7 +13,10 @@ setup(name='satnogsclient',
                         'requests',
                         'validators',
                         'python-dateutil',
-                        'pyephem',
+                        'ephem',
                         'pytz'],
+      dependency_links=[
+          'git+https://github.com/brandon-rhodes/pyephem.git@47d0ba3616ee6c308f2eed319af3901592d00f70#egg=ephem'
+      ],
       scripts=['satnogsclient/bin/satnogs-poller',
                'satnogsclient/bin/satnogs-task'])

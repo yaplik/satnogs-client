@@ -6,6 +6,7 @@ import time
 
 from datetime import datetime
 
+import ephem
 import pytz
 
 from satnogsclient.observer.commsocket import Commsocket
@@ -127,6 +128,8 @@ class WorkerTrack(Worker):
 
 class WorkerFreq(Worker):
     def send_to_socket(self, p, sock):
-        msg = 'F {0}\n'.format(self._frequency)
+        doppler_calc_freq = self._frequency * (1 + (p['rng_vlct'] / ephem.c))
+        msg = 'F {0}\n'.format(doppler_calc_freq)
+        logger.debug('Initial frequency: {0}'.format(self._frequency))
         logger.debug('Rigctld msg: {0}'.format(msg))
         sock.send(msg)
