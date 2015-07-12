@@ -110,11 +110,15 @@ class SignalReceiver():
         args = ['{0} {1}'.format(key, params[key]) for key in params]
         return [settings.DEMODULATION_COMMAND] + args
 
-    def get_output_path(self):
+    def get_output_path(self, receiving=True):
         """Provides path to observation output file."""
-        timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S-%f%z')
-        file_extension = 'ogg' if self.decoding else 'out'
-        filename = 'satnogs_{0}_{1}.{2}'.format(self.observation_id, timestamp, file_extension)
+        timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S%z')
+        file_extension = 'out' if self.decoding else 'ogg'
+        if receiving:
+            prefix = 'receiving_satnogs'
+        else:
+            prefix = 'satnogs'
+        filename = '{0}_{1}_{2}.{3}'.format(prefix, self.observation_id, timestamp, file_extension)
         return os.path.join(settings.OUTPUT_PATH, filename)
 
     def run(self):
@@ -129,6 +133,9 @@ class SignalReceiver():
     def stop(self):
         """Stops the receiver pipelines."""
         logger.info('Stop receiver')
+        tmp_name = self.get_output_path()
+        filename = self.get_output_path(receiving=False)
+        os.rename(tmp_name, filename)
         self.producer.kill()
         self.consumer.kill()
         self.output.close()

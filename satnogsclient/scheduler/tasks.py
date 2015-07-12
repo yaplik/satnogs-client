@@ -74,6 +74,9 @@ def post_data():
     headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
 
     for f in os.walk(settings.OUTPUT_PATH).next()[2]:
+        # Ignore files in receiving state
+        if f.startswith('receiving'):
+            continue
         observation_id = f.split('_')[1]
         logger.info('Trying to PUT observation data for id: {0}'.format(observation_id))
         file_path = os.path.join(*[settings.OUTPUT_PATH, f])
