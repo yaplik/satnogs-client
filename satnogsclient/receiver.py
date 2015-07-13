@@ -133,9 +133,8 @@ class SignalReceiver():
     def stop(self):
         """Stops the receiver pipelines."""
         logger.info('Stop receiver')
-        tmp_name = self.get_output_path()
         filename = self.get_output_path(receiving=False)
-        os.rename(tmp_name, filename)
+        os.rename(self.output.name, filename)
         self.producer.kill()
         self.consumer.kill()
         self.output.close()
