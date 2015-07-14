@@ -128,7 +128,7 @@ class WorkerTrack(Worker):
 
 class WorkerFreq(Worker):
     def send_to_socket(self, p, sock):
-        doppler_calc_freq = self._frequency * (1 + (p['rng_vlct'] / ephem.c))
+        doppler_calc_freq = self._frequency * (1 - (p['rng_vlct'] / ephem.c))
         msg = 'F {0}\n'.format(doppler_calc_freq)
         logger.debug('Initial frequency: {0}'.format(self._frequency))
         logger.debug('Rigctld msg: {0}'.format(msg))
