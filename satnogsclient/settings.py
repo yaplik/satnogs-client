@@ -18,17 +18,17 @@ GROUND_STATION_LON = _cast_or_none(float, environ.get('SATNOGS_STATION_LON', Non
 GROUND_STATION_ELEV = _cast_or_none(float, environ.get('SATNOGS_STATION_ELEV', None))
 
 # Output paths
-OUTPUT_PATH = environ.get('SATNOGS_OUTPUT_PATH', '/tmp/.satnogs')
-COMPLETE_OUTPUT_PATH = environ.get('SATNOGS_COMPLETE_PATH', '/tmp/.satnogs/complete')
-INCOMPLETE_OUTPUT_PATH = environ.get('SATNOGS_INCOMPLETE_PATH', '/tmp/.satnogs/incomplete')
+APP_PATH = environ.get('SATNOGS_APP_PATH', '/tmp/.satnogs')
+OUTPUT_PATH = environ.get('SATNOGS_OUTPUT_PATH', '/tmp/.satnogs/data')
+COMPLETE_OUTPUT_PATH = environ.get('SATNOGS_COMPLETE_PATH', '/tmp/.satnogs/data/complete')
+INCOMPLETE_OUTPUT_PATH = environ.get('SATNOGS_INCOMPLETE_PATH', '/tmp/.satnogs/data/incomplete')
 
-if not os.path.exists(OUTPUT_PATH):
-    os.makedirs(OUTPUT_PATH)
-    os.makedirs(COMPLETE_OUTPUT_PATH)
-    os.makedirs(INCOMPLETE_OUTPUT_PATH)
+for p in [APP_PATH, OUTPUT_PATH, COMPLETE_OUTPUT_PATH, INCOMPLETE_OUTPUT_PATH]:
+    if not os.path.exists(p):
+        os.mkdir(p)
 
 VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
-DEFAULT_SQLITE_PATH = path.join(OUTPUT_PATH, 'jobs.sqlite')
+DEFAULT_SQLITE_PATH = path.join(APP_PATH, 'jobs.sqlite')
 SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQLITE_PATH)
 DEMODULATION_COMMAND = environ.get('SATNOGS_DEMODULATION_COMMAND', 'rtl_fm')
 ENCODING_COMMAND = environ.get('SATNOGS_ENCODING_COMMAND', 'oggenc')
