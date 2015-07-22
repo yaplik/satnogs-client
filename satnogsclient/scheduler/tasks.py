@@ -65,7 +65,7 @@ def spawn_receiver(*args, **kwargs):
             time.sleep(1)
         else:
             receiver.stop()
-            sys.exit()
+            break
 
 
 def post_data():
