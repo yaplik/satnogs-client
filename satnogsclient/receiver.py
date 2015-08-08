@@ -61,7 +61,7 @@ class SignalReceiver():
         self.observation_id = observation_id
         self.frequency = frequency
         self.decoding = kwargs.get('decoding', None)
-        self.ppm_error = kwargs.get('ppm_error', 0)  # sliding error of receiver
+        self.ppm_error = settings.PPM_ERROR  # sliding error of receiver
         self.pcm_demodulator = kwargs.get('demodulator', 'AFSK1200')
         self.modulation = kwargs.get('modulation', 'fm')  # mode of received signal
         self.sample_rate = kwargs.get('sample_rate', 22050)  # sample rate for rtl_fm output

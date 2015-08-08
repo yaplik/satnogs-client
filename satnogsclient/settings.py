@@ -45,6 +45,8 @@ ROT_PORT = int(environ.get('SATNOGS_ROT_PORT', 4533))
 RIG_IP = environ.get('SATNOGS_RIG_IP', '127.0.0.1')
 RIG_PORT = int(environ.get('SATNOGS_RIG_PORT', 4532))
 
+PPM_ERROR = float(environ.get('SATNOGS_PPM_ERROR', 0))
+
 # Logging configuration
 DEFAULT_LOGGING = {
     'version': 1,
