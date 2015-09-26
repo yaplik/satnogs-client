@@ -30,6 +30,8 @@ for p in [APP_PATH, OUTPUT_PATH, COMPLETE_OUTPUT_PATH, INCOMPLETE_OUTPUT_PATH]:
 VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
 DEFAULT_SQLITE_PATH = path.join(APP_PATH, 'jobs.sqlite')
 SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQLITE_PATH)
+
+HARDWARE_RADIO = bool(strtobool(environ.get('SATNOGS_HARDWARE_RADIO', False)))
 DEMODULATION_COMMAND = environ.get('SATNOGS_DEMODULATION_COMMAND', 'rtl_fm')
 ENCODING_COMMAND = environ.get('SATNOGS_ENCODING_COMMAND', 'oggenc')
 DECODING_COMMAND = environ.get('SATNOGS_DECODING_COMMAND', 'multimon-ng')

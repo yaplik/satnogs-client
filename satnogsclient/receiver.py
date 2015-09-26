@@ -77,13 +77,16 @@ class SignalReceiver():
                 '-a': self.pcm_demodulator,
             }
 
-            args = ['{0}{1}'.format(key, params[key]) for key in params]
+            args = []
+            for key in params:
+                args.append(key)
+                args.append(params[key])
 
             if self.aprs:
                 args.append('-A')
 
             args.append('-')
-            ret = [settings.ENCODING_COMMAND] + args
+            cmd = [settings.ENCODING_COMMAND] + args
         else:
             # oggenc --raw-endianess=0 -R 24k -B 16 -C 1 -r -q 4
             params = {
@@ -93,21 +96,35 @@ class SignalReceiver():
                 '-q': '4'
             }
             args = ['--raw-endianness=0', '-r']
-            args += ['{0} {1}'.format(key, params[key]) for key in params]
-            args += ['-']
-            ret = [settings.ENCODING_COMMAND] + args
-        return ret
+            for key in params:
+                args.append(key)
+                args.append(params[key])
+
+            args.append('-')
+            cmd = [settings.ENCODING_COMMAND] + args
+        return cmd
 
     def get_demodulation_cmd(self):
         """Provides demodulation command."""
-        params = {
-            '-f': self.frequency,
-            '-p': self.ppm_error,
-            '-s': self.sample_rate,
-            '-M': self.modulation,
-            '-g': '40'
-        }
-        args = ['{0} {1}'.format(key, params[key]) for key in params]
+        if settings.HARDWARE_RADIO:
+            params = {
+                '-f': 'cd',
+                '-t': 'raw'
+            }
+        else:
+            params = {
+                '-f': self.frequency,
+                '-p': self.ppm_error,
+                '-s': self.sample_rate,
+                '-M': self.modulation,
+                '-g': '40'
+            }
+
+        args = []
+        for key in params:
+            args.append(key)
+            args.append(params[key])
+
         return [settings.DEMODULATION_COMMAND] + args
 
     def get_output_path(self, receiving=True):
