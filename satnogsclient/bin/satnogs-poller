@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
     try:
         logger.info('Press Ctrl+C to exit SatNOGS poller')
-        app.run(host='0.0.0.0', port=5000)
+        app.run(host='0.0.0.0', port=5000, ssl_context='adhoc')
     except (KeyboardInterrupt, SystemExit):
         scheduler.shutdown()

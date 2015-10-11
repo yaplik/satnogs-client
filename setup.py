@@ -16,7 +16,8 @@ setup(name='satnogsclient',
           'python-dateutil',
           'ephem',
           'pytz',
-          'flask'
+          'flask',
+          'pyopenssl'
       ],
       scripts=['satnogsclient/bin/satnogs-poller',
                'satnogsclient/bin/satnogs-task'])
