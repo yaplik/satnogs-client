@@ -20,6 +20,10 @@ $ python setup.py install
 
 For more information see our [documentation](http://docs.satnogs.org/client/).
 
+## Provisioning
+In order to make the provisioning of ``satnogs-client`` easier, we maintain an ansible-playbook for that purpose.
+For more information see our [ansible-satnogs-client](https://github.com/satnogs/satnogs-client-ansible) repository.
+
 ## License
 
 &copy; 2014-2015 [Libre Space Foundation](http://librespacefoundation.org).
