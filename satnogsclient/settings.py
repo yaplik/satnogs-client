@@ -44,8 +44,10 @@ SCHEDULER_SLEEP_TIME = 10  # In seconds
 
 ROT_IP = environ.get('SATNOGS_ROT_IP', '127.0.0.1')
 ROT_PORT = int(environ.get('SATNOGS_ROT_PORT', 4533))
+ROT_INTERVAL = environ.get('SATNOGS_ROT_INTERVAL', 0.1)
 RIG_IP = environ.get('SATNOGS_RIG_IP', '127.0.0.1')
 RIG_PORT = int(environ.get('SATNOGS_RIG_PORT', 4532))
+RIG_INTERVAL = environ.get('SATNOGS_RIG_INTERVAL', 1)
 
 PPM_ERROR = float(environ.get('SATNOGS_PPM_ERROR', 0))
 
