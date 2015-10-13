@@ -135,9 +135,11 @@ class Observer:
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
-        # start thread for rotctl
-        logger.info('Start rotctrl thread.')
-        self.run_rot()
+
+        if settings.USE_ROTATOR:
+            # start thread for rotctl
+            logger.info('Start rotctrl thread.')
+            self.run_rot()
 
         # start thread for rigctl
         logger.info('Start rigctrl thread.')
