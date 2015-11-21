@@ -8,6 +8,8 @@ setup(name='satnogsclient',
       author_email='client-dev@satnogs.org',
       url='https://github.com/satnogs/satnogs-client/',
       description='SatNOGS Client',
+      include_package_data=True,
+      zip_safe=False,
       install_requires=[
           'APScheduler',
           'SQLAlchemy',
