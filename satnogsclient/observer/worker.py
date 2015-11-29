@@ -19,9 +19,6 @@ logger = logging.getLogger('satnogsclient')
 class Worker:
     """Class to facilitate as a worker for rotctl/rigctl."""
 
-    # sleep time of loop (in seconds)
-    SLEEP_TIME = 0.1
-
     # loop flag
     _stay_alive = False
 
@@ -34,10 +31,11 @@ class Worker:
     observer_dict = {}
     satellite_dict = {}
 
-    def __init__(self, ip, port, time_to_stop=None, frequency=None):
+    def __init__(self, ip, port, time_to_stop=None, frequency=None, sleep_time=1):
         """Initialize worker class."""
         self._IP = ip
         self._PORT = port
+        self._SLEEP_TIME = sleep_time
         if frequency:
             self._frequency = frequency
         if time_to_stop:
@@ -99,7 +97,7 @@ class Worker:
             p = pinpoint(self.observer_dict, self.satellite_dict)
             if p['ok']:
                 self.send_to_socket(p, sock)
-                time.sleep(self.SLEEP_TIME)
+                time.sleep(self._SLEEP_TIME)
 
         sock.disconnect()
 

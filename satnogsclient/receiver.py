@@ -108,7 +108,9 @@ class SignalReceiver():
         """Provides demodulation command."""
         if settings.HARDWARE_RADIO:
             params = {
-                '-f': 'cd',
+                '-f': 'S16_LE',
+                '-c': '1',
+                '-r': '24000',
                 '-t': 'raw'
             }
         else:
