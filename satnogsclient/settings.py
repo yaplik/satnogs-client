@@ -34,7 +34,7 @@ DEMODULATION_COMMAND = environ.get('SATNOGS_DEMODULATION_COMMAND', 'rtl_fm')
 ENCODING_COMMAND = environ.get('SATNOGS_ENCODING_COMMAND', 'oggenc')
 DECODING_COMMAND = environ.get('SATNOGS_DECODING_COMMAND', 'multimon-ng')
 
-NETWORK_API_URL = environ.get('SATNOGS_API_URL', 'https://dev.satnogs.org/api/')
+NETWORK_API_URL = environ.get('SATNOGS_API_URL', 'https://network-dev.satnogs.org/api/')
 NETWORK_API_QUERY_INTERVAL = 5  # In minutes
 NETWORK_API_POST_INTERVAL = 15  # In minutes
 DEMODULATOR_INIT_TIME = int(environ.get('SATNOGS_DEMODULATOR_INIT_TIME', 5))  # In seconds
