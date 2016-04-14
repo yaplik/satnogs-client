@@ -113,6 +113,8 @@ class SignalReceiver():
                 '-r': '24000',
                 '-t': 'raw'
             }
+            if settings.ARECORD_DEVICE is not None:
+                params['-D'] = settings.ARECORD_DEVICE
         else:
             params = {
                 '-f': self.frequency,

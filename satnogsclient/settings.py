@@ -32,6 +32,7 @@ DEFAULT_SQLITE_PATH = path.join(APP_PATH, 'jobs.sqlite')
 SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQLITE_PATH)
 
 HARDWARE_RADIO = bool(strtobool(environ.get('SATNOGS_HARDWARE_RADIO', 'False')))
+ARECORD_DEVICE = _cast_or_none(str, environ.get('SATNOGS_ARECORD_DEVICE', None))
 USE_ROTATOR = bool(strtobool(environ.get('SATNOGS_USE_ROTATOR', 'True')))
 DEMODULATION_COMMAND = environ.get('SATNOGS_DEMODULATION_COMMAND', 'rtl_fm')
 ENCODING_COMMAND = environ.get('SATNOGS_ENCODING_COMMAND', 'oggenc')
