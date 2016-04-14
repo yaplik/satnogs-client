@@ -30,6 +30,10 @@ for p in [APP_PATH, OUTPUT_PATH, COMPLETE_OUTPUT_PATH, INCOMPLETE_OUTPUT_PATH]:
 VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
 DEFAULT_SQLITE_PATH = path.join(APP_PATH, 'jobs.sqlite')
 SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQLITE_PATH)
+
+HARDWARE_RADIO = bool(strtobool(environ.get('SATNOGS_HARDWARE_RADIO', 'False')))
+ARECORD_DEVICE = _cast_or_none(str, environ.get('SATNOGS_ARECORD_DEVICE', None))
+USE_ROTATOR = bool(strtobool(environ.get('SATNOGS_USE_ROTATOR', 'True')))
 DEMODULATION_COMMAND = environ.get('SATNOGS_DEMODULATION_COMMAND', 'rtl_fm')
 ENCODING_COMMAND = environ.get('SATNOGS_ENCODING_COMMAND', 'oggenc')
 DECODING_COMMAND = environ.get('SATNOGS_DECODING_COMMAND', 'multimon-ng')
@@ -42,8 +46,10 @@ SCHEDULER_SLEEP_TIME = 10  # In seconds
 
 ROT_IP = environ.get('SATNOGS_ROT_IP', '127.0.0.1')
 ROT_PORT = int(environ.get('SATNOGS_ROT_PORT', 4533))
+ROT_INTERVAL = environ.get('SATNOGS_ROT_INTERVAL', 0.1)
 RIG_IP = environ.get('SATNOGS_RIG_IP', '127.0.0.1')
 RIG_PORT = int(environ.get('SATNOGS_RIG_PORT', 4532))
+RIG_INTERVAL = environ.get('SATNOGS_RIG_INTERVAL', 1)
 
 PPM_ERROR = float(environ.get('SATNOGS_PPM_ERROR', 0))
 
