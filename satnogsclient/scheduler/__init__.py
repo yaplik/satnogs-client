@@ -18,7 +18,7 @@ executors = {
 
 job_defaults = {
     'coalesce': True,
-    'max_instances': 3,
+    'max_instances': 1,
     'misfire_grace_time': 5
 }
 
