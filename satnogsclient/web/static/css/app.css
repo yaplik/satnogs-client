@@ -1,6 +1,272 @@
 body {
-    padding-top: 50px;
+    padding-top: 20px;
 }
 .settings {
     padding: 40px 15px;
+}
+
+#network-switch {
+    margin-top: 8px;
+}
+
+.no-padding {
+   padding: 0 !important;
+   margin: 0 !important;
+}
+
+.circle {
+	position: relative;
+    border: 3px solid #000;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+}
+
+.arrow {
+    width: 100px;
+    height: 5px;
+    background-color: #000;
+    position: absolute;
+    margin-top: 48%;
+    margin-left: 15%;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -moz-transition: all 1s ease;
+    -webkit-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    transition: all 1s ease;
+}
+
+.system-labels {
+	font-size: 20px;
+}
+
+.pass-progress {
+	margin-top: 3%;
+}
+
+.scheduled-pass-table {
+	width: 96%;
+    margin-left: 1%;
+    border-style: hidden;
+}
+
+#map-container {
+  height: 100%;
+}
+
+#map {
+  height: 100px;
+}
+
+.current-obs {
+  font-size: 12px;
+}
+
+.font-bold {
+  font-weight: bold;
+  margin-right: 2px;
+}
+
+.info-c {
+  display: inline-flex;
+  margin-left: 5px;
+}
+
+.parameter-panel {
+  margin-top: 10px;
+}
+
+#command-dropdown {
+  margin-bottom: 10px;
+}
+
+#response-panel {
+  height: 500px;
+}
+
+#response-panel-body {
+  height: 400px;
+  overflow-y: scroll;
+  text-align: left;
+}
+
+#caret-custom {
+  margin-left: 5px;
+}
+
+#service-select {
+  margin-bottom: 20px;
+  cursor: pointer;
+  height: 500px;
+  border-bottom: 0;
+}
+
+#service-select.nav-tabs > li > a {
+    margin-right: 2px;
+    line-height: 1.42857143;
+    border: 1px solid transparent;
+    border-radius: 4px 0 0 0;
+}
+
+#service-select.nav-tabs li.active a {
+    background-color: #f8f8f8;
+}
+
+#service-select.nav-tabs li a:hover {
+    background-color: #95a5a6;
+    color: #fff;
+}
+
+#service-panel {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+#service-param-panel {
+  text-align: left;
+  margin-left: -32px;
+  height: 500px;
+  background-color: #f8f8f8;
+  border-radius: 0 5px 5px 5px;
+}
+
+#switch-panel {
+  text-align: center;
+}
+
+.dropdown-group-inline {
+  display: inline-flex;
+}
+
+.dropdown-group-inline .dropdown {
+  margin-right: 5px;
+}
+
+#service-param-panel :button {
+  margin-top: 15px;
+}
+
+.m-b-md {
+  margin-bottom: 15px;
+}
+
+.dropdown-menu>li:focus, .dropdown-menu>li:hover {
+    color: #262626;
+    text-decoration: none;
+    background-color: #f5f5f5;
+}
+
+.dropdown-menu>li {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
+
+
+
+.inline-label-bold {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.radio-inline {
+  margin-right: 10px;
+  display: inline-flex;
+}
+
+#comms-on-off {
+  display: inline-flex;
+  margin-bottom: 15px;
+}
+
+#service-send {
+  margin-top: 15px;
+}
+
+/**
+ *  UPLOAD BOX STYLE
+ */
+
+.box {
+    font-size: 1.25rem;
+    background-color: #fff;
+    position: relative;
+    padding: 100px 20px;
+}
+
+.box__dragndrop,
+.box__uploading,
+.box__success,
+.box__error {
+  display: none;
+}
+
+.box.has-advanced-upload {
+    outline: 2px dashed #92b0b3;
+    outline-offset: -10px;
+    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear;
+}
+
+.box.has-advanced-upload .box__icon {
+    width: 100%;
+    height: 50px;
+    fill: #92b0b3;
+    display: block;
+    margin-bottom: 40px;
+}
+
+.box__file {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.box__file + label {
+    max-width: 80%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.box__button {
+    display: block;
+    margin: 40px auto 0;
+}
+
+.box.has-advanced-upload .box__dragndrop {
+  display: inline;
+}
+
+/**
+ *  LOG BOX STYLE
+ */
+
+#filter-section {
+  font-size: 10px;
+  background-color: rgb(230, 230, 205);
+  margin-left: 0px;
+}
+
+#filter-section ul {
+  margin-left: 10px;
+}
+
+.show-log {
+    display: list-item;
+}
+.hide-log {
+    display: none;
 }

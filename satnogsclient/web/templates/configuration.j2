@@ -1,0 +1,25 @@
+{% extends "base.j2" %}
+{% set active_page = "configuration" %}
+
+{% block title %} - Configuration{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h1>Configuration</h1>
+  </div>
+  <div class="container">
+    <table class="table table-striped" id="config-table">
+      <tr>
+        <th>Key</th>
+        <th>Value</th>
+      </tr>
+      {% for (key, value) in settings %}
+        <tr>
+          <td>{{ key }}</td>
+          <td id="{{ key }}" contenteditable="true">{{ value }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    <button type="button" id="config-save-button" class="btn btn-primary">Save</button>
+  </div>
+{% endblock %}
