@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
 
+
 from satnogsclient import settings
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
-
-
 logger = logging.getLogger('satnogsclient')
 
 
@@ -19,11 +18,9 @@ class Observer:
 
     _rot_ip = settings.ROT_IP
     _rot_port = settings.ROT_PORT
-    _rot_interval = settings.ROT_INTERVAL
 
     _rig_ip = settings.RIG_IP
     _rig_port = settings.RIG_PORT
-    _rig_interval = settings.RIG_INTERVAL
 
     # Variables from settings
     # Mainly present so we can support multiple ground stations from the client
@@ -53,14 +50,6 @@ class Observer:
         self._rot_port = port
 
     @property
-    def rot_interval(self):
-        return self._rot_interval
-
-    @rot_interval.setter
-    def rot_interval(self, interval):
-        self._rot_interval = interval
-
-    @property
     def rig_ip(self):
         return self._rig_ip
 
@@ -75,14 +64,6 @@ class Observer:
     @rig_port.setter
     def rig_port(self, port):
         self._rig_port = port
-
-    @property
-    def rig_interval(self):
-        return self._rig_interval
-
-    @rig_interval.setter
-    def rig_interval(self, interval):
-        self._rig_interval = interval
 
     # Passed variables
 
@@ -130,16 +111,13 @@ class Observer:
         self.tle = tle
         self.observation_end = observation_end
         self.frequency = frequency
-
         return all([self.observation_id, self.tle, self.observation_end, self.frequency])
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
-
-        if settings.USE_ROTATOR:
-            # start thread for rotctl
-            logger.info('Start rotctrl thread.')
-            self.run_rot()
+        # start thread for rotctl
+        logger.info('Start rotctrl thread.')
+        self.run_rot()
 
         # start thread for rigctl
         logger.info('Start rigctrl thread.')
@@ -148,20 +126,20 @@ class Observer:
     def run_rot(self):
         self.tracker_rot = WorkerTrack(ip=self.rot_ip,
                                        port=self.rot_port,
-                                       time_to_stop=self.observation_end,
-                                       sleep_time=self.rot_interval)
+                                       frequency=self.frequency,
+                                       time_to_stop=self.observation_end)
         logger.debug('TLE: {0}'.format(self.tle))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_rot.trackobject(self.location, self.tle)
-        self.tracker_rot.trackstart()
+        self.tracker_rot.trackstart(settings.CURRENT_PASS_TCP_PORT, True)
 
     def run_rig(self):
         self.tracker_freq = WorkerFreq(ip=self.rig_ip,
                                        port=self.rig_port,
                                        frequency=self.frequency,
-                                       time_to_stop=self.observation_end,
-                                       sleep_time=self.rig_interval)
+                                       time_to_stop=self.observation_end)
         logger.debug('Frequency {0}'.format(self.frequency))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_freq.trackobject(self.location, self.tle)
-        self.tracker_freq.trackstart()
+        self.tracker_freq.trackstart(5006, False)
+        
