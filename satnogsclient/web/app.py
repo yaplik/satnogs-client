@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, json, jsonify
 
 
 from satnogsclient import settings as client_settings
-from satnogsclient import packet_settings
 from satnogsclient.scheduler import tasks
 from satnogsclient.upsat import packet
 from satnogsclient.observer.commsocket import Commsocket
@@ -112,7 +111,7 @@ def get_command():
                     'size' : len(requested_command['ecss_cmd']['PacketDataField']['ApplicationData']),
                     'seq_count' : 0,
                     'ser_type' : int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['ServiceType']),
-                    'ser_subtype' : int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['ServiceSubType']),
+                    'ser_subtype' : 1,#int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['ServiceSubType']),
                     'data' : map(int,requested_command['ecss_cmd']['PacketDataField']['ApplicationData']),
                     'dest_id' : int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['SourceID']),
                     'ack': int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['Ack'])}
@@ -122,7 +121,7 @@ def get_command():
             if 'SequenceCount' in requested_command['ecss_cmd']['PacketHeader']['PacketSequenceControl']:
                 print "seq count from ui"
             #store packet for response check
-            if ecss['ack'] == '1':  
+            if ecss['ack'] == '1':
                 print "storing packet for verification"
 
             buf = packet.construct_packet(ecss)
