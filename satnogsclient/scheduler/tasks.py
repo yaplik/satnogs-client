@@ -311,5 +311,16 @@ def kill_netw_proc():
     if status.TASK_FEEDER_PID != 0 :
         os.kill(status.TASK_FEEDER_PID, signal.SIGTERM)
     scheduler.remove_all_jobs()
-            
-            
+
+def add_observation(obj):
+    start = parser.parse(obj['start'])
+    job_id = str(obj['id'])
+    kwargs = {'obj': obj}
+    receiver_start = start - timedelta(seconds=settings.DEMODULATOR_INIT_TIME)
+    logger.info('Adding new job: {0}'.format(job_id))
+    logger.debug('Observation obj: {0}'.format(obj))
+    scheduler.add_job(spawn_observer,
+                        'date',
+                        run_date=start,
+                        id='observer_{0}'.format(job_id),
+                        kwargs=kwargs)           
