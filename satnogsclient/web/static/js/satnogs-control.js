@@ -5,7 +5,7 @@ $(document).ready(function() {
     }, 10000);
 
     datepicker = $('#datetimepicker1').datetimepicker({
-       format: 'DD/MMM/YYYY hh:mm:ss a',
+       format: 'DD-MM-YYYY HH:mm:ss',
     });
     var backend = "gnu-radio";
 
@@ -28,6 +28,7 @@ $(document).ready(function() {
                       'time-select':'service-param-time',
                       'tle-select':'service-param-tle',
                       'ms-select':'service-param-mass-storage',
+                      'comms-select':'service-param-comms',
                       'hk-select':'service-param-housekeeping'};
       var keys = [];
       for (var key in services) {
@@ -44,12 +45,6 @@ $(document).ready(function() {
         }
       }
     }
-
-    // $('#service-panel select').on('change', function() {
-    //     // Handle change on service parameter dropdowns
-    //     selected_service_id = $(this).find("option:selected").prop('id');
-    //     display_service(selected_service_id);
-    // });
 
     $('#service-select li').on('click', function() {
         // Handle change on service parameter dropdowns
@@ -186,9 +181,10 @@ $(document).ready(function() {
     });
 
     $('#service-param-panel :button').on('click', function() {
-        //TODO: Check whether all required fields are selected
+
         var list = $('this').parent().siblings().find('select');
-        var selected_value = $('#service-select').val();
+        var selected_value = $('#service-select li.active a').text();
+        //TODO: Check whether all required fields are selected
         var missing = [];
         var flag = true;
         for (i = 0; i < list.length; i++) {
@@ -205,22 +201,20 @@ $(document).ready(function() {
             var service_type = $('#service-param-service_type').val();
             var service_subtype = $('#service-param-service_subtype').val();
             var dest_id = $('#service-param-dest_id').val();
-
             var data = $('#service-param-service-data').val().split(",");
+            var seq_count = 0;
+        } else if (selected_value == "House keeping") {
+            var app_id = $('#service-param-hk-app_id').val();
+            var type = 1;
+            var ack = 0;
+            var service_type = 3;
+            var service_subtype = 21;
+            var dest_id = $('#service-param-hk-dest-id').val();
 
-        // } else if (selected_value == "House keeping") {
-        //
-        //     var app_id = $('#service-param-hk-app_id').val();
-        //     var type = 1;
-        //     var ack = 0;
-        //     var service_type = 3;
-        //     var service_subtype = 21;
-        //     var dest_id = $('#service-param-hk-dest-id').val();
-        //
-        //     var data = $('#service-param-hk-sid').val();
-        //
-        //
-        // } else if (selected_value == "Mass storage") {
+            var data = $('#service-param-hk-sid').val();
+
+
+         } //else if (selected_value == "Mass storage") {
         //
         //     var type = 1;
         //     var ack = $('#service-param-ms-ack').val();
@@ -272,7 +266,8 @@ $(document).ready(function() {
         //       continue;
         //     }
 
-        } else if (selected_value == "Power") {
+        //}
+        else if (selected_value == "Power") {
             var dev_id = $('#service-param-dev-id').val();
             var type = 1;
             var ack = $('#service-param-power-ack').val();
@@ -369,7 +364,7 @@ $(document).ready(function() {
         }
 
         if (flag) {
-            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
             query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
         } else {
             alert('Please fill ' + missing);
@@ -490,7 +485,7 @@ function progressHandlingFunction(e){
 
         var PacketSequenceControl = new Object();
         PacketSequenceControl.SequenceFlags = '3';
-        
+
 
         if (typeof seq_count != "undefined") {
             PacketSequenceControl.SequenceCount = seq_count;
@@ -498,14 +493,14 @@ function progressHandlingFunction(e){
 
         var PacketDataField = new Object();
         PacketDataField.DataFieldHeader = DataFieldHeader;
-        PacketDataField.ApplicationData = '';
-        PacketDataField.Spare = '0';
-        PacketDataField.PacketErrorControl = '5';
-
-        if (typeof data != "undefined") {
+        if (data) {
             PacketDataField.ApplicationData = data;
         }
-
+        else {
+          PacketDataField.ApplicationData = '';
+        }
+        PacketDataField.Spare = '0';
+        PacketDataField.PacketErrorControl = '5';
 
         var PacketHeader = new Object();
         PacketHeader.PacketID = PacketID;
@@ -555,7 +550,7 @@ function progressHandlingFunction(e){
         data_type = 'other';
         log_data = data['log_message'];
       }
-      response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">[' + moment().format().toString() + '] ' + log_data + '</li>');
+      response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">[' + moment().format('DD-MM-YYYY HH:mm:ss').toString() + '] ' + log_data + '</li>');
       response_panel.scrollTop = response_panel.scrollHeight;
     }
 

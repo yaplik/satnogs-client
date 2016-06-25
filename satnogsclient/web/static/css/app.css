@@ -113,6 +113,9 @@ body {
 
 #service-select.nav-tabs li.active a {
     background-color: #f8f8f8;
+    z-index: 1000;
+    border: 1px dashed #bfbdbd;
+    border-right: none;
 }
 
 #service-select.nav-tabs li a:hover {
@@ -127,10 +130,21 @@ body {
 
 #service-param-panel {
   text-align: left;
-  margin-left: -32px;
+  margin-left: -18px;
   height: 500px;
   background-color: #f8f8f8;
   border-radius: 0 5px 5px 5px;
+  border-radius: 0 5px 5px 5px;
+  border: 1px dashed #bfbdbd;
+}
+
+#service-param-comms {
+  margin-top: 10px;
+  text-align: center;
+}
+
+#file-browser-panel {
+  margin-top: 15px;
 }
 
 #switch-panel {
@@ -148,6 +162,10 @@ body {
 #service-param-panel :button {
   margin-top: 15px;
 }
+
+#service-param-panel .table th, .table td {
+     border-top: none !important;
+ }
 
 .m-b-md {
   margin-bottom: 15px;
@@ -169,8 +187,6 @@ body {
     white-space: nowrap;
 }
 
-
-
 .inline-label-bold {
   font-weight: bold;
   margin-right: 5px;
@@ -189,6 +205,7 @@ body {
 #service-send {
   margin-top: 15px;
 }
+
 
 /**
  *  UPLOAD BOX STYLE
@@ -269,4 +286,12 @@ body {
 }
 .hide-log {
     display: none;
+}
+
+#service-param-panel .row {
+  margin-top: 10px;
+}
+
+.font-bold {
+  font-weight: 600;
 }
