@@ -4,9 +4,7 @@ import logging
 from satnogsclient.settings import (NETWORK_API_QUERY_INTERVAL,
                                     NETWORK_API_POST_INTERVAL)
 from satnogsclient.scheduler import scheduler
-from satnogsclient.scheduler.tasks import get_jobs, post_data, task_feeder , ecss_feeder
-from satnogsclient.upsat.serial_handler import read_from_serial
-from satnogsclient.upsat.gnuradio_handler import read_from_gnuradio
+from satnogsclient.scheduler.tasks import get_jobs, post_data, task_feeder , ecss_feeder, status_listener
 from satnogsclient import settings as client_settings
 from satnogsclient.web.app import app
 import threading
@@ -15,37 +13,12 @@ logger = logging.getLogger('satnogsclient')
 
 
 if __name__ == '__main__':
-    interval = NETWORK_API_QUERY_INTERVAL
-    msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
-    logger.info(msg)
-    scheduler.add_job(get_jobs, 'interval', minutes=interval)
 
-    interval = NETWORK_API_POST_INTERVAL
-    msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
-    logger.info(msg)
-    scheduler.add_job(post_data, 'interval', minutes=interval)
-    
-    logger.info('Starting task feeder thread...')
-    r = threading.Thread(target=task_feeder,args=(client_settings.TASK_FEEDER_TCP_PORT,client_settings.TASK_LISTENER_TCP_PORT,))
-    r.daemon = True
-    r.start()
-    
-    logger.info('Starting ecss feeder thread...')
-    e = threading.Thread(target=ecss_feeder,args=(client_settings.ECSS_FEEDER_UDP_PORT,client_settings.ECSS_LISTENER_UDP_PORT,))
-    e.daemon = True
-    e.start()
-    
-    
-    logger.info('Starting serial listener thread...')
-    ser = threading.Thread(target=read_from_serial,args=())
+    logger.info('Starting status listener thread...')
+    ser = threading.Thread(target=status_listener,args=())
     ser.daemon = True
     ser.start()
     
-    logger.info('Starting gnuradio listener thread...')
-    gr = threading.Thread(target=read_from_gnuradio,args=())
-    gr.daemon = True
-    gr.start()
-
     logger.info('Starting scheduler...')
     scheduler.start()
 

@@ -12,15 +12,20 @@ from satnogsclient.upsat import packet
 from satnogsclient.observer.udpsocket import Udpsocket
 
 logger = logging.getLogger('satnogsclient')
-port = serial.Serial(client_settings.SERIAL_PORT, baudrate=9600, timeout=1.0)
+#port = serial.Serial(client_settings.SERIAL_PORT, baudrate=9600, timeout=1.0)
 ecss_feeder_sock = Udpsocket([]) # The socket with which we communicate with the ecss feeder thread
+ui_listener_sock = Udpsocket(('127.0.0.1',client_settings.BACKEND_FEEDER_PORT))
 ld_socket = Udpsocket([])
 
-def write(buf):
-    print "Write in serial", buf
-    port.write(buf)
+def write_to_serial():
+    logger = logging.info('Started serial ui listener process')
+    while True:
+        conn = ui_listener_sock.recv()
+        buf = conn[0]
+        port.write(buf)
     
 def read_from_serial():
+    print 'Started serial listener process'
     buf_in = bytearray(0)
     while True:
         c = port.read()
