@@ -95,7 +95,7 @@ class Commsocket:
 
     def listen(self):
         self.s.listen(1)
-    
+
     def accept(self):
         conn, addr = self.s.accept()
         return conn

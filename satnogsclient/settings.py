@@ -9,7 +9,7 @@ def _cast_or_none(func, value):
         return func(value)
     except:
         return None
- 
+
 # Ground station information
 API_TOKEN = environ.get('SATNOGS_API_TOKEN', None)
 GROUND_STATION_ID = _cast_or_none(int, environ.get('SATNOGS_STATION_ID', None))

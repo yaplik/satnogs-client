@@ -7,12 +7,12 @@ import ctypes
 from satnogsclient.upsat import packet_settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
-from satnogsclient.upsat import hldlc 
+from satnogsclient.upsat import hldlc
 
 logger = logging.getLogger('satnogsclient')
 
 
-                
+
 def ecss_encoder(port):
     logger.info('Started ecss encoder')
     sock = Commsocket('127.0.0.1',port)
@@ -23,7 +23,7 @@ def ecss_encoder(port):
         if conn:
             data = conn.recv(sock.tasks_buffer_size)
             ecss_packetizer(data)
-                
+
 def ecss_depacketizer(buf,dict_out):
     size = len(buf)
     print binascii.hexlify(buf)
@@ -50,7 +50,7 @@ def ecss_depacketizer(buf,dict_out):
     #pkt_seq_count = t & 0x3FFF;
     pkt_seq_count = (((t[0] & 0x3FF) << 8) | (t[1] & 0xFF))
 
-    pkt_len = (buf[4] << 8) | buf[5] 
+    pkt_len = (buf[4] << 8) | buf[5]
 
     ccsds_sec_hdr = buf[6] >> 7;
 
@@ -72,14 +72,14 @@ def ecss_depacketizer(buf,dict_out):
     if not ((pkt_len == size - packet_settings.ECSS_HEADER_SIZE - 1) == True):
         print "INV LEN", pkt_len, " ", size - packet_settings.ECSS_HEADER_SIZE - 1
         return (dict_out, packet_settings.SATR_PKT_INV_LEN)
-    
+
     pkt_len = pkt_len - packet_settings.ECSS_DATA_HEADER_SIZE - packet_settings.ECSS_CRC_SIZE + 1;
 
     if not ((tmp_crc1 == tmp_crc2) == True) :
         pkt_verification_state = packet_settings.SATR_PKT_INC_CRC
         return (dict_out, packet_settings.SATR_PKT_INC_CRC)
 
-    if not((packet_settings.SERVICES_VERIFICATION_TC_TM[pkt_ser_type][pkt_ser_subtype][pkt_type] == 1) == True) : 
+    if not((packet_settings.SERVICES_VERIFICATION_TC_TM[pkt_ser_type][pkt_ser_subtype][pkt_type] == 1) == True) :
         pkt_verification_state = packet_settings.SATR_PKT_ILLEGAL_PKT_TP
         return (dict_out, packet_settings.SATR_PKT_ILLEGAL_PKT_TP)
 
@@ -123,7 +123,7 @@ def ecss_depacketizer(buf,dict_out):
              }
     print "I should see that also" , dict_out
     return (dict_out, packet_settings.SATR_OK)
-                
+
 def ecss_decoder(port):
     logger.info('Started ecss decoder')
     sock = Commsocket('127.0.0.1',port)
@@ -134,9 +134,9 @@ def ecss_decoder(port):
         if conn:
             data = conn.recv(sock.tasks_buffer_size)
             ecss_depacketizer(data)
-         
-         
-            
+
+
+
 def ecss_packetizer(ecss,buf):
     sock = Commsocket(packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT)
     assert(((ecss['type'] == 0) or (ecss['type'] == 1)) == True )
@@ -146,20 +146,20 @@ def ecss_packetizer(ecss,buf):
     app_id_ms = app_id & 0xFF00
     app_id_ls = app_id & 0x00FF
     app_id_ms = app_id_ms >> 8
-    buf[0] = ( packet_settings.ECSS_VER_NUMBER << 5 | ecss['type'] 
+    buf[0] = ( packet_settings.ECSS_VER_NUMBER << 5 | ecss['type']
                << 4 | packet_settings.ECSS_DATA_FIELD_HDR_FLG << 3 | app_id_ms);
     buf[1] = app_id_ls
     seq_flags = packet_settings.TC_TM_SEQ_SPACKET
     seq_count = ecss['seq_count']
     seq_count_ms = seq_count & 0xFF00
     seq_count_ls = seq_count & 0x00FF
-    seq_count_ms = seq_count >> 8 
+    seq_count_ms = seq_count >> 8
     buf[2] = (seq_flags << 6 | seq_count_ms)
     buf[3] = seq_count_ls
     if ecss['type'] == 0 :
         buf[6] = packet_settings.ECSS_PUS_VER << 4 ;
     elif ecss['type'] == 1 :
-        buf[6] = ( packet_settings.ECSS_SEC_HDR_FIELD_FLG << 7 | packet_settings.ECSS_PUS_VER << 4 | ecss['ack']);    
+        buf[6] = ( packet_settings.ECSS_SEC_HDR_FIELD_FLG << 7 | packet_settings.ECSS_PUS_VER << 4 | ecss['ack']);
     buf[7] = ecss['ser_type']
     buf[8] = ecss['ser_subtype']
     buf[9] = ecss['dest_id']
@@ -174,11 +174,11 @@ def ecss_packetizer(ecss,buf):
     buf_pointer = buf_pointer + data_size
     for i in range(0,buf_pointer):
         buf[buf_pointer + 1] = buf[buf_pointer + 1] ^ buf[i]
-    
+
     size = buf_pointer + 2
     assert((size > packet_settings.MIN_PKT_SIZE and size < packet_settings.MAX_PKT_SIZE) == True)
     return packet_settings.SATR_OK
-    
+
 def comms_off():
     sock = Udpsocket([])
     data = ctypes.create_string_buffer(25)
@@ -188,8 +188,8 @@ def comms_off():
     struct.pack_into("<I",data,17,0x24d60191)
     struct.pack_into("<I",data,21,0x9287b5fd)
     d = bytearray(data)
-    sock.sendto(d,(packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT))    
-    
+    sock.sendto(d,(packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT))
+
 def comms_on():
     sock = Udpsocket([])
     data = ctypes.create_string_buffer(25)
@@ -199,7 +199,7 @@ def comms_on():
     struct.pack_into("<I",data,17,0x413981b)
     struct.pack_into("<I",data,21,0xa94ee2d3)
     d = bytearray(data)
-    sock.sendto(d,(packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT))   
+    sock.sendto(d,(packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT))
 
 def construct_packet(ecss_dict,backend):
     print 'ecss to be sent ',ecss_dict
@@ -225,9 +225,9 @@ def deconstruct_packet(buf_in, ecss_dict , backend):
     elif backend == 'gnuradio':
         res = ecss_depacketizer(buf_in,ecss_dict)
     return res
-    
-    
-    
-    
+
+
+
+
 
 

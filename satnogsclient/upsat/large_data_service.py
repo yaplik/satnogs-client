@@ -38,9 +38,9 @@ def uplink(filename, info):
         buf.insert(0,large_data_id)
         buf.insert(0,packet_count_ls )
         buf.insert(0,packet_count_ms >> 8)
-        
+
         if packet_count == 0:
-            ser_subtype = packet_settings.TC_LD_FIRST_UPLINK     
+            ser_subtype = packet_settings.TC_LD_FIRST_UPLINK
         elif packet_count == total_packets - 1:
             ser_subtype = packet_settings.TC_LD_LAST_UPLINK
         else:
@@ -79,7 +79,7 @@ def uplink(filename, info):
                 else:
                     print 'Wrond large data id'
                     retries = retries + 1
-            except Exception,e: 
+            except Exception,e:
                 traceback.print_exc()
                 print str(e)
                 gnuradio_sock.sendto(hldlc_buf,(client_settings.GNURADIO_IP,client_settings.GNURADIO_UDP_PORT))
@@ -93,7 +93,7 @@ def uplink(filename, info):
         else:
             print 'Abort'
             return
-                
-        
-        
-    
+
+
+
+

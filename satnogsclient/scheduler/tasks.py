@@ -131,9 +131,9 @@ def get_jobs():
     for job in scheduler.get_jobs():
         if job.name in [spawn_observer.__name__, spawn_receiver.__name__]:
             job.remove()
-            
+
     sock = Commsocket('127.0.0.1',client_settings.TASK_LISTENER_TCP_PORT)
-    
+
     tasks = []
     for obj in response.json():
         tasks.append(obj)
@@ -157,14 +157,14 @@ def get_jobs():
 
     while sys.getsizeof(json.dumps(tasks)) > sock.tasks_buffer_size:
         tasks.pop()
-    
+
     b = sock.connect()
     if b:
-        sock.send_not_recv(json.dumps(tasks))    
+        sock.send_not_recv(json.dumps(tasks))
     else:
         print 'Task listener thread not online'
-    
-        
+
+
 def task_feeder(port1,port2):
     sleep(1)
     logger.info('Started task feeder')
@@ -186,7 +186,7 @@ def task_feeder(port1,port2):
                 conn.send('[]')
     p.join()
 
-    
+
 def task_listener(port,queue):
     logger.info('Started task listener')
     print port
@@ -207,7 +207,7 @@ def ecss_feeder(port1,port2):
     sleep(1)
     logger.info('Started ecss feeder')
     print port1,' ',port2
-    sock = Udpsocket(('127.0.0.1',port1))    
+    sock = Udpsocket(('127.0.0.1',port1))
     qu = Queue(maxsize=10)
     pr = Process(target=ecss_listener, args=(port2,qu))
     pr.daemon = True
@@ -218,10 +218,10 @@ def ecss_feeder(port1,port2):
         while not qu.empty():
             a = qu.get()
             list.append(a)
-        sock.sendto(json.dumps(list),conn[1])     
+        sock.sendto(json.dumps(list),conn[1])
     pr.join()
 
-    
+
 def ecss_listener(port,queue):
     logger.info('Started ecss listener')
     sock = Udpsocket(('127.0.0.1',port))
@@ -232,7 +232,7 @@ def ecss_listener(port,queue):
                 queue.put(data)
             else:
                 queue.put(data)
-                
+
 def status_listener():
     logger.info('Started upsat status listener')
     sock = Udpsocket(('127.0.0.1',settings.STATUS_LISTENER_PORT))
@@ -274,7 +274,7 @@ def status_listener():
             if dict['mode'] == 'cmd_ctrl':
                 print 'Starting ecss feeder thread...'
                 status.MODE = 'cmd_ctrl'
-                kill_netw_proc() 
+                kill_netw_proc()
                 ef = Process(target=ecss_feeder,args=(settings.ECSS_FEEDER_UDP_PORT,settings.ECSS_LISTENER_UDP_PORT,))
                 ef.start()
                 status.ECSS_FEEDER_PID = ef.pid
@@ -301,7 +301,7 @@ def kill_cmd_ctrl_proc():
     if status.BACKEND_TX_PID != 0:
         os.kill(status.BACKEND_TX_PID, signal.SIGTERM)
         status.BACKEND_TX_PID =0
-        
+
     if status.BACKEND_RX_PID != 0:
         os.kill(status.BACKEND_RX_PID, signal.SIGTERM)
         status.BACKEND_RX_PID =0
@@ -323,4 +323,4 @@ def add_observation(obj):
                         'date',
                         run_date=start,
                         id='observer_{0}'.format(job_id),
-                        kwargs=kwargs)           
+                        kwargs=kwargs)

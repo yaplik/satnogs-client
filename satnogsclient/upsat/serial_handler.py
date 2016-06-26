@@ -23,7 +23,7 @@ def write_to_serial():
         conn = ui_listener_sock.recv()
         buf = conn[0]
         port.write(buf)
-    
+
 def read_from_serial():
     print 'Started serial listener process'
     buf_in = bytearray(0)
@@ -35,7 +35,7 @@ def read_from_serial():
             if len(buf_in) == 1 and buf_in[0] != 0x7E:
                 buf_in = bytearray(0)
             elif len(buf_in) > 1 and buf_in[len(buf_in) - 1] == 0x7E:
-                print "From serial got pkt", ''.join('{:02x}'.format(x) for x in buf_in) 
+                print "From serial got pkt", ''.join('{:02x}'.format(x) for x in buf_in)
                 ecss_dict = []
                 ret = packet.deconstruct_packet(buf_in, ecss_dict,"serial")
                 ecss_dict = ret[0]
@@ -46,4 +46,4 @@ def read_from_serial():
                     ecss_feeder_sock.sendto(pickled,('127.0.0.1',client_settings.ECSS_LISTENER_UDP_PORT))
                 buf_in = bytearray(0)
 
-    
+

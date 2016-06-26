@@ -26,8 +26,8 @@ class Udpsocket:
             self._UDP_PORT = addr[1]
             self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.s.bind((self._UDP_IP , self._UDP_PORT))
-        
-       
+
+
 
     @property
     def ip(self):
@@ -56,17 +56,17 @@ class Udpsocket:
     @property
     def is_connected(self):
         return self._connected
-    
+
     def get_sock(self):
         return self.s
-        
+
     def recv(self):
         data, addr = self.s.recvfrom(1024)
         return (data, addr)
-    
+
     def sendto(self,message,addr):
         self.s.sendto(message,addr)
-        
+
     def send_listen(self, message, addr):
         self.s.sendto(message,addr)
         ret = self.recv()
@@ -75,6 +75,6 @@ class Udpsocket:
         self.s.settimeout(timeout)
         conn = self.s.recvfrom(1024)
         return conn
-    
+
     def set_timeout(self,sec):
         self.s.settimeout(sec)

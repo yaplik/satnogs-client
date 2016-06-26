@@ -25,7 +25,7 @@ def write_to_gnuradio():
         conn = ui_listener_sock.recv()
         buf = conn[0]
         backend_feeder_sock.sendto(buf, (client_settings.GNURADIO_IP,client_settings.GNURADIO_UDP_PORT))
-    
+
 def read_from_gnuradio():
     print 'Started gnuradio listener process'
     while True:

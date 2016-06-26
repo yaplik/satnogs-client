@@ -9,7 +9,7 @@ ECSS_CRC_SIZE = 2
 ECSS_DATA_OFFSET = ECSS_HEADER_SIZE + ECSS_DATA_HEADER_SIZE
 MIN_PKT_SIZE = 5
 MAX_COMMS_PKT_SIZE = 210
-MAX_PACKET_SIZE = 2048 + ECSS_HEADER_SIZE + ECSS_DATA_HEADER_SIZE + ECSS_CRC_SIZE 
+MAX_PACKET_SIZE = 2048 + ECSS_HEADER_SIZE + ECSS_DATA_HEADER_SIZE + ECSS_CRC_SIZE
 ECSS_PUS_VER = 1
 ECSS_SEC_HDR_FIELD_FLG = 0
 SATR_PKT_ILLEGAL_APPID     = 0
@@ -94,7 +94,7 @@ SATR_SSCH_ID_INVALID       = 18 # Subschedule ID invalid */
 SATR_NMR_OF_TC_INVALID     = 19 # Number of telecommands invalid */
 SATR_INTRL_ID_INVALID      = 20 # Interlock ID invalid */
 SATR_ASS_INTRL_ID_INVALID  = 21 # Assess Interlock ID invalid */
-SATR_ASS_TYPE_ID_INVALID   = 22 # Assesment type id invalid*/        
+SATR_ASS_TYPE_ID_INVALID   = 22 # Assesment type id invalid*/
 SATR_RLS_TIMET_ID_INVALID  = 23 # Relese time type ID invalid */
 SATR_DEST_APID_INVALID     = 24 # Destination APID in embedded TC is invalid */
 SATR_TIME_INVALID          = 25 # Release time of TC is invalid */
@@ -120,7 +120,7 @@ SATRF_TIMEOUT              = 44 # (15) Could not get a grant to access the volum
 SATRF_LOCKED               = 45 # (16) The operation is rejected according to the file sharing policy */
 SATRF_NOT_ENOUGH_CORE      = 46 # (17) LFN working buffer could not be allocated */
 SATRF_TOO_MANY_OPEN_FILES  = 47 # (18) Number of open files > _FS_SHARE */
-SATRF_INVALID_PARAMETER    = 48 # (19) Given parameter is invalid */    
+SATRF_INVALID_PARAMETER    = 48 # (19) Given parameter is invalid */
 SATRF_DIR_ERROR            = 49
 SATR_LAST                  = 50
 
@@ -134,14 +134,14 @@ TC_VERIFICATION_SERVICE        =  1
 TC_HOUSEKEEPING_SERVICE        =  3
 TC_EVENT_SERVICE               =  5
 TC_FUNCTION_MANAGEMENT_SERVICE =  8
-TC_TIME_MANAGEMENT_SERVICE     =  9 
+TC_TIME_MANAGEMENT_SERVICE     =  9
 TC_SCHEDULING_SERVICE          =  11
 TC_LARGE_DATA_SERVICE          =  13
 TC_MASS_STORAGE_SERVICE        =  15
 TC_TEST_SERVICE                =  17
 TC_SU_MNLP_SERVICE             =  18
 
-# Service Subtypes 
+# Service Subtypes
 
 TM_VR_ACCEPTANCE_SUCCESS       = 1
 TM_VR_ACCEPTANCE_FAILURE       = 2
@@ -187,12 +187,12 @@ TC_MS_DELETE                   = 11
 TC_MS_REPORT                   = 12
 TM_MS_CATALOGUE_REPORT         = 13
 TC_MS_UPLINK                   = 14
-TC_MS_FORMAT                   = 15 
+TC_MS_FORMAT                   = 15
 
 TC_CT_PERFORM_TEST             = 1
 TM_CT_REPORT_TEST              = 2
 
-# mNLP science unit sub-service definitions 
+# mNLP science unit sub-service definitions
 TC_SU_ON                       = 1
 TC_SU_OFF                      = 2
 TC_SU_RESET                    = 3
