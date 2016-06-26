@@ -13,16 +13,23 @@ from satnogsclient.upsat import packet
 
 logger = logging.getLogger('satnogsclient')
 
-udp_local_sock = Udpsocket(('127.0.0.1',client_settings.UDP_CLIENT_PORT)) # Port in which client listens for frames from gnuradio
+backend_listener_sock = Udpsocket(('127.0.0.1',client_settings.BACKEND_LISTENER_PORT)) # Port in which client listens for frames from gnuradio
+ui_listener_sock = Udpsocket(('127.0.0.1',client_settings.BACKEND_FEEDER_PORT))
 ecss_feeder_sock = Udpsocket([]) # The socket with which we communicate with the ecss feeder thread
+backend_feeder_sock = Udpsocket([])
 ld_socket = Udpsocket([])
 
-def write(buf):
-    udp_local_sock.sendto(buf, (client_settings.GNURADIO_IP,client_settings.GNURADIO_UDP_PORT))
+def write_to_gnuradio():
+    logger = logging.info('Started gnuradio ui listener process')
+    while True:
+        conn = ui_listener_sock.recv()
+        buf = conn[0]
+        backend_feeder_sock.sendto(buf, (client_settings.GNURADIO_IP,client_settings.GNURADIO_UDP_PORT))
     
 def read_from_gnuradio():
+    print 'Started gnuradio listener process'
     while True:
-        conn = udp_local_sock.recv()
+        conn = backend_listener_sock.recv()
         buf_in = conn[0]
         ecss_dict = []
         ret = packet.deconstruct_packet(buf_in, ecss_dict, "gnuradio")

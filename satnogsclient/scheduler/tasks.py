@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+import signal
 import time
 import sys
 from datetime import datetime, timedelta
@@ -8,6 +9,7 @@ from dateutil import parser
 from urlparse import urljoin
 from multiprocessing import Process, Queue
 import json
+from satnogsclient.scheduler import scheduler
 
 import pytz
 import requests
@@ -18,6 +20,9 @@ from satnogsclient.receiver import SignalReceiver
 from satnogsclient.scheduler import scheduler
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
+from satnogsclient.upsat import upsat_status_settings as status
+from satnogsclient.upsat import serial_handler
+from satnogsclient.upsat.gnuradio_handler import write_to_gnuradio, read_from_gnuradio
 from time import sleep
 
 
@@ -75,6 +80,7 @@ def spawn_receiver(*args, **kwargs):
 
 
 def post_data():
+    print 'Post data started'
     """PUT observation data back to Network API."""
     base_url = urljoin(settings.NETWORK_API_URL, 'data/')
     headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
@@ -107,6 +113,7 @@ def post_data():
 
 
 def get_jobs():
+    print 'Get jobs started'
     """Query SatNOGS Network API to GET jobs."""
     url = urljoin(settings.NETWORK_API_URL, 'jobs/')
     params = {'ground_station': settings.GROUND_STATION_ID}
@@ -224,4 +231,96 @@ def ecss_listener(port,queue):
             if not queue.empty():
                 queue.put(data)
             else:
-                queue.put(data)         
+                queue.put(data)
+                
+def status_listener():
+    logger.info('Started upsat status listener')
+    sock = Udpsocket(('127.0.0.1',settings.STATUS_LISTENER_PORT))
+    while 1:
+        print 'Listening status, ',settings.STATUS_LISTENER_PORT
+        conn = sock.recv()
+        dict = json.loads(conn[0])
+        if 'switch_backend' in dict.keys() and dict['switch_backend']:
+            print 'Passed ', status.BACKEND
+            if dict['backend'] == status.BACKEND:
+                continue
+            kill_cmd_ctrl_proc()
+            if dict['backend'] == 'gnuradio':
+                status.BACKEND = 'gnuradio'
+                tx = Process(target=write_to_gnuradio, args=())
+                print 'Started process'
+                tx.daemon = True
+                tx.start()
+                print status.BACKEND_TX_PID
+                status.BACKEND_TX_PID = tx.pid
+                rx = Process(target=read_from_gnuradio, args=())
+                rx.daemon = True
+                rx.start()
+                status.BACKEND_RX_PID = rx.pid
+            elif dict['backend'] == 'serial':
+                status.BACKEND = 'serial'
+                tx = Process(target=serial_handler.write_to_serial, args=())
+                tx.daemon = True
+                tx.start()
+                status.BACKEND_TX_PID = tx.pid
+                rx = Process(target=serial_handler.read_from_serial, args=())
+                rx.daemon = True
+                rx.start()
+                status.BACKEND_RX_PID = rx.pid
+        if 'switch_mode' in dict.keys() and dict['switch_mode']:
+            print 'Changing mode'
+            if dict['mode'] == status.MODE:
+                continue
+            if dict['mode'] == 'cmd_ctrl':
+                print 'Starting ecss feeder thread...'
+                status.MODE = 'cmd_ctrl'
+                kill_netw_proc() 
+                ef = Process(target=ecss_feeder,args=(settings.ECSS_FEEDER_UDP_PORT,settings.ECSS_LISTENER_UDP_PORT,))
+                ef.start()
+                status.ECSS_FEEDER_PID = ef.pid
+            elif dict['mode'] == 'network':
+                status.MODE = 'network'
+                kill_cmd_ctrl_proc()
+                if status.ECSS_FEEDER_PID != 0:
+                    os.kill(status.ECSS_FEEDER_PID, signal.SIGTERM)
+                    status.ECSS_FEEDER_PID =0
+                interval = settings.NETWORK_API_QUERY_INTERVAL
+                msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
+                print msg
+                scheduler.add_job(get_jobs, 'interval', minutes=interval)
+                interval = settings.NETWORK_API_POST_INTERVAL
+                msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
+                print msg
+                scheduler.add_job(post_data, 'interval', minutes=interval)
+                scheduler.print_jobs()
+                tf = Process(target=task_feeder,args=(settings.TASK_FEEDER_TCP_PORT,settings.TASK_LISTENER_TCP_PORT,))
+                tf.start()
+                status.TASK_FEEDER_PID = tf.pid
+
+def kill_cmd_ctrl_proc():
+    if status.BACKEND_TX_PID != 0:
+        os.kill(status.BACKEND_TX_PID, signal.SIGTERM)
+        status.BACKEND_TX_PID =0
+        
+    if status.BACKEND_RX_PID != 0:
+        os.kill(status.BACKEND_RX_PID, signal.SIGTERM)
+        status.BACKEND_RX_PID =0
+
+def kill_netw_proc():
+    if status.TASK_FEEDER_PID != 0 :
+        os.kill(status.TASK_FEEDER_PID, signal.SIGTERM)
+        status.TASK_FEEDER_PID =0
+    scheduler.remove_all_jobs()
+
+def add_observation(obj):
+    start = parser.parse(obj['start'])
+    job_id = str(obj['id'])
+    kwargs = {'obj': obj}
+    receiver_start = start - timedelta(seconds=settings.DEMODULATOR_INIT_TIME)
+    logger.info('Adding new job: {0}'.format(job_id))
+    logger.debug('Observation obj: {0}'.format(obj))
+    scheduler.add_job(spawn_observer,
+                        'date',
+                        run_date=start,
+                        id='observer_{0}'.format(job_id),
+                        kwargs=kwargs)           
