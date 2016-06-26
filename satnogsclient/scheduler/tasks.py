@@ -17,14 +17,12 @@ import requests
 from satnogsclient import settings
 from satnogsclient.observer.observer import Observer
 from satnogsclient.receiver import SignalReceiver
-from satnogsclient.scheduler import scheduler
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
 from satnogsclient.upsat import upsat_status_settings as status
 from satnogsclient.upsat import serial_handler
 from satnogsclient.upsat.gnuradio_handler import write_to_gnuradio, read_from_gnuradio
 from time import sleep
-
 
 
 logger = logging.getLogger('satnogsclient')
@@ -124,7 +122,6 @@ def get_jobs():
     logger.info('Trying to GET observation jobs from the network')
     response = requests.get(url, params=params, headers=headers, verify=settings.VERIFY_SSL)
 
-
     if not response.status_code == 200:
         raise Exception('Status code: {0} on request: {1}'.format(response.status_code, url))
 
@@ -132,7 +129,7 @@ def get_jobs():
         if job.name in [spawn_observer.__name__, spawn_receiver.__name__]:
             job.remove()
 
-    sock = Commsocket('127.0.0.1',client_settings.TASK_LISTENER_TCP_PORT)
+    sock = Commsocket('127.0.0.1', settings.TASK_LISTENER_TCP_PORT)
 
     tasks = []
     for obj in response.json():
@@ -165,21 +162,21 @@ def get_jobs():
         print 'Task listener thread not online'
 
 
-def task_feeder(port1,port2):
+def task_feeder(port1, port2):
     sleep(1)
     logger.info('Started task feeder')
-    print port1,' ',port2
-    sock = Commsocket('127.0.0.1',port1)
+    print port1, ' ', port2
+    sock = Commsocket('127.0.0.1', port1)
     sock.bind()
     q = Queue(maxsize=1)
-    p = Process(target=task_listener, args=(port2,q))
+    p = Process(target=task_listener, args=(port2, q))
     p.daemon = True
     p.start()
     sock.listen()
     while 1:
         conn = sock.accept()
         if conn:
-            data = conn.recv(sock.tasks_buffer_size)
+            conn.recv(sock.tasks_buffer_size)
             if not q.empty():
                 conn.send(q.get())
             else:
@@ -187,10 +184,10 @@ def task_feeder(port1,port2):
     p.join()
 
 
-def task_listener(port,queue):
+def task_listener(port, queue):
     logger.info('Started task listener')
     print port
-    sock = Commsocket('127.0.0.1',port)
+    sock = Commsocket('127.0.0.1', port)
     sock.bind()
     sock.listen()
     while 1:
@@ -203,41 +200,43 @@ def task_listener(port,queue):
             else:
                 queue.put(data)
 
-def ecss_feeder(port1,port2):
+
+def ecss_feeder(port1, port2):
     sleep(1)
     logger.info('Started ecss feeder')
-    print port1,' ',port2
-    sock = Udpsocket(('127.0.0.1',port1))
+    print port1, ' ', port2
+    sock = Udpsocket(('127.0.0.1', port1))
     qu = Queue(maxsize=10)
-    pr = Process(target=ecss_listener, args=(port2,qu))
+    pr = Process(target=ecss_listener, args=(port2, qu))
     pr.daemon = True
     pr.start()
     while 1:
         conn = sock.recv()
-        list= []
+        list = []
         while not qu.empty():
             a = qu.get()
             list.append(a)
-        sock.sendto(json.dumps(list),conn[1])
+        sock.sendto(json.dumps(list), conn[1])
     pr.join()
 
 
-def ecss_listener(port,queue):
+def ecss_listener(port, queue):
     logger.info('Started ecss listener')
-    sock = Udpsocket(('127.0.0.1',port))
+    sock = Udpsocket(('127.0.0.1', port))
     while 1:
-            conn = sock.recv()
-            data = conn[0]
-            if not queue.empty():
-                queue.put(data)
-            else:
-                queue.put(data)
+        conn = sock.recv()
+        data = conn[0]
+        if not queue.empty():
+            queue.put(data)
+        else:
+            queue.put(data)
+
 
 def status_listener():
     logger.info('Started upsat status listener')
-    sock = Udpsocket(('127.0.0.1',settings.STATUS_LISTENER_PORT))
+    sock = Udpsocket(('127.0.0.1', settings.STATUS_LISTENER_PORT))
     while 1:
-        print 'Listening status, ',settings.STATUS_LISTENER_PORT
+        print 'Listening status, ', settings.STATUS_LISTENER_PORT
         conn = sock.recv()
         dict = json.loads(conn[0])
         if 'switch_backend' in dict.keys() and dict['switch_backend']:
@@ -275,7 +274,7 @@ def status_listener():
                 print 'Starting ecss feeder thread...'
                 status.MODE = 'cmd_ctrl'
                 kill_netw_proc()
-                ef = Process(target=ecss_feeder,args=(settings.ECSS_FEEDER_UDP_PORT,settings.ECSS_LISTENER_UDP_PORT,))
+                ef = Process(target=ecss_feeder, args=(settings.ECSS_FEEDER_UDP_PORT, settings.ECSS_LISTENER_UDP_PORT,))
                 ef.start()
                 status.ECSS_FEEDER_PID = ef.pid
             elif dict['mode'] == 'network':
@@ -283,7 +282,7 @@ def status_listener():
                 kill_cmd_ctrl_proc()
                 if status.ECSS_FEEDER_PID != 0:
                     os.kill(status.ECSS_FEEDER_PID, signal.SIGTERM)
-                    status.ECSS_FEEDER_PID =0
+                    status.ECSS_FEEDER_PID = 0
                 interval = settings.NETWORK_API_QUERY_INTERVAL
                 msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
                 print msg
@@ -293,30 +292,32 @@ def status_listener():
                 print msg
                 scheduler.add_job(post_data, 'interval', minutes=interval)
                 scheduler.print_jobs()
-                tf = Process(target=task_feeder,args=(settings.TASK_FEEDER_TCP_PORT,settings.TASK_LISTENER_TCP_PORT,))
+                tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT, settings.TASK_LISTENER_TCP_PORT,))
                 tf.start()
                 status.TASK_FEEDER_PID = tf.pid
+
 
 def kill_cmd_ctrl_proc():
     if status.BACKEND_TX_PID != 0:
         os.kill(status.BACKEND_TX_PID, signal.SIGTERM)
-        status.BACKEND_TX_PID =0
+        status.BACKEND_TX_PID = 0
 
     if status.BACKEND_RX_PID != 0:
         os.kill(status.BACKEND_RX_PID, signal.SIGTERM)
-        status.BACKEND_RX_PID =0
+        status.BACKEND_RX_PID = 0
+
 
 def kill_netw_proc():
-    if status.TASK_FEEDER_PID != 0 :
+    if status.TASK_FEEDER_PID != 0:
         os.kill(status.TASK_FEEDER_PID, signal.SIGTERM)
-        status.TASK_FEEDER_PID =0
+        status.TASK_FEEDER_PID = 0
     scheduler.remove_all_jobs()
+
 
 def add_observation(obj):
     start = parser.parse(obj['start'])
     job_id = str(obj['id'])
     kwargs = {'obj': obj}
-    receiver_start = start - timedelta(seconds=settings.DEMODULATOR_INIT_TIME)
     logger.info('Adding new job: {0}'.format(job_id))
     logger.debug('Observation obj: {0}'.format(obj))
     scheduler.add_job(spawn_observer,

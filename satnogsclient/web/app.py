@@ -2,15 +2,12 @@ from flask import Flask, render_template, request, json, jsonify
 
 
 from satnogsclient import settings as client_settings
-from satnogsclient.scheduler import tasks
 from satnogsclient.upsat import packet
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
 from satnogsclient.upsat import serial_handler
 from satnogsclient.upsat import gnuradio_handler
 import logging
-from flask.json import JSONDecoder
-import binascii
 import cPickle
 
 logger = logging.getLogger('satnogsclient')
@@ -27,12 +24,12 @@ def get_status_info():
     current_pass_json['tle0'] = 'NA'
     current_pass_json['tle1'] = 'NA'
     current_pass_json['tle2'] = 'NA'
-    #current_pass_json = jsonify(current_pass_json)
+    # current_pass_json = jsonify(current_pass_json)
     scheduled_pass_json['Info'] = 'There are no scheduled observations.'
-    #scheduled_pass_json = jsonify(scheduled_pass_json)
+    # scheduled_pass_json = jsonify(scheduled_pass_json)
 
-    current_pass_sock = Commsocket('127.0.0.1',client_settings.CURRENT_PASS_TCP_PORT)
-    scheduled_pass_sock = Commsocket('127.0.0.1',client_settings.TASK_FEEDER_TCP_PORT)
+    current_pass_sock = Commsocket('127.0.0.1', client_settings.CURRENT_PASS_TCP_PORT)
+    scheduled_pass_sock = Commsocket('127.0.0.1', client_settings.TASK_FEEDER_TCP_PORT)
 
     current_pass_check = current_pass_sock.connect()
     scheduled_pass_check = scheduled_pass_sock.connect()
@@ -49,15 +46,16 @@ def get_status_info():
     else:
         print 'No observations currently'
 
-    #return current_pass_json
+    # return current_pass_json
     return jsonify(observation=dict(current=current_pass_json, scheduled=scheduled_pass_json))
+
 
 @app.route('/control_rx', methods=['GET', 'POST'])
 def get_control_rx():
-    sock = Udpsocket(('127.0.0.1',client_settings.CLIENT_LISTENER_UDP_PORT))
+    sock = Udpsocket(('127.0.0.1', client_settings.CLIENT_LISTENER_UDP_PORT))
     packet_list = ""
     try:
-        conn = sock.send_listen("Requesting received packets", ('127.0.0.1',client_settings.ECSS_FEEDER_UDP_PORT))
+        conn = sock.send_listen("Requesting received packets", ('127.0.0.1', client_settings.ECSS_FEEDER_UDP_PORT))
     except:
         logger.error("An error with the ECSS feeder occured")
     data = conn[0]
@@ -80,60 +78,62 @@ def get_control_rx():
         tmp['log_message'] = 'This is a test'
         return jsonify(tmp)
 
+
 @app.route('/raw', methods=['GET', 'POST'])
 def get_raw():
     with open('/home/ctriant/hope', 'wb') as file_:
-        file_.write(request.get_data());
-    return request.get_data();
+        file_.write(request.get_data())
+    return request.get_data()
+
 
 @app.route('/command', methods=['GET', 'POST'])
 def get_command():
-    requested_command = request.get_json();
+    requested_command = request.get_json()
     response = {}
     response['log_message'] = 'This is a test response'
     if requested_command is not None:
-        print 'Command received';
+        print 'Command received'
         if 'custom_cmd' in requested_command:
             if 'comms_tx_rf' in requested_command['custom_cmd']:
-                #TODO: Handle the comms_tx_rf request
-                if requested_command['custom_cmd']['comms_tx_rf'] == 'comms_off' :
-                    packet.comms_off();
-                    response['log_message'] = 'COMMS_OFF command sent';
-                    response['id'] = 1;
-                elif requested_command['custom_cmd']['comms_tx_rf'] == 'comms_on' :
-                    packet.comms_on();
-                    response['log_message'] = 'COMMS_ON command sent';
-                    response['id'] = 1;
-                return jsonify(response);
+                # TODO: Handle the comms_tx_rf request
+                if requested_command['custom_cmd']['comms_tx_rf'] == 'comms_off':
+                    packet.comms_off()
+                    response['log_message'] = 'COMMS_OFF command sent'
+                    response['id'] = 1
+                elif requested_command['custom_cmd']['comms_tx_rf'] == 'comms_on':
+                    packet.comms_on()
+                    response['log_message'] = 'COMMS_ON command sent'
+                    response['id'] = 1
+                return jsonify(response)
         elif 'ecss_cmd' in requested_command:
             ecss = {'app_id': int(requested_command['ecss_cmd']['PacketHeader']['PacketID']['ApplicationProcessID']),
                     'type': int(requested_command['ecss_cmd']['PacketHeader']['PacketID']['Type']),
-                    'size' : len(requested_command['ecss_cmd']['PacketDataField']['ApplicationData']),
-                    'seq_count' : 0,
-                    'ser_type' : int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['ServiceType']),
-                    'ser_subtype' : 1,#int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['ServiceSubType']),
-                    'data' : map(int,requested_command['ecss_cmd']['PacketDataField']['ApplicationData']),
-                    'dest_id' : int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['SourceID']),
+                    'size': len(requested_command['ecss_cmd']['PacketDataField']['ApplicationData']),
+                    'seq_count': 0,
+                    'ser_type': int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['ServiceType']),
+                    'ser_subtype': 1,  # int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['ServiceSubType']),
+                    'data': map(int, requested_command['ecss_cmd']['PacketDataField']['ApplicationData']),
+                    'dest_id': int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['SourceID']),
                     'ack': int(requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['Ack'])}
             print "CMD", requested_command['ecss_cmd']['PacketDataField']['DataFieldHeader']['Ack']
 
-            #check if ui wants a specific seq count
+            # check if ui wants a specific seq count
             if 'SequenceCount' in requested_command['ecss_cmd']['PacketHeader']['PacketSequenceControl']:
                 print "seq count from ui"
-            #store packet for response check
+            # store packet for response check
             if ecss['ack'] == '1':
                 print "storing packet for verification"
 
             buf = packet.construct_packet(ecss)
-            response['log_message'] = 'ECSS command send';
-            response['id'] = 1;
+            response['log_message'] = 'ECSS command send'
+            response['id'] = 1
             if requested_command['backend'] == 'serial':
                 print "CMD to Serial"
                 serial_handler.write(buf)
             else:
                 gnuradio_handler.write(buf)
-            #else gnu radio
-            return jsonify(response);
+            # else gnu radio
+            return jsonify(response)
     return render_template('control.j2')
 
 
@@ -141,6 +141,7 @@ def get_command():
 def status():
     '''View status satnogs-client.'''
     return render_template('status.j2')
+
 
 @app.route('/control/')
 def control():

@@ -37,6 +37,7 @@ class Worker:
 
     observer_dict = {}
     satellite_dict = {}
+
     def __init__(self, ip, port, time_to_stop=None, frequency=None):
         """Initialize worker class."""
         self._IP = ip
@@ -79,7 +80,7 @@ class Worker:
         self.t.start()
 
         if start_thread:
-            self.r = threading.Thread(target=self._status_interface,args=(port,))
+            self.r = threading.Thread(target=self._status_interface, args=(port,))
             self.r.daemon = True
             self.r.start()
 
@@ -111,16 +112,16 @@ class Worker:
 
         sock.disconnect()
 
-    def _status_interface(self,port):
-        sock = Commsocket('127.0.0.1',port)
-        #sock.get_sock().bind(('127.0.0.1',port))
+    def _status_interface(self, port):
+        sock = Commsocket('127.0.0.1', port)
+        # sock.get_sock().bind(('127.0.0.1',port))
         sock.bind()
         sock.listen()
         while self.is_alive:
             conn = sock.accept()
             if conn:
-                data = conn.recv(sock.buffer_size)
-                dict={'azimuth': "{0:.2f}".format(self._azimuth),
+                conn.recv(sock.buffer_size)
+                dict = {'azimuth': "{0:.2f}".format(self._azimuth),
                   'altitude': "{0:.2f}".format(self._altitude),
                   'frequency': self._frequency,
                   'tle0': self.satellite_dict['tle0'],
@@ -139,7 +140,6 @@ class Worker:
     def check_observation_end_reached(self):
         if datetime.now(pytz.utc) > self._observation_end:
             self.trackstop()
-
 
 
 class WorkerTrack(Worker):
