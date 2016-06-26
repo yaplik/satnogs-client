@@ -246,7 +246,6 @@ def status_listener():
                 continue
             kill_cmd_ctrl_proc()
             if dict['backend'] == 'gnuradio':
-                print 'Passed 2'
                 status.BACKEND = 'gnuradio'
                 tx = Process(target=write_to_gnuradio, args=())
                 print 'Started process'
@@ -263,11 +262,11 @@ def status_listener():
                 tx = Process(target=serial_handler.write_to_serial, args=())
                 tx.daemon = True
                 tx.start()
-                current_tx_pid = tx.pid
+                status.BACKEND_TX_PID = tx.pid
                 rx = Process(target=serial_handler.read_from_serial, args=())
                 rx.daemon = True
                 rx.start()
-                current_rx_pid = rx.pid
+                status.BACKEND_RX_PID = rx.pid
         if 'switch_mode' in dict.keys() and dict['switch_mode']:
             print 'Changing mode'
             if dict['mode'] == status.MODE:
@@ -277,7 +276,6 @@ def status_listener():
                 status.MODE = 'cmd_ctrl'
                 kill_netw_proc() 
                 ef = Process(target=ecss_feeder,args=(settings.ECSS_FEEDER_UDP_PORT,settings.ECSS_LISTENER_UDP_PORT,))
-                #ef.daemon = True
                 ef.start()
                 status.ECSS_FEEDER_PID = ef.pid
             elif dict['mode'] == 'network':
@@ -285,6 +283,7 @@ def status_listener():
                 kill_cmd_ctrl_proc()
                 if status.ECSS_FEEDER_PID != 0:
                     os.kill(status.ECSS_FEEDER_PID, signal.SIGTERM)
+                    status.ECSS_FEEDER_PID =0
                 interval = settings.NETWORK_API_QUERY_INTERVAL
                 msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
                 print msg
@@ -295,21 +294,22 @@ def status_listener():
                 scheduler.add_job(post_data, 'interval', minutes=interval)
                 scheduler.print_jobs()
                 tf = Process(target=task_feeder,args=(settings.TASK_FEEDER_TCP_PORT,settings.TASK_LISTENER_TCP_PORT,))
-                #tf.daemon = True
                 tf.start()
                 status.TASK_FEEDER_PID = tf.pid
-    tx.join()
-    rx.join()
 
 def kill_cmd_ctrl_proc():
     if status.BACKEND_TX_PID != 0:
         os.kill(status.BACKEND_TX_PID, signal.SIGTERM)
+        status.BACKEND_TX_PID =0
+        
     if status.BACKEND_RX_PID != 0:
         os.kill(status.BACKEND_RX_PID, signal.SIGTERM)
+        status.BACKEND_RX_PID =0
 
 def kill_netw_proc():
     if status.TASK_FEEDER_PID != 0 :
         os.kill(status.TASK_FEEDER_PID, signal.SIGTERM)
+        status.TASK_FEEDER_PID =0
     scheduler.remove_all_jobs()
 
 def add_observation(obj):
