@@ -9,6 +9,7 @@ from satnogsclient.upsat import serial_handler
 from satnogsclient.upsat import gnuradio_handler
 import logging
 import cPickle
+import os
 
 logger = logging.getLogger('satnogsclient')
 app = Flask(__name__)
@@ -52,13 +53,21 @@ def get_status_info():
 
 @app.route('/control_rx', methods=['GET', 'POST'])
 def get_control_rx():
+    if int(os.environ['ECSS_FEEDER_PID']) == 0:
+        tmp = {}
+        tmp['log_message'] = 'Ecss feeder thread not online'
+        return jsonify(tmp)
     sock = Udpsocket(('127.0.0.1', client_settings.CLIENT_LISTENER_UDP_PORT))
     packet_list = ""
     try:
         conn = sock.send_listen("Requesting received packets", ('127.0.0.1', client_settings.ECSS_FEEDER_UDP_PORT))
-    except:
+        data = conn[0]
+    except Exception as e:
         logger.error("An error with the ECSS feeder occured")
-    data = conn[0]
+        logger.error(e)
+        tmp = {}
+        tmp['log_message'] = e
+        return jsonify(tmp)
     packet_list = json.loads(data)
     """
     The received 'packet_list' is a json string containing packets. Actually it is a list of dictionaries:

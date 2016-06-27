@@ -19,13 +19,19 @@ from satnogsclient.observer.observer import Observer
 from satnogsclient.receiver import SignalReceiver
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
-from satnogsclient.upsat import upsat_status_settings as status
 from satnogsclient.upsat import serial_handler
 from satnogsclient.upsat.gnuradio_handler import write_to_gnuradio, read_from_gnuradio
 from time import sleep
 
-
 logger = logging.getLogger('satnogsclient')
+
+
+def signal_term_handler(signal, frame):
+    dictionary = frame.f_locals
+    if 'child_pid' in dictionary:
+        os.kill(dictionary['child_pid'], signal.SIGKILL)
+
+signal.signal(signal.SIGTERM, signal_term_handler)
 
 
 def spawn_observer(*args, **kwargs):
@@ -78,7 +84,7 @@ def spawn_receiver(*args, **kwargs):
 
 
 def post_data():
-    print 'Post data started'
+    logger.info('Post data started')
     """PUT observation data back to Network API."""
     base_url = urljoin(settings.NETWORK_API_URL, 'data/')
     headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
@@ -111,7 +117,7 @@ def post_data():
 
 
 def get_jobs():
-    print 'Get jobs started'
+    logger.info('Get jobs started')
     """Query SatNOGS Network API to GET jobs."""
     url = urljoin(settings.NETWORK_API_URL, 'jobs/')
     params = {'ground_station': settings.GROUND_STATION_ID}
@@ -159,34 +165,39 @@ def get_jobs():
     if b:
         sock.send_not_recv(json.dumps(tasks))
     else:
-        print 'Task listener thread not online'
+        logger.info('Task listener thread not online')
 
 
 def task_feeder(port1, port2):
     sleep(1)
-    logger.info('Started task feeder')
-    print port1, ' ', port2
-    sock = Commsocket('127.0.0.1', port1)
-    sock.bind()
-    q = Queue(maxsize=1)
-    p = Process(target=task_listener, args=(port2, q))
-    p.daemon = True
-    p.start()
-    sock.listen()
-    while 1:
-        conn = sock.accept()
-        if conn:
-            conn.recv(sock.tasks_buffer_size)
-            if not q.empty():
-                conn.send(q.get())
-            else:
-                conn.send('[]')
-    p.join()
+    child_pid = 0
+    try:
+        logger.info('Started task feeder')
+        sock = Commsocket('127.0.0.1', port1)
+        sock.bind()
+        q = Queue(maxsize=1)
+        p = Process(target=task_listener, args=(port2, q))
+        p.daemon = True
+        p.start()
+        child_pid = p.pid
+        sock.listen()
+        while 1:
+            conn = sock.accept()
+            if conn:
+                conn.recv(sock.tasks_buffer_size)
+                if not q.empty():
+                    conn.send(q.get())
+                else:
+                    conn.send('[]')
+        p.join()
+    except IOError:  # Handle SIGTERM signal
+        if child_pid != 0:
+            logger.info('Killing task_listener pid %d', child_pid)
+            os.kill(child_pid, signal.SIGKILL)
 
 
 def task_listener(port, queue):
     logger.info('Started task listener')
-    print port
     sock = Commsocket('127.0.0.1', port)
     sock.bind()
     sock.listen()
@@ -203,21 +214,27 @@ def task_listener(port, queue):
 
 def ecss_feeder(port1, port2):
     sleep(1)
-    logger.info('Started ecss feeder')
-    print port1, ' ', port2
-    sock = Udpsocket(('127.0.0.1', port1))
-    qu = Queue(maxsize=10)
-    pr = Process(target=ecss_listener, args=(port2, qu))
-    pr.daemon = True
-    pr.start()
-    while 1:
-        conn = sock.recv()
-        list = []
-        while not qu.empty():
-            a = qu.get()
-            list.append(a)
-        sock.sendto(json.dumps(list), conn[1])
-    pr.join()
+    child_pid = 0
+    try:
+        logger.info('Started ecss feeder')
+        sock = Udpsocket(('127.0.0.1', port1))
+        qu = Queue(maxsize=10)
+        pr = Process(target=ecss_listener, args=(port2, qu))
+        pr.daemon = True
+        pr.start()
+        child_pid = pr.pid
+        while 1:
+            conn = sock.recv()
+            new_list = []
+            while not qu.empty():
+                a = qu.get()
+                new_list.append(a)
+            sock.sendto(json.dumps(new_list), conn[1])
+        pr.join()
+    except IOError:  # Handle SIGTERM signal
+        if child_pid != 0:
+            logger.info('Killing ecss listener pid %d', child_pid)
+            os.kill(child_pid, signal.SIGKILL)
 
 
 def ecss_listener(port, queue):
@@ -234,84 +251,98 @@ def ecss_listener(port, queue):
 
 def status_listener():
     logger.info('Started upsat status listener')
+    logger.info('Starting scheduler...')
+    scheduler.start()
+    interval = settings.NETWORK_API_QUERY_INTERVAL
+    scheduler.add_job(get_jobs, 'interval', minutes=interval)
+    msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
+    logger.info(msg)
+    interval = settings.NETWORK_API_POST_INTERVAL
+    msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
+    logger.info(msg)
+    scheduler.add_job(post_data, 'interval', minutes=interval)
+    tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT, settings.TASK_LISTENER_TCP_PORT,))
+    tf.start()
+    os.environ['TASK_FEEDER_PID'] = str(tf.pid)
     sock = Udpsocket(('127.0.0.1', settings.STATUS_LISTENER_PORT))
+    os.environ['BACKEND_TX_PID'] = '0'
+    os.environ['BACKEND_RX_PID'] = '0'
+    os.environ['BACKEND'] = ""
+    os.environ['MODE'] = "network"
+    os.environ['ECSS_FEEDER_PID'] = '0'
+    os.environ['SCHEDULER'] = 'ON'
     while 1:
-        print 'Listening status, ', settings.STATUS_LISTENER_PORT
         conn = sock.recv()
-        dict = json.loads(conn[0])
-        if 'switch_backend' in dict.keys() and dict['switch_backend']:
-            print 'Passed ', status.BACKEND
-            if dict['backend'] == status.BACKEND:
+        dictionary = json.loads(conn[0])
+        if 'backend' in dictionary.keys():
+            if dictionary['backend'] == os.environ['BACKEND']:
                 continue
             kill_cmd_ctrl_proc()
-            if dict['backend'] == 'gnuradio':
-                status.BACKEND = 'gnuradio'
+            if dictionary['backend'] == 'gnuradio':
+                os.environ['BACKEND'] = 'gnuradio'
                 tx = Process(target=write_to_gnuradio, args=())
-                print 'Started process'
                 tx.daemon = True
                 tx.start()
-                print status.BACKEND_TX_PID
-                status.BACKEND_TX_PID = tx.pid
+                logger.info('Started gnuradio tx process %d', tx.pid)
+                os.environ['BACKEND_TX_PID'] = str(tx.pid)
                 rx = Process(target=read_from_gnuradio, args=())
                 rx.daemon = True
                 rx.start()
-                status.BACKEND_RX_PID = rx.pid
-            elif dict['backend'] == 'serial':
-                status.BACKEND = 'serial'
+                logger.info('Started gnuradio rx process %d', rx.pid)
+                os.environ['BACKEND_RX_PID'] = str(rx.pid)
+            elif dictionary['backend'] == 'serial':
+                os.environ['BACKEND'] = 'serial'
                 tx = Process(target=serial_handler.write_to_serial, args=())
                 tx.daemon = True
                 tx.start()
-                status.BACKEND_TX_PID = tx.pid
+                os.environ['BACKEND_TX_PID'] = str(tx.pid)
                 rx = Process(target=serial_handler.read_from_serial, args=())
                 rx.daemon = True
                 rx.start()
-                status.BACKEND_RX_PID = rx.pid
-        if 'switch_mode' in dict.keys() and dict['switch_mode']:
-            print 'Changing mode'
-            if dict['mode'] == status.MODE:
+                os.environ['BACKEND_RX_PID'] = str(rx.pid)
+        if 'mode' in dictionary.keys():
+            if dictionary['mode'] == os.environ['MODE']:
                 continue
-            if dict['mode'] == 'cmd_ctrl':
-                print 'Starting ecss feeder thread...'
-                status.MODE = 'cmd_ctrl'
+            logger.info('Changing mode')
+            if dictionary['mode'] == 'cmd_ctrl':
+                logger.info('Starting ecss feeder thread...')
+                os.environ['MODE'] = 'cmd_ctrl'
                 kill_netw_proc()
                 ef = Process(target=ecss_feeder, args=(settings.ECSS_FEEDER_UDP_PORT, settings.ECSS_LISTENER_UDP_PORT,))
                 ef.start()
-                status.ECSS_FEEDER_PID = ef.pid
-            elif dict['mode'] == 'network':
-                status.MODE = 'network'
+                os.environ['ECSS_FEEDER_PID'] = str(ef.pid)
+                logger.info('Started ecss_feeder process %d', ef.pid)
+            elif dictionary['mode'] == 'network':
+                os.environ['MODE'] = 'network'
                 kill_cmd_ctrl_proc()
-                if status.ECSS_FEEDER_PID != 0:
-                    os.kill(status.ECSS_FEEDER_PID, signal.SIGTERM)
-                    status.ECSS_FEEDER_PID = 0
-                interval = settings.NETWORK_API_QUERY_INTERVAL
-                msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
-                print msg
-                scheduler.add_job(get_jobs, 'interval', minutes=interval)
-                interval = settings.NETWORK_API_POST_INTERVAL
-                msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
-                print msg
-                scheduler.add_job(post_data, 'interval', minutes=interval)
-                scheduler.print_jobs()
+                if int(os.environ['ECSS_FEEDER_PID']) != 0:
+                    os.kill(int(os.environ['ECSS_FEEDER_PID']), signal.SIGTERM)
+                    os.environ['ECSS_FEEDER_PID'] = '0'
+                os.environ['SCHEDULER'] = 'ON'
+                scheduler.start()
                 tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT, settings.TASK_LISTENER_TCP_PORT,))
                 tf.start()
-                status.TASK_FEEDER_PID = tf.pid
+                os.environ['TASK_FEEDER_PID'] = str(tf.pid)
+                logger.info('Started task feeder process %d', tf.pid)
 
 
 def kill_cmd_ctrl_proc():
-    if status.BACKEND_TX_PID != 0:
-        os.kill(status.BACKEND_TX_PID, signal.SIGTERM)
-        status.BACKEND_TX_PID = 0
+    if int(os.environ['BACKEND_TX_PID']) != 0:
+        os.kill(int(os.environ['BACKEND_TX_PID']), signal.SIGKILL)
+        os.environ['BACKEND_TX_PID'] = '0'
 
-    if status.BACKEND_RX_PID != 0:
-        os.kill(status.BACKEND_RX_PID, signal.SIGTERM)
-        status.BACKEND_RX_PID = 0
+    if int(os.environ['BACKEND_RX_PID']) != 0:
+        os.kill(int(os.environ['BACKEND_RX_PID']), signal.SIGKILL)
+        os.environ['BACKEND_RX_PID'] = '0'
 
 
 def kill_netw_proc():
-    if status.TASK_FEEDER_PID != 0:
-        os.kill(status.TASK_FEEDER_PID, signal.SIGTERM)
-        status.TASK_FEEDER_PID = 0
-    scheduler.remove_all_jobs()
+    if int(os.environ['TASK_FEEDER_PID']) != 0:
+        logger.info('Killing feeder %d', int(os.environ['TASK_FEEDER_PID']))
+        os.kill(int(os.environ['TASK_FEEDER_PID']), signal.SIGTERM)
+        os.environ['TASK_FEEDER_PID'] = '0'
+    scheduler.shutdown()
+    logger.info('Scheduler shutting down')
 
 
 def add_observation(obj):
