@@ -46,12 +46,13 @@
               {% endfor %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <div id="network-switch" class="btn-group">
+              <div id="mode-switch" class="btn-group">
                 <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Network mode <span class="caret"></span>
+                  Network Mode<span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a href="#">Switch to Stand-alone mode</a></li>
+                  <li data-value="Stand-Alone"><a>Switch to Stand-alone mode</a></li>
+                  <li data-value="Network" style="display:none;"><a>Switch to Network mode</a></li>
                 </ul>
               </div>
             </ul>
@@ -67,6 +68,8 @@
     <script src="{{ url_for('static', filename='js/moment.js')}}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap-datetimepicker.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/js.cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/satnogs.js') }}"></script>
     {% block js %}{% endblock %}
   </body>
 </html>

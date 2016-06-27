@@ -9,6 +9,7 @@ $(document).ready(function() {
     });
     var backend = "gnu-radio";
 
+
     $("#comms-gnu").click(function() {
       backend = "gnu-radio";
       $("#comms-gnu").css('background-color','#5cb85c');
