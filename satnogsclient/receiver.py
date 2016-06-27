@@ -77,10 +77,7 @@ class SignalReceiver():
                 '-a': self.pcm_demodulator,
             }
 
-            args = []
-            for key in params:
-                args.append(key)
-                args.append(params[key])
+            args = ['{0} {1}'.format(key, params[key]) for key in params]
 
             if self.aprs:
                 args.append('-A')
@@ -96,11 +93,8 @@ class SignalReceiver():
                 '-q': '4'
             }
             args = ['--raw-endianness=0', '-r']
-            for key in params:
-                args.append(key)
-                args.append(params[key])
-
-            args.append('-')
+            args += ['{0} {1}'.format(key, params[key]) for key in params]
+            args += ['-']
             cmd = [settings.ENCODING_COMMAND] + args
         return cmd
 
@@ -124,10 +118,7 @@ class SignalReceiver():
                 '-g': '40'
             }
 
-        args = []
-        for key in params:
-            args.append(key)
-            args.append(params[key])
+        args = ['{0} {1}'.format(key, params[key]) for key in params]
 
         return [settings.DEMODULATION_COMMAND] + args
 
