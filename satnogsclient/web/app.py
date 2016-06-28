@@ -2,11 +2,9 @@ from flask import Flask, render_template, request, json, jsonify
 
 
 from satnogsclient import settings as client_settings
-from satnogsclient.upsat import packet
+from satnogsclient.upsat import packet, tx_handler
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
-from satnogsclient.upsat import serial_handler
-from satnogsclient.upsat import gnuradio_handler
 import logging
 import cPickle
 import os
@@ -133,15 +131,10 @@ def get_command():
             if ecss['ack'] == '1':
                 print "storing packet for verification"
 
-            buf = packet.construct_packet(ecss)
+            buf = packet.construct_packet(ecss, os.environ['BACKEND'])
             response['log_message'] = 'ECSS command send'
             response['id'] = 1
-            if requested_command['backend'] == 'serial':
-                print "CMD to Serial"
-                serial_handler.write(buf)
-            else:
-                gnuradio_handler.write(buf)
-            # else gnu radio
+            tx_handler.send_to_backend(buf)
             return jsonify(response)
     return render_template('control.j2')
 

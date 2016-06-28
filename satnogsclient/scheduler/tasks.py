@@ -20,7 +20,7 @@ from satnogsclient.receiver import SignalReceiver
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
 from satnogsclient.upsat import serial_handler
-from satnogsclient.upsat.gnuradio_handler import write_to_gnuradio, read_from_gnuradio
+from satnogsclient.upsat.gnuradio_handler import read_from_gnuradio
 from time import sleep
 
 logger = logging.getLogger('satnogsclient')
@@ -280,11 +280,6 @@ def status_listener():
             kill_cmd_ctrl_proc()
             if dictionary['backend'] == 'gnuradio':
                 os.environ['BACKEND'] = 'gnuradio'
-                tx = Process(target=write_to_gnuradio, args=())
-                tx.daemon = True
-                tx.start()
-                logger.info('Started gnuradio tx process %d', tx.pid)
-                os.environ['BACKEND_TX_PID'] = str(tx.pid)
                 rx = Process(target=read_from_gnuradio, args=())
                 rx.daemon = True
                 rx.start()
@@ -292,10 +287,6 @@ def status_listener():
                 os.environ['BACKEND_RX_PID'] = str(rx.pid)
             elif dictionary['backend'] == 'serial':
                 os.environ['BACKEND'] = 'serial'
-                tx = Process(target=serial_handler.write_to_serial, args=())
-                tx.daemon = True
-                tx.start()
-                os.environ['BACKEND_TX_PID'] = str(tx.pid)
                 rx = Process(target=serial_handler.read_from_serial, args=())
                 rx.daemon = True
                 rx.start()
@@ -327,10 +318,6 @@ def status_listener():
 
 
 def kill_cmd_ctrl_proc():
-    if int(os.environ['BACKEND_TX_PID']) != 0:
-        os.kill(int(os.environ['BACKEND_TX_PID']), signal.SIGKILL)
-        os.environ['BACKEND_TX_PID'] = '0'
-
     if int(os.environ['BACKEND_RX_PID']) != 0:
         os.kill(int(os.environ['BACKEND_RX_PID']), signal.SIGKILL)
         os.environ['BACKEND_RX_PID'] = '0'
