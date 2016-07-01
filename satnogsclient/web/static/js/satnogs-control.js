@@ -1,51 +1,23 @@
 $(document).ready(function() {
 
-    setInterval(function(){
-      query_control_backend({}, 'POST', '/control_rx', "application/json; charset=utf-8", "json", true);
-    }, 10000);
-
-    datepicker = $('#datetimepicker1').datetimepicker({
-       format: 'DD-MM-YYYY HH:mm:ss',
-    });
-    var backend = "gnu-radio";
-
+    init();
 
     $("#comms-gnu").click(function() {
-      backend = "gnu-radio";
-      $("#comms-gnu").css('background-color','#5cb85c');
-      $("#comms-ser").css('background-color','#d9534f');
+        mode = "gnuradio";
+        request = encode_backend_mode(mode);
+        query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+        $("#comms-gnu").css('background-color', '#5cb85c');
+        $("#comms-ser").css('background-color', '#d9534f');
     });
 
     $("#comms-ser").click(function() {
-      backend = "serial";
-      $("#comms-gnu").css('background-color','#d9534f');
-      $("#comms-ser").css('background-color','#5cb85c');
+        mode = "serial";
+        request = encode_backend_mode(mode);
+        query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+        $("#comms-gnu").css('background-color', '#d9534f');
+        $("#comms-ser").css('background-color', '#5cb85c');
     });
 
-    function display_service(selection) {
-      var services = {'custom-select':'service-param-custom',
-                      'power-select':'service-param-power',
-                      'test-select':'service-param-test',
-                      'time-select':'service-param-time',
-                      'tle-select':'service-param-tle',
-                      'ms-select':'service-param-mass-storage',
-                      'comms-select':'service-param-comms',
-                      'hk-select':'service-param-housekeeping'};
-      var keys = [];
-      for (var key in services) {
-        var elem = document.getElementById(services[key]);
-        var service_param_panel = document.getElementById('service-param-panel');
-        var service_select = document.getElementById(key);
-        if (key == selection) {
-          elem.style.display = "block";
-          service_param_panel.style.backgroundColor = '#f8f8f8';
-        }
-        else {
-          elem.style.display = "none";
-          service_select.classList.remove('active');
-        }
-      }
-    }
 
     $('#service-select li').on('click', function() {
         // Handle change on service parameter dropdowns
@@ -128,6 +100,7 @@ $(document).ready(function() {
         $select.find('option').remove();
         $select.append('<option selected="true" style="display:none;">Service sub Type</option>');
 
+        var key;
         if (subservice == "TC_VERIFICATION_SERVICE") {
             for (key in VR_SERVICE) {
                 $select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
@@ -172,13 +145,12 @@ $(document).ready(function() {
     });
 
     $('#service-param-time-report').on('change', function() {
-      elem = document.getElementById('datetimepicker1');
-      if ($('#service-param-time-report').find("option:selected").val() == "manual") {
-        elem.style.display = "table";
-      }
-      else {
-        elem.style.display = "none";
-      }
+        elem = document.getElementById('datetimepicker1');
+        if ($('#service-param-time-report').find("option:selected").val() == "manual") {
+            elem.style.display = "table";
+        } else {
+            elem.style.display = "none";
+        }
     });
 
     $('#service-param-panel :button').on('click', function() {
@@ -196,26 +168,26 @@ $(document).ready(function() {
         }
 
         if (selected_value == "Custom") {
-            var app_id = $('#service-param-app_id').val();
-            var type = $('#service-param-type').val();
-            var ack = $('#service-param-ack').val();
-            var service_type = $('#service-param-service_type').val();
-            var service_subtype = $('#service-param-service_subtype').val();
-            var dest_id = $('#service-param-dest_id').val();
-            var data = $('#service-param-service-data').val().split(",");
-            var seq_count = 0;
+            app_id = $('#service-param-app_id').val();
+            type = $('#service-param-type').val();
+            ack = $('#service-param-ack').val();
+            service_type = $('#service-param-service_type').val();
+            service_subtype = $('#service-param-service_subtype').val();
+            dest_id = $('#service-param-dest_id').val();
+            data = $('#service-param-service-data').val().split(",");
+            seq_count = 0;
         } else if (selected_value == "House keeping") {
-            var app_id = $('#service-param-hk-app_id').val();
-            var type = 1;
-            var ack = 0;
-            var service_type = 3;
-            var service_subtype = 21;
-            var dest_id = $('#service-param-hk-dest-id').val();
+            app_id = $('#service-param-hk-app_id').val();
+            type = 1;
+            ack = 0;
+            service_type = 3;
+            service_subtype = 21;
+            dest_id = $('#service-param-hk-dest-id').val();
 
-            var data = $('#service-param-hk-sid').val();
+            data = $('#service-param-hk-sid').val();
 
 
-         } //else if (selected_value == "Mass storage") {
+        } //else if (selected_value == "Mass storage") {
         //
         //     var type = 1;
         //     var ack = $('#service-param-ms-ack').val();
@@ -269,98 +241,96 @@ $(document).ready(function() {
 
         //}
         else if (selected_value == "Power") {
-            var dev_id = $('#service-param-dev-id').val();
-            var type = 1;
-            var ack = $('#service-param-power-ack').val();
+            dev_id = $('#service-param-dev-id').val();
+            type = 1;
+            ack = $('#service-param-power-ack').val();
 
-            var service_type = 8;
-            var service_subtype = 1;
-            var dest_id = $('#service-param-power-dest_id').val();
+            service_type = 8;
+            service_subtype = 1;
+            dest_id = $('#service-param-power-dest_id').val();
 
             if (dev_id == 1) {
-                var app_id = 2;
+                app_id = 2;
             } else if (dev_id == 2) {
-                var app_id = 2;
+                app_id = 2;
             } else if (dev_id == 3) {
-                var app_id = 2;
+                app_id = 2;
             } else if (dev_id == 4) {
-                var app_id = 2;
+                app_id = 2;
             } else if (dev_id == 5) {
-                var app_id = 1;
+                app_id = 1;
             } else if (dev_id == 6) {
-                var app_id = 2;
+                app_id = 2;
             } else if (dev_id == 7) {
-                var app_id = 3;
+                app_id = 3;
             } else if (dev_id == 8) {
-                var app_id = 1;
+                app_id = 1;
             } else if (dev_id == 9) {
-                var app_id = 3;
+                app_id = 3;
             } else if (dev_id == 10) {
-                var app_id = 3;
+                app_id = 3;
             } else if (dev_id == 11) {
-                var app_id = 3;
+                app_id = 3;
             } else if (dev_id == 12) {
-                var app_id = 3;
+                app_id = 3;
             } else if (dev_id == 13) {
-                var app_id = 3;
+                app_id = 3;
             } else if (dev_id == 14) {
-                var app_id = 3;
+                app_id = 3;
             } else if (dev_id == 15) {
-                var app_id = 3;
+                app_id = 3;
             }
 
             var fun_id = $('#service-param-function').val();
-            var data = [ fun_id, dev_id];
+            data = [fun_id, dev_id];
         } else if (selected_value == "Test") {
-            var app_id = $('#service-param-test-app_id').val();
-            var type = 1;
-            var ack = 0;
+            app_id = $('#service-param-test-app_id').val();
+            type = 1;
+            ack = 0;
 
-            var service_type = 17;
-            var service_subtype = 1;
-            var dest_id = $('#service-param-test-dest_id').val();
-            var data = [];
+            service_type = 17;
+            service_subtype = 1;
+            dest_id = $('#service-param-test-dest_id').val();
+            data = [];
         } else if (selected_value == "Time") {
             // TODO: Is app_id needed in time service?
-            //var app_id = $('#service-param-time-app_id').val();
-            var app_id = 1;
-            var type = 1;
-            var ack = 0;
+            //app_id = $('#service-param-time-app_id').val();
+            app_id = 1;
+            type = 1;
+            ack = 0;
 
-            var service_type = 17;
-            var service_subtype = 1;
-            var dest_id = $('#service-param-time-dest_id').val();
+            service_type = 17;
+            service_subtype = 1;
+            dest_id = $('#service-param-time-dest_id').val();
 
             selected_action = $('#service-param-time-report').find("option:selected").val();
 
             if (selected_action == 'manual') {
-              var datetime = datepicker.data("DateTimePicker").date();
-              var data = [datetime.utc().format().toString()];
-            }
-            else if (selected_action == 'auto') {
-              var data = [moment().utc().format().toString()];
-            }
-            else {
-              data = [];
+                var datetime = datepicker.data("DateTimePicker").date();
+                data = [datetime.utc().format().toString()];
+            } else if (selected_action == 'auto') {
+                data = [moment().utc().format().toString()];
+            } else {
+                data = [];
             }
         } else if (selected_value == "ADCS TLE update") {
             // TODO: Is app_id needed in time service?
-            //var app_id = $('#service-param-time-app_id').val();
-            var app_id = 7;
-            var type = 0;
-            var ack = 0;
+            //app_id = $('#service-param-time-app_id').val();
+            app_id = 7;
+            type = 0;
+            ack = 0;
 
-            var service_type = 3;
-            var service_subtype = 23;
-            var dest_id = 3;
+            service_type = 3;
+            service_subtype = 23;
+            dest_id = 3;
 
             data = [];
             ascii_to_dec($('#service-param-service-tle').val().split(''), data);
             data.unshift(6);
             //number of TLE chanacters
-            if(data.length != 137) {
-              alert("TLE shouldnt be: " + data.length);
-              return 0;
+            if (data.length != 137) {
+                alert("TLE shouldnt be: " + data.length);
+                return 0;
             }
         }
 
@@ -384,7 +354,7 @@ $(document).ready(function() {
 
     $("#time-radio").change(function() {
         // If checkbox not checked already
-        if ($('input[name=power-radio]').prop('checked') == true) {
+        if ($('input[name=power-radio]').prop('checked') === true) {
             var elem = document.getElementById('subservice-params-time');
             var elem2 = document.getElementById('subservice-params-power');
             elem.style.display = "block";
@@ -394,44 +364,39 @@ $(document).ready(function() {
         }
     });
 
-   $(':file').change(function(){
-      // var file = this.files[0];
-      // var name = file.name;
-      // var size = file.size;
-      // var type = file.type;
-      //Your validation
+    $(':file').change(function() {
+        // var file = this.files[0];
+        // var name = file.name;
+        // var size = file.size;
+        // var type = file.type;
+        //Your validation
     });
 
-  $('#upload-btn').click(function(){
-    var formData = new FormData($('form')[0]);
-    $.ajax({
-        url: '/raw',  //Server script to process data
-        type: 'POST',
-        xhr: function() {  // Custom XMLHttpRequest
-            var myXhr = $.ajaxSettings.xhr();
-            if(myXhr.upload){ // Check if upload property exists
-                myXhr.upload.addEventListener('progress',progressHandlingFunction, false); // For handling the progress of the upload
-            }
-            return myXhr;
-        },
-        //Ajax events
-        // beforeSend: beforeSendHandler,
-        // success: completeHandler,
-        // error: errorHandler,
-        // Form data
-        data: formData.get('file'),
-        //Options to tell jQuery not to process data or worry about content-type.
-        cache: false,
-        contentType: false,
-        processData: false
+    $('#upload-btn').click(function() {
+        var formData = new FormData($('form')[0]);
+        $.ajax({
+            url: '/raw', //Server script to process data
+            type: 'POST',
+            xhr: function() { // Custom XMLHttpRequest
+                var myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) { // Check if upload property exists
+                    myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // For handling the progress of the upload
+                }
+                return myXhr;
+            },
+            //Ajax events
+            // beforeSend: beforeSendHandler,
+            // success: completeHandler,
+            // error: errorHandler,
+            // Form data
+            data: formData.get('file'),
+            //Options to tell jQuery not to process data or worry about content-type.
+            cache: false,
+            contentType: false,
+            processData: false
+        });
     });
-});
 
-function progressHandlingFunction(e){
-    if(e.lengthComputable){
-        $('progress').attr({value:e.loaded,max:e.total});
-    }
-}
 
     //  $("#fileinput").click(function(){
     //     input = document.getElementById('fileinput');
@@ -462,141 +427,217 @@ function progressHandlingFunction(e){
         query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
     });
 
-    function ascii_to_dec(inc, out) {
-      for (var i = 0; i < inc.length; i++) {
-        out[i] = inc[i].charCodeAt(0);
-      }
-    }
-
-    function encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count) {
-        var DataFieldHeader = new Object();
-        DataFieldHeader.CCSDSSecondaryHeaderFlag = '0';
-        DataFieldHeader.TCPacketPUSVersionNumber = '1';
-        DataFieldHeader.Ack = ack;
-        DataFieldHeader.ServiceType = service_type;
-        DataFieldHeader.ServiceSubType = service_subtype;
-        DataFieldHeader.SourceID = dest_id;
-        DataFieldHeader.Spare = '0';
-
-        var PacketID = new Object();
-        PacketID.VersionNumber = '0';
-        PacketID.Type = type;
-        PacketID.DataFieldHeaderFlag = '1';
-        PacketID.ApplicationProcessID = app_id;
-
-        var PacketSequenceControl = new Object();
-        PacketSequenceControl.SequenceFlags = '3';
-
-
-        if (typeof seq_count != "undefined") {
-            PacketSequenceControl.SequenceCount = seq_count;
-        }
-
-        var PacketDataField = new Object();
-        PacketDataField.DataFieldHeader = DataFieldHeader;
-        if (data) {
-            PacketDataField.ApplicationData = data;
-        }
-        else {
-          PacketDataField.ApplicationData = '';
-        }
-        PacketDataField.Spare = '0';
-        PacketDataField.PacketErrorControl = '5';
-
-        var PacketHeader = new Object();
-        PacketHeader.PacketID = PacketID;
-        PacketHeader.PacketSequenceControl = PacketSequenceControl;
-        PacketHeader.PacketLength = '66';
-
-        var TestServicePacket = new Object();
-        TestServicePacket.PacketHeader = PacketHeader;
-        TestServicePacket.PacketDataField = PacketDataField;
-
-        var ecss_cmd = new Object();
-        ecss_cmd.ecss_cmd = TestServicePacket;
-        ecss_cmd.backend = backend;
-
-        console.log(JSON.stringify(ecss_cmd));
-        var json_packet = JSON.stringify(ecss_cmd);
-        return json_packet;
-    }
-
-    function encode_comms_tx_rf(status) {
-      var response = new Object();
-      var custom_cmd = new Object();
-      var comms_tx_rf = new Object();
-      if (status) {
-          custom_cmd.comms_tx_rf = 'comms_on';
-      } else {
-          custom_cmd.comms_tx_rf = 'comms_off';
-      }
-      response.custom_cmd = custom_cmd;
-      console.log(JSON.stringify(response));
-      var json_packet = JSON.stringify(response);
-      return json_packet;
-    }
-
-    function print_command_response(data) {
-      var response_panel = $('#response-panel-body ul');
-      var data_type;
-      if (data['id'] == 1) {
-        data_type = 'cmd';
-        log_data = data['log_message'];
-      }
-      else if (data['id'] == 2) {
-        data_type = 'ecss';
-        log_data = data['log_message'];
-      }
-      else {
-        data_type = 'other';
-        log_data = data['log_message'];
-      }
-      response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">[' + moment().format('DD-MM-YYYY HH:mm:ss').toString() + '] ' + log_data + '</li>');
-      response_panel.scrollTop = response_panel.scrollHeight;
-    }
-
     $('#filter-section input').on('change', function() {
         var itemsToFilter = $('#response-panel-body ul li');
         for (var i = 0; i < itemsToFilter.length; i++) {
-          var currentItem = itemsToFilter[i];
-          if (currentItem.getAttribute("data-type") == $(this).val()) {
-            if ($(this).is(':checked')) {
-              currentItem.classList.remove('hide-log');
-              currentItem.classList.add('show-log');
+            var currentItem = itemsToFilter[i];
+            if (currentItem.getAttribute("data-type") == $(this).val()) {
+                if ($(this).is(':checked')) {
+                    currentItem.classList.remove('hide-log');
+                    currentItem.classList.add('show-log');
+                } else {
+                    currentItem.classList.remove('show-log');
+                    currentItem.classList.add('hide-log');
+                }
             }
-            else {
-              currentItem.classList.remove('show-log');
-              currentItem.classList.add('hide-log');
-            }
-          }
         }
     });
 
-    //A function that returns the appropriate class based on the applied filters
-    function apply_log_filter(log_data_type) {
-      var status = $('#filter-section :input[value=' + log_data_type +']').is(':checked');
-      if (status) {
-        return 'show-log';
-      }
-      else {
-        return 'hide-log';
-      }
-    }
-
-    function query_control_backend(data, post_mode, url, content_type, data_type, process_data) {
-        $.ajax({
-            type: post_mode,
-            url: url,
-            contentType: content_type,
-            dataType: data_type,
-            data: data,
-            processData: process_data,
-            success: function(data) {
-                print_command_response(data);
-            },
-            error: function(data) {
-            }
-        });
-    }
+    $("#mode-switch li").click(function() {
+        var mode = $(this).attr("data-value");
+        display_control_view(mode);
+    });
 
 });
+
+function display_service(selection) {
+    var services = {
+        'custom-select': 'service-param-custom',
+        'power-select': 'service-param-power',
+        'test-select': 'service-param-test',
+        'time-select': 'service-param-time',
+        'tle-select': 'service-param-tle',
+        'ms-select': 'service-param-mass-storage',
+        'comms-select': 'service-param-comms',
+        'hk-select': 'service-param-housekeeping'
+    };
+    var keys = [];
+    for (var key in services) {
+        var elem = document.getElementById(services[key]);
+        var service_param_panel = document.getElementById('service-param-panel');
+        var service_select = document.getElementById(key);
+        if (key == selection) {
+            elem.style.display = "block";
+            service_param_panel.style.backgroundColor = '#f8f8f8';
+        } else {
+            elem.style.display = "none";
+            service_select.classList.remove('active');
+        }
+    }
+}
+
+function ascii_to_dec(inc, out) {
+    for (var i = 0; i < inc.length; i++) {
+        out[i] = inc[i].charCodeAt(0);
+    }
+}
+
+function encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count) {
+    var DataFieldHeader = {};
+    DataFieldHeader.CCSDSSecondaryHeaderFlag = '0';
+    DataFieldHeader.TCPacketPUSVersionNumber = '1';
+    DataFieldHeader.Ack = ack;
+    DataFieldHeader.ServiceType = service_type;
+    DataFieldHeader.ServiceSubType = service_subtype;
+    DataFieldHeader.SourceID = dest_id;
+    DataFieldHeader.Spare = '0';
+
+    var PacketID = {};
+    PacketID.VersionNumber = '0';
+    PacketID.Type = type;
+    PacketID.DataFieldHeaderFlag = '1';
+    PacketID.ApplicationProcessID = app_id;
+
+    var PacketSequenceControl = {};
+    PacketSequenceControl.SequenceFlags = '3';
+
+
+    if (typeof seq_count != "undefined") {
+        PacketSequenceControl.SequenceCount = seq_count;
+    }
+
+    var PacketDataField = {};
+    PacketDataField.DataFieldHeader = DataFieldHeader;
+    if (data) {
+        PacketDataField.ApplicationData = data;
+    } else {
+        PacketDataField.ApplicationData = '';
+    }
+    PacketDataField.Spare = '0';
+    PacketDataField.PacketErrorControl = '5';
+
+    var PacketHeader = {};
+    PacketHeader.PacketID = PacketID;
+    PacketHeader.PacketSequenceControl = PacketSequenceControl;
+    PacketHeader.PacketLength = '66';
+
+    var TestServicePacket = {};
+    TestServicePacket.PacketHeader = PacketHeader;
+    TestServicePacket.PacketDataField = PacketDataField;
+
+    var ecss_cmd = {};
+    ecss_cmd.ecss_cmd = TestServicePacket;
+    ecss_cmd.backend = backend;
+
+    console.log(JSON.stringify(ecss_cmd));
+    var json_packet = JSON.stringify(ecss_cmd);
+    return json_packet;
+}
+
+function encode_comms_tx_rf(status) {
+    var response = {};
+    var custom_cmd = {};
+    var comms_tx_rf = {};
+    if (status) {
+        custom_cmd.comms_tx_rf = 'comms_on';
+    } else {
+        custom_cmd.comms_tx_rf = 'comms_off';
+    }
+    response.custom_cmd = custom_cmd;
+    console.log(JSON.stringify(response));
+    var json_packet = JSON.stringify(response);
+    return json_packet;
+}
+
+function encode_backend_mode(mode) {
+    var response = {};
+    var custom_cmd = {};
+    var backend = {};
+    if (mode == "gnuradio") {
+        custom_cmd.backend = 'gnuradio';
+    } else if (mode == "serial") {
+        custom_cmd.backend = 'serial';
+    }
+    response.custom_cmd = custom_cmd;
+    console.log(JSON.stringify(response));
+    var json_packet = JSON.stringify(response);
+    return json_packet;
+}
+
+function print_command_response(data) {
+    var response_panel = $('#response-panel-body ul');
+    var data_type;
+    if (data.id == 1) {
+        data_type = 'cmd';
+        log_data = data.log_message;
+    } else if (data.id == 2) {
+        data_type = 'ecss';
+        log_data = data.log_message;
+    } else {
+        data_type = 'other';
+        log_data = data.log_message;
+    }
+    response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">[' + moment().format('DD-MM-YYYY HH:mm:ss').toString() + '] ' + log_data + '</li>');
+    response_panel.scrollTop = response_panel.scrollHeight;
+}
+
+//A function that returns the appropriate class based on the applied filters
+function apply_log_filter(log_data_type) {
+    var status = $('#filter-section :input[value=' + log_data_type + ']').is(':checked');
+    if (status) {
+        return 'show-log';
+    } else {
+        return 'hide-log';
+    }
+}
+
+function query_control_backend(data, post_mode, url, content_type, data_type, process_data) {
+    $.ajax({
+        type: post_mode,
+        url: url,
+        contentType: content_type,
+        dataType: data_type,
+        data: data,
+        processData: process_data,
+        success: function(data) {
+            print_command_response(data);
+        },
+        error: function(data) {}
+    });
+}
+
+function display_control_view(mode) {
+    if (mode == 'Network') {
+        // Disable Upsat Command and Control
+        $('#cnc_mode').css('display', 'none');
+        $('#network_mode').css('display', 'block');
+    } else if (mode == 'Stand-Alone') {
+        // Enable Upsat Command and Control
+        $('#cnc_mode').css('display', 'block');
+        $('#network_mode').css('display', 'none');
+    }
+}
+
+function init() {
+    // Various variable definition
+    var app_id, type, ack, service_type, service_subtype, dest_id, data, seq_count;
+
+    //mode = $("#mode-switch li").attr("data-value");
+    mode = Cookies.get('mode');
+    display_control_view(mode);
+
+    // Set initial back-end mode
+    backend = 'gnuradio';
+    request = encode_backend_mode(backend);
+    query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+    // Setup the periodic packet polling
+    setInterval(function() {
+        query_control_backend({}, 'POST', '/control_rx', "application/json; charset=utf-8", "json", true);
+    }, 10000);
+
+    // Setup the datetimepicker
+    datepicker = $('#datetimepicker1').datetimepicker({
+        format: 'DD-MM-YYYY HH:mm:ss',
+    });
+}

@@ -7,6 +7,8 @@ from satnogsclient.upsat import packet_settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
 from satnogsclient.upsat import hldlc
+from satnogsclient import settings
+import json
 
 logger = logging.getLogger('satnogsclient')
 
@@ -185,6 +187,12 @@ def comms_on():
     struct.pack_into("<I", data, 21, 0xa94ee2d3)
     d = bytearray(data)
     sock.sendto(d, (packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT))
+
+
+def custom_cmd_to_backend(data):
+    sock = Udpsocket([])
+    packet = json.dumps(data)
+    sock.sendto(packet, ('127.0.0.1', settings.STATUS_LISTENER_PORT))
 
 
 def construct_packet(ecss_dict, backend):
