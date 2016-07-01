@@ -3,11 +3,11 @@ import binascii
 import struct
 import ctypes
 
+from satnogsclient import settings
 from satnogsclient.upsat import packet_settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
 from satnogsclient.upsat import hldlc
-from satnogsclient import settings
 import json
 
 logger = logging.getLogger('satnogsclient')
@@ -169,10 +169,10 @@ def comms_off():
     sock = Udpsocket([])
     data = ctypes.create_string_buffer(25)
     data[0:9] = 'RF SW CMD'
-    struct.pack_into("<I", data, 9, 0x593d55df)
-    struct.pack_into("<I", data, 13, 0x4d2f84c0)
-    struct.pack_into("<I", data, 17, 0x24d60191)
-    struct.pack_into("<I", data, 21, 0x9287b5fd)
+    struct.pack_into("<I", data, 9, settings.RF_SW_CMD_OFF_1)
+    struct.pack_into("<I", data, 13, settings.RF_SW_CMD_OFF_2)
+    struct.pack_into("<I", data, 17, settings.RF_SW_CMD_OFF_3)
+    struct.pack_into("<I", data, 21, settings.RF_SW_CMD_OFF_4)
     d = bytearray(data)
     sock.sendto(d, (packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT))
 
@@ -181,10 +181,11 @@ def comms_on():
     sock = Udpsocket([])
     data = ctypes.create_string_buffer(25)
     data[0:9] = 'RF SW CMD'
-    struct.pack_into("<I", data, 9, 0xda4942a9)
-    struct.pack_into("<I", data, 13, 0xa7a45d61)
-    struct.pack_into("<I", data, 17, 0x413981b)
-    struct.pack_into("<I", data, 21, 0xa94ee2d3)
+    struct.pack_into("<I", data, 9, settings.RF_SW_CMD_ON_1)
+    struct.pack_into("<I", data, 13, settings.RF_SW_CMD_ON_2)
+    struct.pack_into("<I", data, 17, settings.RF_SW_CMD_ON_3)
+    struct.pack_into("<I", data, 21, settings.RF_SW_CMD_ON_4)
+    print data.raw
     d = bytearray(data)
     sock.sendto(d, (packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT))
 
