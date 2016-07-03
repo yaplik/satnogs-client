@@ -18,7 +18,7 @@ if __name__ == '__main__':
     ser = threading.Thread(target=status_listener,args=())
     ser.daemon = True
     ser.start()
-
+    
     try:
         logger.info('Press Ctrl+C to exit SatNOGS poller')
         app.run(host='0.0.0.0', port=5000)

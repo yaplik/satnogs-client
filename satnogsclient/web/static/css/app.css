@@ -131,7 +131,7 @@ body {
 #service-param-panel {
   text-align: left;
   margin-left: -18px;
-  height: 500px;
+  height: 650px;
   background-color: #f8f8f8;
   border-radius: 0 5px 5px 5px;
   border-radius: 0 5px 5px 5px;
@@ -275,10 +275,7 @@ body {
   font-size: 10px;
   background-color: rgb(230, 230, 205);
   margin-left: 0px;
-}
-
-#filter-section ul {
-  margin-left: 10px;
+  margin-right: 0px;
 }
 
 .show-log {

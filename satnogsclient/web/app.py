@@ -170,10 +170,16 @@ def status():
     return render_template('status.j2')
 
 
-@app.route('/control/')
-def control():
-    '''Control status satnogs-client.'''
-    return render_template('control.j2')
+@app.route('/upsat_control/')
+def upsat_control():
+    '''UPSat command and control view.'''
+    return render_template('upsat_control.j2')
+
+
+@app.route('/satnogs_control/')
+def satnogs_control():
+    '''Satnogs command and control view.'''
+    return render_template('satnogs_control.j2')
 
 
 @app.route('/configuration/')

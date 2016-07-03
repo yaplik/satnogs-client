@@ -156,10 +156,10 @@ $(document).ready(function() {
     $('#service-param-panel :button').on('click', function() {
 
         var list = $('this').parent().siblings().find('select');
-        var selected_value = $('#service-select li.active a').text();
+        var selected_value = $('#service-select li.active').attr("data-value");
+
         //TODO: Check whether all required fields are selected
         var missing = [];
-        var flag = true;
         for (i = 0; i < list.length; i++) {
             if (isNaN(list[i].value)) {
                 missing.push(list[i].value);
@@ -167,7 +167,7 @@ $(document).ready(function() {
             }
         }
 
-        if (selected_value == "Custom") {
+        if (selected_value == "custom") {
             app_id = $('#service-param-app_id').val();
             type = $('#service-param-type').val();
             ack = $('#service-param-ack').val();
@@ -176,7 +176,11 @@ $(document).ready(function() {
             dest_id = $('#service-param-dest_id').val();
             data = $('#service-param-service-data').val().split(",");
             seq_count = 0;
-        } else if (selected_value == "House keeping") {
+
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+        } else if (selected_value == "house") {
             app_id = $('#service-param-hk-app_id').val();
             type = 1;
             ack = 0;
@@ -185,9 +189,10 @@ $(document).ready(function() {
             dest_id = $('#service-param-hk-dest-id').val();
 
             data = $('#service-param-hk-sid').val();
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
 
-
-        } //else if (selected_value == "Mass storage") {
+        // } else if (selected_value == "mass") {
         //
         //     var type = 1;
         //     var ack = $('#service-param-ms-ack').val();
@@ -199,30 +204,31 @@ $(document).ready(function() {
         //
         //     var fun = $('#service-param-ms-function').val();
         //
-        //     if(fun == "Format")
+        //     if (fun == "Format") {
         //         if (confirm('Are you sure you want to format the sd?')) {
         //             var service_subtype = 15;
         //         } else {
         //             return 0;
         //         }
-        //     } else if(fun == "File_system") {
+        //
+        //     } else if (fun == "File_system") {
         //         var action = $('#service-param-ms-action').val();
         //
-        //         if(action == "Report") {
+        //         if (action == "Report") {
         //
         //             var fn = $('#service-param-service-ms-iter').val();
         //
         //             var service_subtype = 12;
         //             data[0] = store_id;
         //
-        //             data[1] =  0x000000FF & fn;
-        //             data[2] =  0x000000FF & (fn >> 8);
-        //             data[3] =  0x000000FF & (fn >> 16);
-        //             data[4] =  0x000000FF & (fn >> 24);
+        //             data[1] = 0x000000FF & fn;
+        //             data[2] = 0x000000FF & (fn >> 8);
+        //             data[3] = 0x000000FF & (fn >> 16);
+        //             data[4] = 0x000000FF & (fn >> 24);
         //
-        //         } else if(action == "Uplink") {
+        //         } else if (action == "Uplink") {
         //             continue;
-        //         } else if(action == "Delete") {
+        //         } else if (action == "Delete") {
         //
         //             var service_subtype = 11;
         //             data[0] = store_id;
@@ -235,12 +241,11 @@ $(document).ready(function() {
         //             data[5] = 0;
         //         }
         //
-        //     } else if(fun == "Enable") {
-        //       continue;
+        //     } else if (fun == "Enable") {
+        //         continue;
         //     }
-
-        //}
-        else if (selected_value == "Power") {
+        //
+         } else if (selected_value == "power") {
             dev_id = $('#service-param-dev-id').val();
             type = 1;
             ack = $('#service-param-power-ack').val();
@@ -283,7 +288,11 @@ $(document).ready(function() {
 
             var fun_id = $('#service-param-function').val();
             data = [fun_id, dev_id];
-        } else if (selected_value == "Test") {
+
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+        } else if (selected_value == "test") {
             app_id = $('#service-param-test-app_id').val();
             type = 1;
             ack = 0;
@@ -292,7 +301,11 @@ $(document).ready(function() {
             service_subtype = 1;
             dest_id = $('#service-param-test-dest_id').val();
             data = [];
-        } else if (selected_value == "Time") {
+
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+        } else if (selected_value == "time") {
             // TODO: Is app_id needed in time service?
             //app_id = $('#service-param-time-app_id').val();
             app_id = 1;
@@ -313,7 +326,11 @@ $(document).ready(function() {
             } else {
                 data = [];
             }
-        } else if (selected_value == "ADCS TLE update") {
+
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+        } else if (selected_value == "adcs") {
             // TODO: Is app_id needed in time service?
             //app_id = $('#service-param-time-app_id').val();
             app_id = 7;
@@ -332,24 +349,19 @@ $(document).ready(function() {
                 alert("TLE shouldnt be: " + data.length);
                 return 0;
             }
-        }
 
-        if (flag) {
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
             query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-        } else {
-            alert('Please fill ' + missing);
+
+        } else if (selected_value == "comms") {
+            if ($(this).attr("id") == "comms-tx-on") {
+                request = encode_comms_tx_rf(1);
+                query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            } else if ($(this).attr("id") == "comms-tx-off") {
+                request = encode_comms_tx_rf(0);
+                query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            }
         }
-    });
-
-    $("#comms-tx-on").click(function() {
-        request = encode_comms_tx_rf(1);
-        query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-    });
-
-    $("#comms-tx-off").click(function() {
-        request = encode_comms_tx_rf(0);
-        query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
     });
 
     $("#time-radio").change(function() {
@@ -441,6 +453,14 @@ $(document).ready(function() {
                 }
             }
         }
+    });
+
+    $('#clear-log').on('click', function() {
+      var itemsToFilter = $('#response-panel-body ul li');
+      for (var i = 0; i < itemsToFilter.length; i++) {
+        var currentItem = itemsToFilter[i];
+        currentItem.remove();
+      }
     });
 
     $("#mode-switch li").click(function() {

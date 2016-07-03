@@ -19,6 +19,11 @@
     ('/configuration/', 'configuration', 'Configuration')
   ] -%}
 
+  {% set control_menu = [
+    ('/satnogs_control', 'satnogs', 'Ground Station'),
+    ('/upsat_control', 'upsat', 'UPSat')
+  ] -%}
+
   {% set active_page = active_page|default('status') -%}
 
   <body>
@@ -40,9 +45,20 @@
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
               {% for href, id, caption in navigation_bar %}
+                {% if id == 'control' %}
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ caption|e }} <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    {% for href, id, caption in control_menu %}
+                    <li><a href="{{ href|e }}">{{ caption|e }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </li>
+                {% else %}
                 <li{% if id == active_page %} class="active"{% endif
                 %}><a href="{{ href|e }}">{{ caption|e }}</a>
                 </li>
+                {% endif %}
               {% endfor %}
             </ul>
             <ul class="nav navbar-nav navbar-right">

@@ -1,11 +1,11 @@
 {% extends "base.j2" %}
-{% set active_page = "control" %}
+{% set active_page = "upsat_control" %}
 
-{% block title %} - Control{% endblock %}
+{% block title %} - UPSat C&amp;C{% endblock %}
 
 {% block content %}
   <div class="container">
-    <h1>Control</h1>
+    <h1>UPSat C&amp;C</h1>
     <div class="row" id="cnc_mode">
       <div class="col-md-7">
         <div class="row" id="switch-panel">
@@ -18,6 +18,7 @@
                       <button type="button" class="btn label-success" name="" id="comms-gnu">GNURadio</button>
                       <button type="button" class="btn label-danger" name="" id="comms-ser">Serial</button>
                     </div>
+
                   </div>
               </div>
             </div>
@@ -25,14 +26,14 @@
             <div class="row">
               <div class="col-xs-4">
                 <ul class="nav nav-tabs nav-stacked" id="service-select">
-                  <li role="presentation" id="time-select" class="active"><a>Time</a></li>
-                  <li role="presentation" id="power-select"><a>Power</a></li>
-                  <li role="presentation" id="test-select"><a>Test</a></li>
-                  <li role="presentation" id="ms-select"><a>Mass Storage</a></li>
-                  <li role="presentation" id="hk-select"><a>House keeping</a></li>
-                  <li role="presentation" id="custom-select"><a>Custom</a></li>
-                  <li role="presentation" id="tle-select"><a>ADCS TLE update</a></li>
-                  <li role="presentation" id="comms-select"><a>Comms</a></li>
+                  <li data-value="time" role="presentation" id="time-select" class="active"><a>Time</a></li>
+                  <li data-value="power" role="presentation" id="power-select"><a>Power</a></li>
+                  <li data-value="test" role="presentation" id="test-select"><a>Test</a></li>
+                  <li data-value="mass" role="presentation" id="ms-select"><a>Mass Storage</a></li>
+                  <li data-value="house" role="presentation" id="hk-select"><a>House keeping</a></li>
+                  <li data-value="custom" role="presentation" id="custom-select"><a>Custom</a></li>
+                  <li data-value="adcs" role="presentation" id="tle-select"><a>ADCS TLE update</a></li>
+                  <li data-value="comms" role="presentation" id="comms-select"><a>Comms</a></li>
                 </ul>
               </div>
               <div class="col-xs-8" id="service-param-panel">
@@ -277,57 +278,103 @@
                     </div>
                   </div>
                   <div class="row">
-                    <select id="service-param-ms-function" class="form-control">
-                      <option selected="true" style="display:none;">App ID</option>
-                      <option value="File_system" >File system</option>
-                      <option value="Format" >Format</option>
-                      <option value="Enable" >Enable</option>
-                    </select>
-                    <select id="service-param-ms-ack" class="form-control">
-                      <option selected="true" style="display:none;">ACK</option>
-                      <option value="1" >ACK</option>
-                      <option value="0" >NO ACK</option>
-                    </select>
-                    <select id="service-param-test-ms-dest-id" class="form-control">
-                      <option selected="true" style="display:none;">Dest ID</option>
-                      <option value="6" >GND</option>
-                      <option value="7" >UMB</option>
-                    </select>
-                    <select id="service-param-ms-sid" class="form-control">
-                      <option selected="true" style="display:none;">Service Type</option>
-                      <option value="1" >SU_SCRIPT 1</option>
-                      <option value="2" >SU_SCRIPT 2</option>
-                      <option value="3" >SU_SCRIPT 3</option>
-                      <option value="4" >SU_SCRIPT 4</option>
-                      <option value="5" >SU_SCRIPT 5</option>
-                      <option value="6" >SU_SCRIPT 6</option>
-                      <option value="7" >SU_SCRIPT 7</option>
-                      <option value="8" >SU_LOG</option>
-                      <option value="9" >WOD_LOG</option>
-                      <option value="10" >EXT_WOD_LOG</option>
-                      <option value="11" >EVENT_LOG</option>
-                      <option value="12" >FOTOS</option>
-                    </select>
-                    <select id="service-param-ms-action" class="form-control">
-                      <option selected="true" style="display:none;">ACK</option>
-                      <option value="Delete" >Delete All</option>
-                      <option value="Report" >Report</option>
-                      <option value="Uplink" >Uplink</option>
-                    </select>
-                    <div class="text-center m-b-md">
-                      <label> Iter: </label>
-                      <input type="text" id="service-param-service-ms-iter">
+                    <div class="col-md-4">
+                      <label>Function:</label>
                     </div>
-                    <div id="service-param-ms-fs-action">
-                      <label> File name </label>
-                      <label> File size </label>
-                      <label> Modified </label>
-                      <button class="btn btn-primary"> View </button>
-                      <button class="btn btn-primary"> Delete </button>
-                      <button class="btn btn-primary"> Delete To</button>
+                    <div class="col-md-8">
+                      <select id="service-param-ms-function" class="form-control">
+                        <option selected="true" style="display:none;">App ID</option>
+                        <option value="File_system" >File system</option>
+                        <option value="Format" >Format</option>
+                        <option value="Enable" >Enable</option>
+                      </select>
                     </div>
-                    <div class="text-center text-center">
-                      <button class="btn btn-primary"> Send </button>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>ACK:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-ms-ack" class="form-control">
+                        <option selected="true" style="display:none;">ACK</option>
+                        <option value="1" >ACK</option>
+                        <option value="0" >NO ACK</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Destination ID:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-test-ms-dest-id" class="form-control">
+                        <option selected="true" style="display:none;">Dest ID</option>
+                        <option value="6" >GND</option>
+                        <option value="7" >UMB</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Service ID:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-ms-sid" class="form-control">
+                        <option selected="true" style="display:none;">Service ID</option>
+                        <option value="1" >SU_SCRIPT 1</option>
+                        <option value="2" >SU_SCRIPT 2</option>
+                        <option value="3" >SU_SCRIPT 3</option>
+                        <option value="4" >SU_SCRIPT 4</option>
+                        <option value="5" >SU_SCRIPT 5</option>
+                        <option value="6" >SU_SCRIPT 6</option>
+                        <option value="7" >SU_SCRIPT 7</option>
+                        <option value="8" >SU_LOG</option>
+                        <option value="9" >WOD_LOG</option>
+                        <option value="10" >EXT_WOD_LOG</option>
+                        <option value="11" >EVENT_LOG</option>
+                        <option value="12" >FOTOS</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Action:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-ms-action" class="form-control">
+                        <option selected="true" style="display:none;">Action</option>
+                        <option value="Delete" >Delete All</option>
+                        <option value="Report" >Report</option>
+                        <option value="Uplink" >Uplink</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Iter:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="text-center m-b-md">
+                        <input class="form-control" type="text" id="service-param-service-ms-iter">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div id="service-param-ms-fs-action">
+                        <button class="btn btn-primary"> View </button>
+                        <button class="btn btn-primary"> Delete </button>
+                        <button class="btn btn-primary"> Delete To</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="text-right">
+                        <button class="btn btn-primary"> Send </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -519,18 +566,23 @@
       <div class="col-md-5">
         <div class="panel panel-primary" id="response-panel">
           <div class="panel-heading">Terminal</div>
-          <div id="filter-section">
-            <ul class="list-inline">
-              <li>
-                  <strong>Show:</strong>
-                  <input checked="true" type="checkbox" value="cmd"/>
-                  <label>Command</label>
-              </li>
-              <li>
-                  <input checked="true" type="checkbox" value="other"/>
-                  <label>Other</label>
-              </li>
-            </ul>
+          <div class="row" id="filter-section">
+            <div class="col-md-9">
+              <ul class="list-inline">
+                <li>
+                    <strong>Show:</strong>
+                    <input checked="true" type="checkbox" value="cmd"/>
+                    <label>Command</label>
+                </li>
+                <li>
+                    <input checked="true" type="checkbox" value="other"/>
+                    <label>Other</label>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-3">
+              <a id="clear-log">Clear</a>
+            </div>
           </div>
           <div class="panel-body" id="response-panel-body">
             <ul class="list-unstyled" id="log-list">
@@ -550,5 +602,5 @@
 
 {% endblock %}
 {% block js %}
-<script src="{{ url_for('static', filename='js/satnogs-control.js') }}"></script>
+<script src="{{ url_for('static', filename='js/upsat-control.js') }}"></script>
 {% endblock %}
