@@ -86,13 +86,6 @@ def get_control_rx():
         return jsonify(tmp)
 
 
-@app.route('/raw', methods=['GET', 'POST'])
-def get_raw():
-    with open('/home/ctriant/hope', 'wb') as file_:
-        file_.write(request.get_data())
-    return request.get_data()
-
-
 @app.route('/command', methods=['GET', 'POST'])
 def get_command():
     requested_command = request.get_json()
