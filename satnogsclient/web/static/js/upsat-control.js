@@ -1,5 +1,4 @@
 $(document).ready(function() {
-
     init();
 
     $("#comms-gnu").click(function() {
@@ -157,7 +156,7 @@ $(document).ready(function() {
 
         var list = $('this').parent().siblings().find('select');
         var selected_value = $('#service-select li.active').attr("data-value");
-
+        data = [];
         //TODO: Check whether all required fields are selected
         var missing = [];
         for (i = 0; i < list.length; i++) {
@@ -384,61 +383,6 @@ $(document).ready(function() {
         //Your validation
     });
 
-    $('#upload-btn').click(function() {
-        var formData = new FormData($('form')[0]);
-        $.ajax({
-            url: '/raw', //Server script to process data
-            type: 'POST',
-            xhr: function() { // Custom XMLHttpRequest
-                var myXhr = $.ajaxSettings.xhr();
-                if (myXhr.upload) { // Check if upload property exists
-                    myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // For handling the progress of the upload
-                }
-                return myXhr;
-            },
-            //Ajax events
-            // beforeSend: beforeSendHandler,
-            // success: completeHandler,
-            // error: errorHandler,
-            // Form data
-            data: formData.get('file'),
-            //Options to tell jQuery not to process data or worry about content-type.
-            cache: false,
-            contentType: false,
-            processData: false
-        });
-    });
-
-
-    //  $("#fileinput").click(function(){
-    //     input = document.getElementById('fileinput');
-    //
-    //     file = input.files[0];
-    //     var reader = new FileReader();
-    //     reader.onload = function(){
-    //         var binaryString = this.result;
-    //         $.ajax({
-    //            url: '/raw',
-    //            type: 'POST',
-    //            contentType: 'application/octet-stream',
-    //            data: binaryString,
-    //            processData: false
-    //         });
-    //       };
-    //     data = reader.readAsBinaryString(file);
-    //
-    //  });
-
-    $("#send-cmd").click(function() {
-        if ($("#command-btn:first-child").text() == 'Test Service') {
-            request = encode_test_service();
-        } else {
-            alert('Invalid command');
-            request = false;
-        }
-        query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-    });
-
     $('#filter-section input').on('change', function() {
         var itemsToFilter = $('#response-panel-body ul li');
         for (var i = 0; i < itemsToFilter.length; i++) {
@@ -636,6 +580,23 @@ function display_control_view(mode) {
         $('#cnc_mode').css('display', 'block');
         $('#network_mode').css('display', 'none');
     }
+}
+
+//Retrieve file encode command and post the request
+function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, seq_count) {
+  input = document.getElementById('file');
+  file = input.files[0];
+  reader = new FileReader();
+  reader.readAsBinaryString(file.slice());
+  reader.onloadend = function(evt) {
+    if (evt.target.readyState == FileReader.DONE) {
+      data = [];
+      result = evt.target.result;
+      ascii_to_dec(result,data);
+      request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
+      query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+    }
+  };
 }
 
 function init() {
