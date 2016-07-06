@@ -285,39 +285,39 @@ def ecss_logic(ecss_dict):
 
             roll = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "roll " + roll + " "
+            report += "roll " + str(roll) + " "
 
             pitch = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "pitch " + pitch + " "
+            report += "pitch " + str(pitch) + " "
 
             yaw = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "yaw " + yaw + " "
+            report += "yaw " + str(yaw) + " "
 
             roll_dot = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "roll_dot " + roll_dot + " "
+            report += "roll_dot " + str(roll_dot) + " "
 
             pitch_dot = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "pitch_dot " + pitch_dot + " "
+            report += "pitch_dot " + str(pitch_dot) + " "
 
             yaw_dot = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "yaw_dot " + yaw_dot + " "
+            report += "yaw_dot " + str(yaw_dot) + " "
 
             x = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "x " + x + " "
+            report += "x " + str(x) + " "
 
             y = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "y " + y + " "
+            report += "y " + str(y) + " "
 
             z = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
-            report += "z " + z + " "
+            report += "z " + str(z) + " "
 
         elif ecss_dict['app_id'] == packet_settings.OBC_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
 
