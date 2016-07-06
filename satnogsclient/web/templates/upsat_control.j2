@@ -307,7 +307,7 @@
                       <label>Destination ID:</label>
                     </div>
                     <div class="col-md-8">
-                      <select id="service-param-test-ms-dest-id" class="form-control">
+                      <select id="service-param-ms-dest-id" class="form-control">
                         <option selected="true" style="display:none;">Dest ID</option>
                         <option value="6" >GND</option>
                         <option value="7" >UMB</option>
@@ -316,11 +316,11 @@
                   </div>
                   <div class="row">
                     <div class="col-md-4">
-                      <label>Service ID:</label>
+                      <label>Store ID:</label>
                     </div>
                     <div class="col-md-8">
                       <select id="service-param-ms-sid" class="form-control">
-                        <option selected="true" style="display:none;">Service ID</option>
+                        <option selected="true" style="display:none;">Store ID</option>
                         <option value="1" >SU_SCRIPT 1</option>
                         <option value="2" >SU_SCRIPT 2</option>
                         <option value="3" >SU_SCRIPT 3</option>
@@ -343,28 +343,23 @@
                     <div class="col-md-8">
                       <select id="service-param-ms-action" class="form-control">
                         <option selected="true" style="display:none;">Action</option>
-                        <option value="Delete" >Delete All</option>
+                        <option value="Delete" >Delete</option>
+                        <option value="All" >Delete all</option>
+                        <option value="Hard" >Hard delete</option>
                         <option value="Report" >Report</option>
+                        <option value="List" >List</option>
+                        <option value="Downlink" >Downlink</option>
                         <option value="Uplink" >Uplink</option>
                       </select>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-md-4">
-                      <label>Iter:</label>
+                      <label>Num/Iter:</label>
                     </div>
                     <div class="col-md-8">
                       <div class="text-center m-b-md">
-                        <input class="form-control" type="text" id="service-param-service-ms-iter">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div id="service-param-ms-fs-action">
-                        <button class="btn btn-primary"> View </button>
-                        <button class="btn btn-primary"> Delete </button>
-                        <button class="btn btn-primary"> Delete To</button>
+                        <input class="form-control" type="text" id="service-param-service-ms-num">
                       </div>
                     </div>
                   </div>
@@ -511,6 +506,18 @@
                         <option selected="true" style="display:none;">Dest ID</option>
                         <option value="6" >GND</option>
                         <option value="7" >UMB</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Application ID:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-time-app_id" class="form-control">
+                        <option selected="true" style="display:none;">Application ID:</option>
+                        <option value="1" >OBC</option>
+                        <option value="3" >ADCS</option>
                       </select>
                     </div>
                   </div>

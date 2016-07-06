@@ -12,7 +12,7 @@ class Udpsocket:
 
     """
 
-    _BUFFER_SIZE = 2048
+    _BUFFER_SIZE = 3000
     _connected = False
     """
     If the socket is used only for sending, an empty list for 'addr' is adequate
@@ -59,7 +59,7 @@ class Udpsocket:
         return self.s
 
     def recv(self):
-        data, addr = self.s.recvfrom(1024)
+        data, addr = self.s.recvfrom(3000)
         return (data, addr)
 
     def sendto(self, message, addr):
@@ -72,7 +72,7 @@ class Udpsocket:
 
     def recv_timeout(self, timeout):
         self.s.settimeout(timeout)
-        conn = self.s.recvfrom(1024)
+        conn = self.s.recvfrom(3000)
         return conn
 
     def set_timeout(self, sec):

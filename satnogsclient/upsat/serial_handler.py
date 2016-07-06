@@ -15,6 +15,7 @@ ld_socket = Udpsocket([])
 
 
 def write_to_serial(buf):
+    print "Sending data to serial ", ''.join('{:02x}'.format(x) for x in buf)
     port.write(buf)
 
 
@@ -23,7 +24,6 @@ def read_from_serial():
     buf_in = bytearray(0)
     while True:
         c = port.read()
-        # print "From serial port read"
         if len(c) != 0:
             buf_in.append(c)
             if len(buf_in) == 1 and buf_in[0] != 0x7E:
@@ -34,6 +34,7 @@ def read_from_serial():
                 ret = packet.deconstruct_packet(buf_in, ecss_dict, "serial")
                 ecss_dict = ret[0]
                 pickled = cPickle.dumps(ecss_dict)
+                print "Sending to UDP", ecss_dict
                 if ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
                     ld_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
                 else:

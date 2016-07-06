@@ -2,29 +2,27 @@ from satnogsclient.upsat import packet_settings
 
 
 def HLDLC_deframe(buf_in, buf_out):
-    assert((buf_in != 0) and (buf_out != 0))
-    assert(hex(ord(buf_in[0])) == hex(packet_settings.HLDLC_START_FLAG))
-    assert(len(buf_in) <= packet_settings.UART_BUF_SIZE)
     size = len(buf_in)
-    cnt = 0
-    for i in range(1, size):
-        if hex(ord(buf_in[i])) == hex(packet_settings.HLDLC_START_FLAG):
+    print "HLDLC size: ", size, " "
+
+    r = range(1, size)
+    for i in r:
+        if buf_in[i] == packet_settings.HLDLC_START_FLAG:
             return packet_settings.SATR_EOT
-        elif hex(ord(buf_in[i])) == hex(packet_settings.HLDLC_CONTROL_FLAG):
+        elif buf_in[i] == packet_settings.HLDLC_CONTROL_FLAG:
+            r.remove(i + 1)  # it skips the next ieteration
             i = i + 1
             if not (i < size - 1) == True:
                 return packet_settings.SATR_ERROR
-            if hex(ord(buf_in[i])) == hex(0x5E):
+            if buf_in[i] == 0x5E:
                 buf_out.append(0x7E)
-                cnt = cnt + 1
-            elif hex(ord(buf_in[i])) == hex(0x5D):
+            elif buf_in[i] == 0x5D:
                 buf_out.append(0x7D)
-                cnt = cnt + 1
             else:
                 return packet_settings.SATR_ERROR
         else:
             buf_out.append(buf_in[i])
-            cnt = cnt + 1
+
     return packet_settings.SATR_ERROR
 
 
