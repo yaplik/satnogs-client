@@ -82,7 +82,7 @@ def get_control_rx():
         return jsonify(ecss_dicts_list)
     else:
         tmp = {}
-        tmp['log_message'] = 'This is a test'
+        tmp['log_message'] = 'backend_online'
         return jsonify(tmp)
 
 

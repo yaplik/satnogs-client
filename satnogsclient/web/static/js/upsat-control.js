@@ -541,8 +541,14 @@ function print_command_response(data) {
         data_type = 'other';
         log_data = data.log_message;
     }
-    response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">[' + moment().format('DD-MM-YYYY HH:mm:ss').toString() + '] ' + log_data + '</li>');
-    response_panel.scrollTop = response_panel.scrollHeight;
+    //Check if log is just hearbeat
+    if (data.log_message == 'backend_online') {
+        console.log('backend reported online');
+        $('#backend_online').html('backend reported <span data-livestamp="'+moment().toString()+'"></span>');
+    } else {
+        response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">[' + moment().format('DD-MM-YYYY HH:mm:ss').toString() + '] ' + log_data + '</li>');
+        response_panel.scrollTop = response_panel.scrollHeight;
+    }
 }
 
 //A function that returns the appropriate class based on the applied filters

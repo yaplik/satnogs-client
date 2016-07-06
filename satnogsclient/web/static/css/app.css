@@ -271,13 +271,6 @@ body {
  *  LOG BOX STYLE
  */
 
-#filter-section {
-  font-size: 10px;
-  background-color: rgb(230, 230, 205);
-  margin-left: 0px;
-  margin-right: 0px;
-}
-
 .show-log {
     display: list-item;
 }
@@ -291,4 +284,10 @@ body {
 
 .font-bold {
   font-weight: 600;
+}
+
+#backend_online {
+  margin-top: 10px;
+  text-align: right;
+  font-size: 10px;
 }

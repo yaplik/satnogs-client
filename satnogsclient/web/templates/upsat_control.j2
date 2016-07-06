@@ -559,27 +559,43 @@
       <div class="col-md-5">
         <div class="panel panel-primary" id="response-panel">
           <div class="panel-heading">Terminal</div>
-          <div class="row" id="filter-section">
-            <div class="col-md-9">
-              <ul class="list-inline">
-                <li>
-                    <strong>Show:</strong>
-                    <input checked="true" type="checkbox" value="cmd"/>
-                    <label>Command</label>
-                </li>
-                <li>
-                    <input checked="true" type="checkbox" value="other"/>
-                    <label>Other</label>
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-3">
-              <a id="clear-log">Clear</a>
-            </div>
-          </div>
           <div class="panel-body" id="response-panel-body">
             <ul class="list-unstyled" id="log-list">
             </ul>
+          </div>
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="btn-group" role="group" aria-label="...">
+                  <button type="button" class="btn btn-default">
+                    <span class="glyphicon glyphicon-save-file" aria-hidden="true"></span>
+                  </button>
+                  <button type="button" class="btn btn-default" id="clear-log">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                  </button>
+
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="filter-section">
+                      <li>
+                        <input checked="true" type="checkbox" value="cmd"/>
+                        <label>Command</label>
+                      </li>
+                      <li>
+                        <input checked="true" type="checkbox" value="other"/>
+                        <label>Other</label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div id="backend_online"></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="panel panel-primary" id="response-panel-wod">
