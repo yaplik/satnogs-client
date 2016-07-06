@@ -303,3 +303,10 @@ EV_su_error = 9
 EV_su_scr_start = 10
 EV_pkt_pool_timeout = 11
 EV_ms_err = 12
+
+HEALTH_REP = 1
+EX_HEALTH_REP = 2
+EVENTS_REP = 3
+WOD_REP = 4
+EXT_WOD_REP = 5
+SU_SCI_HDR_REP = 6

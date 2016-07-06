@@ -632,7 +632,7 @@ function display_control_view(mode) {
 }
 
 //Retrieve file encode command and post the request
-function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, seq_count) {
+function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id) {
   input = document.getElementById('file');
   file = input.files[0];
   reader = new FileReader();
@@ -642,7 +642,10 @@ function file_encode_and_query_backend(type, app_id, service_type, service_subty
       data = [];
       result = evt.target.result;
       ascii_to_dec(result,data);
-      request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count);
+
+      data.unshift(store_id);
+      console.log(data);
+      request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
       query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
     }
   };

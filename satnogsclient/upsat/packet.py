@@ -324,7 +324,7 @@ def ecss_logic(ecss_dict):
             pointer = 1
             report = "EX_HEALTH_REP "
 
-        text += "HK {0}, FROM: {1}".format(report, ecss_dict['app_id'])
+        text = "HK {0}, FROM: {1}".format(report, ecss_dict['app_id'])
 
     elif ecss_dict['ser_type'] == packet_settings.TC_EVENT_SERVICE and ecss_dict['ser_subtype'] == packet_settings.TM_EV_NORMAL_REPORT:
 
