@@ -346,12 +346,10 @@ $(document).ready(function() {
             query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
 
           } else if (selected_value == "time") {
-              // TODO: Is app_id needed in time service?
-              //app_id = $('#service-param-time-app_id').val();
               app_id = $('#service-param-time-app_id').val();
               type = 1;
               ack = 0;
-
+              data = [];
               service_type = 9;
               dest_id = $('#service-param-time-dest_id').val();
 
@@ -359,15 +357,27 @@ $(document).ready(function() {
 
               if (selected_action == 'manual') {
                   var datetime = datepicker.data("DateTimePicker").date();
-                  data = [datetime.utc().format().toString()];
+                  dateutc = datetime;
               } else if (selected_action == 'auto') {
-                  data = [moment().utc().format().toString()];
+                  dateutc = moment();
               } else if (selected_action == 'utc') {
                   service_subtype = 3;
               } else if (selected_action == 'qb50') {
                   service_subtype = 4;
               } else {
                   return 0;
+              }
+
+              if (dateutc !== null) {
+                data[0] = dateutc.date();
+                data[1] = dateutc.month() + 1;
+                data[2] = dateutc.year() - 2000;
+                data[3] = dateutc.hour();
+                data[4] = dateutc.minute();
+                data[5] = dateutc.seconds();
+              }
+              else {
+                data = [];
               }
 
               request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
