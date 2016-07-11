@@ -1,20 +1,15 @@
 $(document).ready(function() {
     init();
 
-    $("#comms-gnu").click(function() {
-        mode = "gnuradio";
+    $("[name='backend-switch']").on('switchChange.bootstrapSwitch', function(event, state) {
+        if (state) {
+          mode = 'gnuradio';
+        }
+        else {
+          mode = 'serial';
+        }
         request = encode_backend_mode(mode);
         query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-        $("#comms-gnu").css('background-color', '#5cb85c');
-        $("#comms-ser").css('background-color', '#d9534f');
-    });
-
-    $("#comms-ser").click(function() {
-        mode = "serial";
-        request = encode_backend_mode(mode);
-        query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-        $("#comms-gnu").css('background-color', '#d9534f');
-        $("#comms-ser").css('background-color', '#5cb85c');
     });
 
 
@@ -633,10 +628,12 @@ function display_control_view(mode) {
     if (mode == 'Network') {
         // Disable Upsat Command and Control
         $('#cnc_mode').css('display', 'none');
+        $('#backend-switch').css('display', 'none');
         $('#network_mode').css('display', 'block');
     } else if (mode == 'Stand-Alone') {
         // Enable Upsat Command and Control
         $('#cnc_mode').css('display', 'block');
+        $('#backend-switch').css('display', 'block');
         $('#network_mode').css('display', 'none');
     }
 }
@@ -662,17 +659,35 @@ function file_encode_and_query_backend(type, app_id, service_type, service_subty
 }
 
 function init() {
-    // Various variable definition
-    var app_id, type, ack, service_type, service_subtype, dest_id, data, seq_count;
 
-    //mode = $("#mode-switch li").attr("data-value");
-    mode = Cookies.get('mode');
-    display_control_view(mode);
+    // Initialize bootstrap-switch
+    backend_switch = $("[name='backend-switch']");
+    backend_switch.bootstrapSwitch.defaults.size = 'normal';
+    backend_switch.bootstrapSwitch.defaults.onColor = 'success';
+    backend_switch.bootstrapSwitch.defaults.offColor = 'danger';
+    backend_switch.bootstrapSwitch.defaults.onText = 'GNURadio';
+    backend_switch.bootstrapSwitch.defaults.offText = 'Serial';
+    backend_switch.bootstrapSwitch.defaults.labelWidth = 1;
+    backend_switch.bootstrapSwitch();
 
     // Set initial back-end mode
     backend = 'gnuradio';
     request = encode_backend_mode(backend);
     query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+    // Various variable definition
+    var app_id, type, ack, service_type, service_subtype, dest_id, data, seq_count;
+
+    //mode = $("#mode-switch li").attr("data-value");
+    mode = Cookies.get('mode');
+    if (mode !== null && typeof mode != 'undefined') {
+      display_control_view(mode);
+    }
+    else {
+      default_mode = "Network";
+      Cookies.set('mode', default_mode);
+      display_control_view(default_mode);
+    }
 
     // Setup the periodic packet polling
     setInterval(function() {

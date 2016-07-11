@@ -155,7 +155,7 @@ def get_command():
             response[0] = {'id': 1, 'log_message': 'ECSS command send'}
             tx_handler.send_to_backend(buf)
             return jsonify(response)
-    return render_template('control.j2')
+    return render_template('upsat_control.j2')
 
 
 @app.route('/')

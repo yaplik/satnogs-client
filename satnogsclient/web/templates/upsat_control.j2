@@ -5,24 +5,20 @@
 
 {% block content %}
   <div class="container">
-    <h1>UPSat C&amp;C</h1>
+    <div class="row">
+      <div class="col-xs-7 col-md-3">
+        <h1>UPSat C&amp;C</h1>
+      </div>
+      <div class="col-md-4">
+        <div id="backend-switch">
+          <input type="checkbox" name="backend-switch" checked>
+        </div>
+      </div>
+    </div>
     <div class="row" id="cnc_mode">
       <div class="col-md-7">
         <div class="row" id="switch-panel">
           <div class="col-md-12" id="command-col">
-            <div class="row">
-              <div class="col-xs-12 col-md-12">
-                  <div class="inline-label-bold">Backend</div>
-                  <div>
-                    <div class="btn-group" role="group">
-                      <button type="button" class="btn label-success" name="" id="comms-gnu">GNURadio</button>
-                      <button type="button" class="btn label-danger" name="" id="comms-ser">Serial</button>
-                    </div>
-
-                  </div>
-              </div>
-            </div>
-            <hr>
             <div class="row">
               <div class="col-xs-4">
                 <ul class="nav nav-tabs nav-stacked" id="service-select">

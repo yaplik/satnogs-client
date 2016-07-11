@@ -9,6 +9,11 @@ body {
     margin-top: 8px;
 }
 
+#backend-switch {
+  margin-top: 22px;
+  float: right;
+}
+
 .no-padding {
    padding: 0 !important;
    margin: 0 !important;
