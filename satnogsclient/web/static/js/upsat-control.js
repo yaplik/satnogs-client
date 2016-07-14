@@ -12,7 +12,6 @@ $(document).ready(function() {
         query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
     });
 
-
     $('#service-select li').on('click', function() {
         // Handle change on service parameter dropdowns
         selected_service_id = $(this).prop('id');
@@ -20,122 +19,18 @@ $(document).ready(function() {
         display_service(selected_service_id);
     });
 
+    $('#service-param-sch-service-type').on('change', function() {
+        // Handle change on service parameter dropdowns
+        var subservice = $(this).find("option:selected").text();
+        var select = $('#service-param-sch-service-subtype');
+        update_subservice(subservice, select);
+    });
+
     $('#service-param-service_type').on('change', function() {
         // Handle change on service parameter dropdowns
         var subservice = $(this).find("option:selected").text();
-
-        var VR_SERVICE = {
-            TM_VR_ACCEPTANCE_SUCCESS: 1,
-            TM_VR_ACCEPTANCE_FAILURE: 2
-        };
-
-        var HK_SERVICE = {
-            TC_HK_REPORT_PARAMETERS: 21,
-            TM_HK_PARAMETERS_REPORT: 23
-        };
-
-        var EV_SERVICE = {
-            TM_EV_NORMAL_REPORT: 1,
-            TM_EV_ERROR_REPORT: 4
-        };
-
-        var FM_SERVICE = {
-            TC_FM_PERFORM_FUNCTION: 1
-        };
-
-        var SC_SERVICE = {
-            TC_SC_ENABLE_RELEASE: 1,
-            TC_SC_DISABLE_RELEASE: 2,
-            TC_SC_RESET_SCHEDULE: 3,
-            TC_SC_INSERT_TC: 4,
-            TC_SC_DELETE_TC: 5,
-            TC_SC_TIME_SHIFT_SPECIFIC: 7,
-            TC_SC_TIME_SHIFT_SELECTED_OTP: 8,
-            TC_SC_TIME_SHIFT_ALL: 15
-        };
-
-        var LD_SERVICE = {
-            TM_LD_FIRST_DOWNLINK: 1,
-            TC_LD_FIRST_UPLINK: 9,
-            TM_LD_INT_DOWNLINK: 2,
-            TC_LD_INT_UPLINK: 10,
-            TM_LD_LAST_DOWNLINK: 3,
-            TC_LD_LAST_UPLINK: 11,
-            TC_LD_ACK_DOWNLINK: 5,
-            TM_LD_ACK_UPLINK: 14,
-            TC_LD_REPEAT_DOWNLINK: 6,
-            TM_LD_REPEAT_UPLINK: 15,
-            TM_LD_REPEATED_DOWNLINK: 7,
-            TC_LD_REPEATED_UPLINK: 12,
-            TM_LD_ABORT_SE_DOWNLINK: 4,
-            TC_LD_ABORT_SE_UPLINK: 13,
-            TC_LD_ABORT_RE_DOWNLINK: 8,
-            TM_LD_ABORT_RE_UPLINK: 16
-        };
-
-        var MS_SERVICE = {
-            TC_MS_ENABLE: 1,
-            TC_MS_DISABLE: 2,
-            TC_MS_CONTENT: 8,
-            TC_MS_DOWNLINK: 9,
-            TC_MS_DELETE: 11,
-            TC_MS_REPORT: 12,
-            TM_MS_CATALOGUE_REPORT: 13,
-            TC_MS_UPLINK: 14,
-            TC_MS_FORMAT: 15
-        };
-
-        var CT_SERVICE = {
-            TC_CT_PERFORM_TEST: 1,
-            TM_CT_REPORT_TEST: 2
-        };
-
-        var $select = $('#service-param-service_subtype');
-        $select.find('option').remove();
-        $select.append('<option selected="true" style="display:none;">Service sub Type</option>');
-
-        var key;
-        if (subservice == "TC_VERIFICATION_SERVICE") {
-            for (key in VR_SERVICE) {
-                $select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_HOUSEKEEPING_SERVICE") {
-            for (key in HK_SERVICE) {
-                $select.append('<option value=' + HK_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_EVENT_SERVICE") {
-            for (key in EV_SERVICE) {
-                $select.append('<option value=' + EV_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_FUNCTION_MANAGEMENT_SERVICE") {
-            for (key in FM_SERVICE) {
-                $select.append('<option value=' + FM_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_TIME_MANAGEMENT_SERVICE") {
-            for (key in VR_SERVICE) {
-                $select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_SCHEDULING_SERVICE") {
-            for (key in SC_SERVICE) {
-                $select.append('<option value=' + SC_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_LARGE_DATA_SERVICE") {
-            for (key in LD_SERVICE) {
-                $select.append('<option value=' + LD_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_MASS_STORAGE_SERVICE") {
-            for (key in MS_SERVICE) {
-                $select.append('<option value=' + MS_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_TEST_SERVICE") {
-            for (key in CT_SERVICE) {
-                $select.append('<option value=' + CT_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_SU_MNLP_SERVICE") {
-            for (key in VR_SERVICE) {
-                $select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
-            }
-        }
+        var select = $('#service-param-service_subtype');
+        update_subservice(subservice, select);
     });
 
     $('#service-param-time-report').on('change', function() {
@@ -243,9 +138,10 @@ $(document).ready(function() {
 
                 } else if(action == "Uplink") {
 
+                       var file = $('#service-param-service-ms-num').val();
                        service_subtype = 14;
 
-                       file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id);
+                       file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file);
                        return 0;
 
                 } else if(action == "Delete") {
@@ -351,28 +247,34 @@ $(document).ready(function() {
               selected_action = $('#service-param-time-report').find("option:selected").val();
 
               if (selected_action == 'manual') {
-                  var datetime = datepicker.data("DateTimePicker").date();
+                  service_subtype = 1;
+
+                  var datetime = datepicker_time.data("DateTimePicker").date();
                   dateutc = datetime;
+
+                  data.splice(0, 0, dateutc.date());
+                  data.splice(1, 0, dateutc.month() + 1);  // 7 is delete all mode
+                  data.splice(2, 0, dateutc.year() - 2000); // pads for keeping same format as delete
+                  data.splice(3, 0, dateutc.hour());
+                  data.splice(4, 0, dateutc.minute());
+                  data.splice(5, 0, dateutc.seconds());
               } else if (selected_action == 'auto') {
+
+                  service_subtype = 1;
                   dateutc = moment();
+
+                  data.splice(0, 0, dateutc.date());
+                  data.splice(1, 0, dateutc.month() + 1);  // 7 is delete all mode
+                  data.splice(2, 0, dateutc.year() - 2000); // pads for keeping same format as delete
+                  data.splice(3, 0, dateutc.hour());
+                  data.splice(4, 0, dateutc.minute());
+                  data.splice(5, 0, dateutc.seconds());
               } else if (selected_action == 'utc') {
                   service_subtype = 3;
               } else if (selected_action == 'qb50') {
                   service_subtype = 4;
               } else {
                   return 0;
-              }
-
-              if (dateutc !== null) {
-                data[0] = dateutc.date();
-                data[1] = dateutc.month() + 1;
-                data[2] = dateutc.year() - 2000;
-                data[3] = dateutc.hour();
-                data[4] = dateutc.minute();
-                data[5] = dateutc.seconds();
-              }
-              else {
-                data = [];
               }
 
               request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
@@ -464,7 +366,8 @@ function display_service(selection) {
         'tle-select': 'service-param-tle',
         'ms-select': 'service-param-mass-storage',
         'comms-select': 'service-param-comms',
-        'hk-select': 'service-param-housekeeping'
+        'hk-select': 'service-param-housekeeping',
+        'sch-select': 'service-param-schedule'
     };
     var keys = [];
     for (var key in services) {
@@ -485,6 +388,121 @@ function ascii_to_dec(inc, out) {
     for (var i = 0; i < inc.length; i++) {
         out[i] = inc[i].charCodeAt(0);
     }
+}
+
+function update_subservice(subservice, select) {
+
+        var VR_SERVICE = {
+            TM_VR_ACCEPTANCE_SUCCESS: 1,
+            TM_VR_ACCEPTANCE_FAILURE: 2
+        };
+
+        var HK_SERVICE = {
+            TC_HK_REPORT_PARAMETERS: 21,
+            TM_HK_PARAMETERS_REPORT: 23
+        };
+
+        var EV_SERVICE = {
+            TM_EV_NORMAL_REPORT: 1,
+            TM_EV_ERROR_REPORT: 4
+        };
+
+        var FM_SERVICE = {
+            TC_FM_PERFORM_FUNCTION: 1
+        };
+
+        var SC_SERVICE = {
+            TC_SC_ENABLE_RELEASE: 1,
+            TC_SC_DISABLE_RELEASE: 2,
+            TC_SC_RESET_SCHEDULE: 3,
+            TC_SC_INSERT_TC: 4,
+            TC_SC_DELETE_TC: 5,
+            TC_SC_TIME_SHIFT_SPECIFIC: 7,
+            TC_SC_TIME_SHIFT_SELECTED_OTP: 8,
+            TC_SC_TIME_SHIFT_ALL: 15
+        };
+
+        var LD_SERVICE = {
+            TM_LD_FIRST_DOWNLINK: 1,
+            TC_LD_FIRST_UPLINK: 9,
+            TM_LD_INT_DOWNLINK: 2,
+            TC_LD_INT_UPLINK: 10,
+            TM_LD_LAST_DOWNLINK: 3,
+            TC_LD_LAST_UPLINK: 11,
+            TC_LD_ACK_DOWNLINK: 5,
+            TM_LD_ACK_UPLINK: 14,
+            TC_LD_REPEAT_DOWNLINK: 6,
+            TM_LD_REPEAT_UPLINK: 15,
+            TM_LD_REPEATED_DOWNLINK: 7,
+            TC_LD_REPEATED_UPLINK: 12,
+            TM_LD_ABORT_SE_DOWNLINK: 4,
+            TC_LD_ABORT_SE_UPLINK: 13,
+            TC_LD_ABORT_RE_DOWNLINK: 8,
+            TM_LD_ABORT_RE_UPLINK: 16
+        };
+
+        var MS_SERVICE = {
+            TC_MS_ENABLE: 1,
+            TC_MS_DISABLE: 2,
+            TC_MS_CONTENT: 8,
+            TC_MS_DOWNLINK: 9,
+            TC_MS_DELETE: 11,
+            TC_MS_REPORT: 12,
+            TM_MS_CATALOGUE_REPORT: 13,
+            TC_MS_UPLINK: 14,
+            TC_MS_FORMAT: 15
+        };
+
+        var CT_SERVICE = {
+            TC_CT_PERFORM_TEST: 1,
+            TM_CT_REPORT_TEST: 2
+        };
+
+        select.find('option').remove();
+        select.append('<option selected="true" style="display:none;">Service sub Type</option>');
+
+        var key;
+        if (subservice == "TC_VERIFICATION_SERVICE") {
+            for (key in VR_SERVICE) {
+                select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_HOUSEKEEPING_SERVICE") {
+            for (key in HK_SERVICE) {
+                select.append('<option value=' + HK_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_EVENT_SERVICE") {
+            for (key in EV_SERVICE) {
+                select.append('<option value=' + EV_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_FUNCTION_MANAGEMENT_SERVICE") {
+            for (key in FM_SERVICE) {
+                select.append('<option value=' + FM_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_TIME_MANAGEMENT_SERVICE") {
+            for (key in VR_SERVICE) {
+                select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_SCHEDULING_SERVICE") {
+            for (key in SC_SERVICE) {
+                select.append('<option value=' + SC_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_LARGE_DATA_SERVICE") {
+            for (key in LD_SERVICE) {
+                select.append('<option value=' + LD_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_MASS_STORAGE_SERVICE") {
+            for (key in MS_SERVICE) {
+                select.append('<option value=' + MS_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_TEST_SERVICE") {
+            for (key in CT_SERVICE) {
+                select.append('<option value=' + CT_SERVICE[key] + '>' + key + '</option>');
+            }
+        } else if (subservice == "TC_SU_MNLP_SERVICE") {
+            for (key in VR_SERVICE) {
+                select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
+            }
+        }
 }
 
 function encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count) {
@@ -639,7 +657,7 @@ function display_control_view(mode) {
 }
 
 //Retrieve file encode command and post the request
-function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id) {
+function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file) {
   input = document.getElementById('file');
   file = input.files[0];
   reader = new FileReader();
@@ -650,6 +668,9 @@ function file_encode_and_query_backend(type, app_id, service_type, service_subty
       result = evt.target.result;
       ascii_to_dec(result,data);
 
+      data.unshift((file >> 0) & 0x00FF); // file to uplink, applicable only to sch sid.
+      data.unshift((file >> 8) & 0x00FF); //unshifts inserts to first of the array so the order is reversed
+                                          //first the file and then the sid so the array is [sid][file (2 bytes)][data (x bytes)]
       data.unshift(store_id);
       console.log(data);
       request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
@@ -695,7 +716,12 @@ function init() {
     }, 10000);
 
     // Setup the datetimepicker
-    datepicker = $('#datetimepicker1').datetimepicker({
+    datepicker_time = $('#datetimepicker-time').datetimepicker({
+        format: 'DD-MM-YYYY HH:mm:ss',
+    });
+
+        // Setup the datetimepicker
+    datepicker_sch = $('#datetimepicker-sch').datetimepicker({
         format: 'DD-MM-YYYY HH:mm:ss',
     });
 }

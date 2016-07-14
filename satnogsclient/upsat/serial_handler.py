@@ -30,12 +30,12 @@ def read_from_serial():
                 buf_in = bytearray(0)
             elif len(buf_in) > 1 and buf_in[len(buf_in) - 1] == 0x7E:
                 print "From serial got pkt", ''.join('{:02x}'.format(x) for x in buf_in)
-                ecss_dict = []
+                ecss_dict = {}
                 ret = packet.deconstruct_packet(buf_in, ecss_dict, "serial")
                 ecss_dict = ret[0]
                 pickled = cPickle.dumps(ecss_dict)
                 print "Sending to UDP", ecss_dict
-                if ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
+                if not ecss_dict and ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
                     ld_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
                 else:
                     ecss_feeder_sock.sendto(pickled, ('127.0.0.1', client_settings.ECSS_LISTENER_UDP_PORT))

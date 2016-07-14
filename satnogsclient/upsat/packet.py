@@ -254,7 +254,7 @@ def ecss_logic(ecss_dict):
 
             time = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
-            report += "time " + time + " "
+            report += "time " + str(time) + " "
 
         elif ecss_dict['app_id'] == packet_settings.COMMS_APP_ID and struct_id == packet_settings.HEALTH_REP:
 
@@ -267,7 +267,7 @@ def ecss_logic(ecss_dict):
 
             time = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
-            report += "time " + time + " "
+            report += "time " + str(time) + " "
 
         elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
 
@@ -276,46 +276,46 @@ def ecss_logic(ecss_dict):
 
             time = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
-            report += "time " + time + " "
+            report += "time " + str(time) + " "
 
         elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.SU_SCI_HDR_REP:
 
             pointer = 1
             report = "SU_SCI_HDR_REP "
 
-            roll = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            roll = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
             report += "roll " + str(roll) + " "
 
-            pitch = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            pitch = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
             report += "pitch " + str(pitch) + " "
 
-            yaw = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            yaw = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
             pointer += 2
             report += "yaw " + str(yaw) + " "
 
-            roll_dot = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            roll_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
             pointer += 2
             report += "roll_dot " + str(roll_dot) + " "
 
-            pitch_dot = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            pitch_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
             pointer += 2
             report += "pitch_dot " + str(pitch_dot) + " "
 
-            yaw_dot = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            yaw_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
             pointer += 2
             report += "yaw_dot " + str(yaw_dot) + " "
 
-            x = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            x = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
             pointer += 2
             report += "x " + str(x) + " "
 
-            y = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            y = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
             pointer += 2
             report += "y " + str(y) + " "
 
-            z = cnv8_16(ecss_dict['data'][pointer:]) * 0.01
+            z = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
             pointer += 2
             report += "z " + str(z) + " "
 
@@ -324,19 +324,67 @@ def ecss_logic(ecss_dict):
             pointer = 1
             report = "EX_HEALTH_REP "
 
-        text = "HK {0}, FROM: {1}".format(report, ecss_dict['app_id'])
+            time = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+            report += "time " + str(time)
+
+        elif struct_id == packet_settings.EXT_WOD_REP:
+            pointer = 1
+            report = "EXT WOD"
+
+            qb50 = cnv8_32(ecss_dict['data'][pointer:])
+            utc = qb50_to_utc(qb50)
+            pointer += 4
+
+            obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+            comms = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+            eps = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+            adcs = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+
+            task_uart = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+
+            task_idle = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+
+            task_hk = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+
+            task_su = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+
+            task_sch = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            pointer += 4
+
+            report += " time " + str(qb50) + " UTC " + str(utc) + \
+                      " obc " + str(obc) + \
+                      " comms " + str(comms) + \
+                      " eps " + str(eps) + \
+                      " adcs " + str(adcs) + \
+                      " task_uart " + str(task_uart) + \
+                      " task_idle " + str(task_idle) + \
+                      " task_hk " + str(task_hk) + \
+                      " task_su " + str(task_su) + \
+                      " task_sch " + str(task_sch)
+
+        text = "HK {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
 
     elif ecss_dict['ser_type'] == packet_settings.TC_EVENT_SERVICE and ecss_dict['ser_subtype'] == packet_settings.TM_EV_NORMAL_REPORT:
 
-        # event_id = ecss_dict['data'][0]
-        # if event_id == EV_sys_boot:
-        #    report = "booted"
+        report = ""
+        event_id = ecss_dict['data'][0]
+        if event_id == packet_settings.EV_sys_boot:
+            report = "booted"
 
-        text += "EVENT {0}, FROM: {1}".format(report, ecss_dict['app_id'])
+        text += "EVENT {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
 
     elif ecss_dict['ser_type'] == packet_settings.TC_FUNCTION_MANAGEMENT_SERVICE:
         # Nothing to do here
-        text += "FM {0}, FROM: {1}".format(ecss_dict['app_id'])
+        text += "FM {0}, FROM: {1}".format(packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
 
     elif ecss_dict['ser_type'] == packet_settings.TC_TIME_MANAGEMENT_SERVICE:
 
@@ -356,7 +404,7 @@ def ecss_logic(ecss_dict):
 
             qb50 = cnv8_32(ecss_dict['data'][0:])
             utc = qb50_to_utc(qb50)
-            report = "QB50 " + qb50 + " UTC: " + utc
+            report = "QB50 " + str(qb50) + " UTC: " + str(utc)
 
         text = "TIME: {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
 
@@ -388,20 +436,24 @@ def ecss_logic(ecss_dict):
                 offset = (7 * packet_settings.SCRIPT_REPORT_SU_OFFSET) + (i * packet_settings.SCRIPT_REPORT_LOGS_OFFSET)
 
                 fnum = cnv8_16(ecss_dict['data'][(offset):])
-                tail_size = cnv8_32(ecss_dict['data'][(2 + offset):])
-                fatfs_tail = cnv8_32(ecss_dict['data'][(6 + offset):])
+
+                fname_tail = cnv8_16(ecss_dict['data'][(2 + offset):])
+                tail_size = cnv8_32(ecss_dict['data'][(4 + offset):])
+                fatfs_tail = cnv8_32(ecss_dict['data'][(8 + offset):])
                 time_modfied_tail = fatfs_to_utc(fatfs_tail)
 
-                head_size = cnv8_32(ecss_dict['data'][(10 + offset):])
-                fatfs_head = cnv8_32(ecss_dict['data'][(14 + offset):])
+                fname_head = cnv8_16(ecss_dict['data'][(12 + offset):])
+                head_size = cnv8_32(ecss_dict['data'][(14 + offset):])
+                fatfs_head = cnv8_32(ecss_dict['data'][(18 + offset):])
                 time_modfied_head = fatfs_to_utc(fatfs_head)
 
                 print "offset: " + str(offset) + " script " + packet_settings.upsat_store_ids[str(i + 8)] + " number of files: " + str(fnum) + " tail size: " + str(tail_size) + \
                     " tail time_modfied: " + str(time_modfied_tail) + " head size: " + str(head_size) + " head time_modfied: " + str(time_modfied_head)
                 print "raw ", ' '.join('{:02x}'.format(x) for x in ecss_dict['data'][(offset):(offset + packet_settings.SCRIPT_REPORT_LOGS_OFFSET)])
 
-                report += "script " + packet_settings.upsat_store_ids[str(i + 8)] + " number of files: " + str(fnum) + " tail size: " + str(tail_size) + " tail time_modfied: " + \
-                    str(time_modfied_tail) + " head size: " + str(head_size) + " head time_modfied: " + str(time_modfied_head) + "\n"
+                report += "script " + packet_settings.upsat_store_ids[str(i + 8)] + " number of files: " + str(fnum) + " tail name: " + str(fname_tail) + " tail size: " + \
+                    str(tail_size) + " tail time_modfied: " + str(time_modfied_tail) + " head name: " + str(fname_head) + " head size: " + str(head_size) + \
+                    " head time_modfied: " + str(time_modfied_head) + "\n"
 
         elif ecss_dict['ser_subtype'] == packet_settings.TM_MS_CATALOGUE_LIST:
 
@@ -511,3 +563,17 @@ def cnv8_32(inc):
 
 def cnv8_16(inc):
     return ((inc[1] << 8) | (inc[0]))
+
+
+def cnv_signed_8_32(inc):
+    res = ((inc[3] << 24) | (inc[2] << 16) | (inc[1] << 8) | (inc[0]))
+    if (res >> 31) == 1:
+        res = (0xFFFFFFFF - res) * -1
+    return res
+
+
+def cnv_signed_8_16(inc):
+    res = ((inc[1] << 8) | (inc[0]))
+    if (res >> 15) == 1:
+        res = (0xFFFF - res) * -1
+    return res

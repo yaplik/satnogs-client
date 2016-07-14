@@ -30,6 +30,7 @@
                   <li data-value="custom" role="presentation" id="custom-select"><a>Custom</a></li>
                   <li data-value="adcs" role="presentation" id="tle-select"><a>ADCS TLE update</a></li>
                   <li data-value="comms" role="presentation" id="comms-select"><a>Comms</a></li>
+                  <li data-value="sch" role="presentation" id="sch-select"><a>Schedule</a></li>
                 </ul>
               </div>
               <div class="col-xs-8" id="service-param-panel">
@@ -69,7 +70,7 @@
                     </div>
                     <div class="col-md-8">
                       <select id="service-param-app_id" class="form-control">
-                        <option selected="true" style="display:none;">Applicaiton ID:</option>
+                        <option selected="true" style="display:none;">Application ID:</option>
                         <option value="1" >OBC</option>
                         <option value="2" >EPS</option>
                         <option value="3" >ADCS</option>
@@ -155,6 +156,148 @@
                     </div>
                     <div class="col-md-8">
                       <input class="form-control" type="text" id="service-param-service-data">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="text-right">
+                        <button class="btn btn-primary"> Send </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="service-param-schedule" style="display:none;">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Action:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-sch-action" class="form-control">
+                        <option selected="true" style="display:none;">Action:</option>
+                        <option value="ins_qb" >Insert qb50</option>
+                        <option value="ins_abs" >Insert absolute</option>
+                        <option value="del" >Delete</option>
+                        <option value="shift_all" >Timeshift all</option>
+                        <option value="shift_sel" >Timeshift selected</option>
+                        <option value="shift_seq" >Timeshift sequence</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Time:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <div class='input-group date' id='datetimepicker-sch' style="display:table;">
+                        <input type='text' class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Application ID:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-sch-app-id" class="form-control">
+                        <option selected="true" style="display:none;">Application ID:</option>
+                        <option value="1" >OBC</option>
+                        <option value="2" >EPS</option>
+                        <option value="3" >ADCS</option>
+                        <option value="4" >COMMS</option>
+                        <option value="6" >GND</option>
+                        <option value="7" >UMB</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Type:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-sch-type" class="form-control">
+                        <option selected="true" style="display:none;">Type</option>
+                        <option value="0" >TM</option>
+                        <option value="1" >TC</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>ACK:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-sch-ack" class="form-control">
+                        <option selected="true" style="display:none;">ACK</option>
+                        <option value="0" >NO ACK</option>
+                        <option value="1" >ACK</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Service Type:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-sch-service-type" class="form-control">
+                        <option selected="true" style="display:none;">Service Type</option>
+                        <option value="1" >TC_VERIFICATION_SERVICE</option>
+                        <option value="3" >TC_HOUSEKEEPING_SERVICE</option>
+                        <option value="5" >TC_EVENT_SERVICE</option>
+                        <option value="8" >TC_FUNCTION_MANAGEMENT_SERVICE</option>
+                        <option value="9" >TC_TIME_MANAGEMENT_SERVICE</option>
+                        <option value="11" >TC_SCHEDULING_SERVICE</option>
+                        <option value="13" >TC_LARGE_DATA_SERVICE</option>
+                        <option value="15" >TC_MASS_STORAGE_SERVICE</option>
+                        <option value="17" >TC_TEST_SERVICE</option>
+                        <option value="18" >TC_SU_MNLP_SERVICE</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Service Subtype:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-sch-service-subtype" class="form-control">
+                        <option selected="true" style="display:none;">Service sub Type</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Destination ID:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-sch-dest-id" class="form-control">
+                        <option selected="true" style="display:none;">Dest ID</option>
+                        <option value="1" >OBC</option>
+                        <option value="2" >EPS</option>
+                        <option value="3" >ADCS</option>
+                        <option value="4" >COMMS</option>
+                        <option value="6" >GND</option>
+                        <option value="7" >UMB</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Sequence count:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <input class="form-control" type="text" id="service-param-sch-seq-count">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Application Data:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <input class="form-control" type="text" id="service-param-sch-service-data">
                     </div>
                   </div>
                   <div class="row">
@@ -330,6 +473,7 @@
                         <option value="10" >EXT_WOD_LOG</option>
                         <option value="11" >EVENT_LOG</option>
                         <option value="12" >FOTOS</option>
+                        <option value="13" >SCHEDULE</option>
                       </select>
                     </div>
                   </div>
@@ -523,7 +667,7 @@
                       <label>Time:</label>
                     </div>
                     <div class="col-md-8">
-                      <div class='input-group date' id='datetimepicker1' style="display:table;">
+                      <div class='input-group date' id='datetimepicker-time' style="display:table;">
                         <input type='text' class="form-control" />
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
