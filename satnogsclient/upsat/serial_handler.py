@@ -8,7 +8,7 @@ from satnogsclient.upsat import packet
 from satnogsclient.observer.udpsocket import Udpsocket
 
 logger = logging.getLogger('satnogsclient')
-port = ''
+port = 0
 ecss_feeder_sock = ''
 ui_listener_sock = ''
 ld_socket = ''
@@ -39,7 +39,10 @@ def write_to_serial(buf):
     print "Sending data to serial ", ''.join('{:02x}'.format(x) for x in buf)
     global port
     try:
-        port.write(buf)
+        if port != 0:
+            port.write(buf)
+        else:
+            logger.info('Serial port is closed')
     except serial.SerialException as e:
         logger.error('Could not write to serial port. Error occured')
         logger.error(e)
@@ -54,7 +57,10 @@ def read_from_serial():
     buf_in = bytearray(0)
     while True:
         try:
-            c = port.read()
+            if port != 0:
+                c = port.read()
+            else:
+                logger.info('Serial port is closed')
         except serial.SerialException as e:
             logger.error('Could not read from serial port. Error occured')
             logger.error(e)
