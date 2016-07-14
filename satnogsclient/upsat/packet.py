@@ -137,7 +137,6 @@ def ecss_packetizer(ecss, buf):
     seq_count = ecss['seq_count']
     seq_count_ms = (seq_count >> 8) & 0x00FF
     seq_count_ls = seq_count & 0x00FF
-    seq_count_ms = seq_count >> 8
     buf[2] = (seq_flags << 6 | seq_count_ms)
     buf[3] = seq_count_ls
     if ecss['type'] == 0:

@@ -256,6 +256,7 @@ def status_listener():
     logger.info('Started upsat status listener')
     logger.info('Starting scheduler...')
     scheduler.start()
+    scheduler.remove_all_jobs()
     interval = settings.NETWORK_API_QUERY_INTERVAL
     scheduler.add_job(get_jobs, 'interval', minutes=interval)
     msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
@@ -282,6 +283,8 @@ def status_listener():
                 continue
             kill_cmd_ctrl_proc()
             if dictionary['backend'] == 'gnuradio':
+                if os.environ['BACKEND'] == 'serial':
+                    serial_handler.close()
                 os.environ['BACKEND'] = 'gnuradio'
                 rx = Process(target=read_from_gnuradio, args=())
                 rx.daemon = True
@@ -290,6 +293,7 @@ def status_listener():
                 os.environ['BACKEND_RX_PID'] = str(rx.pid)
             elif dictionary['backend'] == 'serial':
                 os.environ['BACKEND'] = 'serial'
+                serial_handler.init()
                 rx = Process(target=serial_handler.read_from_serial, args=())
                 rx.daemon = True
                 rx.start()
