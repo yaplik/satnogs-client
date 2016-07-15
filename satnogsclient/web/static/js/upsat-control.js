@@ -614,7 +614,7 @@ function print_command_response(data) {
             response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">[' + moment().format('DD-MM-YYYY HH:mm:ss').toString() + '] ' + log_data + '</li>');
      	}
     }
-    response_panel.scrollTop = response_panel.scrollHeight;
+    $('#response-panel-body').scrollTop(response_panel.height());
 }
 
 //A function that returns the appropriate class based on the applied filters
