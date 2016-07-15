@@ -17,19 +17,25 @@ ld_socket = Udpsocket([])
 
 
 def write_to_gnuradio(buf):
-    backend_feeder_sock.sendto(buf, (client_settings.GNURADIO_IP, client_settings.GNURADIO_UDP_PORT))
+    backend_feeder_sock.sendto(buf, (client_settings.GNURADIO_IP, client_settings.BACKEND_LISTENER_PORT))
 
 
 def read_from_gnuradio():
     print 'Started gnuradio listener process'
     while True:
         conn = backend_listener_sock.recv()
-        buf_in = conn[0]
-        ecss_dict = []
+        buf_in = bytearray(conn[0])
+        ecss_dict = {}
         ret = packet.deconstruct_packet(buf_in, ecss_dict, "gnuradio")
         ecss_dict = ret[0]
         pickled = cPickle.dumps(ecss_dict)
-        if ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
-            ld_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
-        else:
-            ecss_feeder_sock.sendto(pickled, ('127.0.0.1', client_settings.ECSS_LISTENER_UDP_PORT))
+        if len(ecss_dict) == 0:
+            logger.error('Ecss Dictionary not properly constructed. Error occured')
+            continue
+        try:
+            if not ecss_dict and ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
+                ld_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
+            else:
+                ecss_feeder_sock.sendto(pickled, ('127.0.0.1', client_settings.ECSS_LISTENER_UDP_PORT))
+        except KeyError:
+            logger.error('Ecss Dictionary not properly constructed. Error occured. Key \'ser_type\' not in dictionary')

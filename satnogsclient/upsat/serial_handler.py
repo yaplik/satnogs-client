@@ -82,8 +82,14 @@ def read_from_serial():
                 ecss_dict = ret[0]
                 pickled = cPickle.dumps(ecss_dict)
                 print "Sending to UDP", ecss_dict
-                if not ecss_dict and ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
-                    ld_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
-                else:
-                    ecss_feeder_sock.sendto(pickled, ('127.0.0.1', client_settings.ECSS_LISTENER_UDP_PORT))
+                if len(ecss_dict) == 0:
+                    logger.error('Ecss Dictionary not properly constructed. Error occured')
+                    continue
+                try:
+                    if not ecss_dict and ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
+                        ld_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
+                    else:
+                        ecss_feeder_sock.sendto(pickled, ('127.0.0.1', client_settings.ECSS_LISTENER_UDP_PORT))
+                except KeyError:
+                    logger.error('Ecss Dictionary not properly constructed. Error occured. Key \'ser_type\' not in dictionary')
                 buf_in = bytearray(0)
