@@ -32,7 +32,13 @@ def init():
 
 def close():
     global port
-    port.close()
+    try:
+        if port != 0:
+            port.close()
+    except serial.SerialException as e:
+        logger.error('Could not close serial port. Error occured')
+        logger.error(e)
+        return
 
 
 def write_to_serial(buf):
