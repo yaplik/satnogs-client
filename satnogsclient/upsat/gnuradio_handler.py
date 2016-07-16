@@ -17,7 +17,7 @@ ld_socket = Udpsocket([])
 
 
 def write_to_gnuradio(buf):
-    backend_feeder_sock.sendto(buf, (client_settings.GNURADIO_IP, client_settings.BACKEND_LISTENER_PORT))
+    backend_feeder_sock.sendto(buf, (client_settings.GNURADIO_IP, client_settings.GNURADIO_UDP_PORT))
 
 
 def read_from_gnuradio():
