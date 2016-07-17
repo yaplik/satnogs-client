@@ -1,17 +1,36 @@
-import logging
 import binascii
-import struct
 import ctypes
 import datetime
+import json
+import logging
+import os
+import struct
+import time
 
 from satnogsclient import settings
-from satnogsclient.upsat import packet_settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
 from satnogsclient.upsat import hldlc
-import json
+from satnogsclient.upsat import packet_settings
+
 
 logger = logging.getLogger('satnogsclient')
+log_path = ""
+
+
+def folder_init():
+    global log_path
+    log_path = settings.OUTPUT_PATH + "/files/"
+    print "Dir ", log_path, settings.OUTPUT_PATH
+    if not os.path.exists(log_path):
+        print "Made dir", log_path
+        os.mkdir(log_path)
+    for sid in range(8, 11):
+        sid_dir = os.path.join(log_path, packet_settings.upsat_store_ids[str(sid)])
+        print "check dir", sid_dir
+        if not os.path.exists(sid_dir):
+            print "Made dir", sid_dir
+            os.mkdir(sid_dir)
 
 
 def ecss_encoder(port):
@@ -224,6 +243,8 @@ def deconstruct_packet(buf_in, ecss_dict, backend):
 
 def ecss_logic(ecss_dict):
 
+    global log_path
+
     id = 0
     text = "Nothing found"
 
@@ -234,9 +255,9 @@ def ecss_logic(ecss_dict):
         if ecss_dict['ser_subtype'] == packet_settings.TM_VR_ACCEPTANCE_SUCCESS:
             report = "OK"
         elif ecss_dict['ser_subtype'] == packet_settings.TM_VR_ACCEPTANCE_FAILURE:
-            report = "Error " + packet_settings.SAT_RETURN_STATE[ecss_dict['data'][4]]
+            report = "Error " + packet_settings.SAT_RETURN_STATES[ecss_dict['data'][4]]
 
-        text += "ACK {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
+        text = "ACK {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
 
     elif ecss_dict['ser_type'] == packet_settings.TC_HOUSEKEEPING_SERVICE and ecss_dict['ser_subtype'] == packet_settings.TM_HK_PARAMETERS_REPORT:
 
@@ -251,9 +272,9 @@ def ecss_logic(ecss_dict):
             pointer = 1
             report = "EX_HEALTH_REP "
 
-            time = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            time_obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
-            report += "time " + str(time) + " "
+            report += "time " + str(time_obc) + " "
 
         elif ecss_dict['app_id'] == packet_settings.COMMS_APP_ID and struct_id == packet_settings.HEALTH_REP:
 
@@ -264,18 +285,18 @@ def ecss_logic(ecss_dict):
             pointer = 1
             report = "EX_HEALTH_REP "
 
-            time = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            time_obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
-            report += "time " + str(time) + " "
+            report += "time " + str(time_obc) + " "
 
         elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
 
             pointer = 1
             report = "EX_HEALTH_REP "
 
-            time = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            time_obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
-            report += "time " + str(time) + " "
+            report += "time " + str(time_obc) + " "
 
         elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.SU_SCI_HDR_REP:
 
@@ -323,9 +344,9 @@ def ecss_logic(ecss_dict):
             pointer = 1
             report = "EX_HEALTH_REP "
 
-            time = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            time_obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
-            report += "time " + str(time)
+            report += "time " + str(time_obc)
 
         elif struct_id == packet_settings.EXT_WOD_REP:
             pointer = 1
@@ -359,6 +380,12 @@ def ecss_logic(ecss_dict):
             task_sch = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
 
+            vbat = cnv8_16(ecss_dict['data'][pointer:])
+            pointer += 2
+
+            # uart_state = ecss_dict['data'][pointer]
+            # pointer += 1
+
             report += " time " + str(qb50) + " UTC " + str(utc) + \
                       " obc " + str(obc) + \
                       " comms " + str(comms) + \
@@ -368,7 +395,27 @@ def ecss_logic(ecss_dict):
                       " task_idle " + str(task_idle) + \
                       " task_hk " + str(task_hk) + \
                       " task_su " + str(task_su) + \
-                      " task_sch " + str(task_sch)
+                      " task_sch " + str(task_sch) + \
+                      " vbat " + str(vbat)
+
+            # if uart_state == 0x00:
+            #     report += " Uart state reset"
+            # elif uart_state == 0x20:
+            #     report += " Uart state ready"
+            # elif uart_state == 0x24:
+            #     report += " Uart state busy"
+            # elif uart_state == 0x21:
+            #     report += " Uart state busy tx"
+            # elif uart_state == 0x22:
+            #     report += " Uart state busy rx"
+            # elif uart_state == 0x23:
+            #     report += " Uart state busy tx rx"
+            # elif uart_state == 0xA0:
+            #     report += " Uart state timeout"
+            # elif uart_state == 0xE0:
+            #     report += " Uart state error"
+            # else:
+            #     report += " Uart state unkown: " + str(uart_state)
 
         text = "HK {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
 
@@ -496,22 +543,54 @@ def ecss_logic(ecss_dict):
             sid = ecss_dict['data'][0]
             fname = cnv8_16(ecss_dict['data'][1:])
 
-            report = "From store: " + packet_settings.upsat_store_ids[str(sid)] + " file " + str(fname) + " content " + ecss_dict['data'] + \
-                     " " + ' '.join('{:02x}'.format(x) for x in ecss_dict['data']) + "\n"
+            report = "From store: " + packet_settings.upsat_store_ids[str(sid)] + " file " + str(fname)  # + " content " + ecss_dict['data'] + \
+            # " " + ' '.join('{:02x}'.format(x) for x in ecss_dict['data']) + "\n"
 
-            # if sid == packet_settings.SU_LOG:
+            if sid == packet_settings.SU_LOG:
 
-            # su_logs = (ecss_dict['size'] - 1) / packet_settings.SU_LOG_SIZE
+                su_logs = 1  # (ecss_dict['size'] - 3) / packet_settings.SU_LOG_SIZE
 
-            # If su_logs > MAX_DOWNLINK_SU_LOGS:
-            # Error
+                # If su_logs > MAX_DOWNLINK_SU_LOGS:
+                # Error
 
-            # report = "received " + su_logs + " su logs "
-            # for i in range(0, su_logs):
-            #    qb50 = cnv8_32(ecss_dict['data'][1 + (i * packet_settings.SU_LOG_SIZE)])
-            #    utc = qb50_to_utc(qb50)
-            #    report += "SU LOG, with QB50 " + qb50 + " UTC: " + utc
-            # Write log to a file and or in DB
+                report += " received " + str(su_logs) + " su logs "
+                for i in range(0, su_logs):
+                    qb50 = cnv8_32(ecss_dict['data'][(3 + (i * packet_settings.SU_LOG_SIZE)):])
+                    utc = qb50_to_utc(qb50)
+                    report += "SU LOG, with QB50 " + str(qb50) + " UTC: " + str(utc)
+
+            elif sid == packet_settings.WOD_LOG:
+
+                wod_logs = 1  # (ecss_dict['size'] - 3) / packet_settings.SU_LOG_SIZE
+
+                # If su_logs > MAX_DOWNLINK_SU_LOGS:
+                # Error
+
+                report += " received " + str(wod_logs) + " wod logs "
+                for i in range(0, wod_logs):
+                    qb50 = cnv8_32(ecss_dict['data'][(3 + (i * packet_settings.WOD_LOG_SIZE)):])
+                    utc = qb50_to_utc(qb50)
+                    report += "WOD LOG, with QB50 " + str(qb50) + " UTC: " + str(utc)
+
+            elif sid <= packet_settings.SU_SCRIPT_7:
+
+                sum1 = 0
+                sum2 = 0
+                size = (ecss_dict['size'] - 3)
+                for i in range(3, size):
+                    sum1 = (sum1 + ecss_dict['data'][i]) % 255
+                    sum2 = (sum2 + sum1) % 255
+                if ((sum2 << 8) | sum1) == 0:
+                    report += " Checksum ok"
+                else:
+                    report += " Checksum error"
+
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+
+            fwname = log_path + packet_settings.upsat_store_ids[str(sid)] + "/" + str(fname) + "_" + timestr + ".bin"
+            myfile = open(fwname, 'w')
+            myfile.write(ecss_dict['data'][3:])
+            myfile.close()
 
         text = "MS {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
 

@@ -7,6 +7,7 @@ from satnogsclient.scheduler import scheduler
 from satnogsclient.scheduler.tasks import get_jobs, post_data, task_feeder, ecss_feeder, status_listener
 from satnogsclient import settings as client_settings
 from satnogsclient.web.app import app
+from satnogsclient.upsat.packet import folder_init
 import threading
 
 logger = logging.getLogger('satnogsclient')
@@ -18,6 +19,7 @@ if __name__ == '__main__':
     ser = threading.Thread(target=status_listener, args=())
     ser.daemon = True
     ser.start()
+    folder_init()
 
     try:
         logger.info('Press Ctrl+C to exit SatNOGS poller')

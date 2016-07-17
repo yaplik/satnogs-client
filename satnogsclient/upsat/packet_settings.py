@@ -67,6 +67,9 @@ upsat_store_ids = {
 SCRIPT_REPORT_SU_OFFSET = 9
 SCRIPT_REPORT_LOGS_OFFSET = 22
 
+SU_LOG_SIZE = 196
+WOD_LOG_SIZE = 228
+
 LOGS_LIST_SIZE = 10
 
 SERVICES_VERIFICATION_TC_TM = [
@@ -122,59 +125,57 @@ TC_ACK_ALL = 0x0F
 FRAME_RECEIVER_IP = '127.0.0.1'
 FRAME_RECEIVER_PORT = 16886
 
-SAT_RETURN_STATE = 0
-
-SATR_PKT_ILLEGAL_APPID = 0
-SATR_PKT_INV_LEN = 1
-SATR_PKT_INC_CRC = 2
-SATR_PKT_ILLEGAL_PKT_TP = 3
-SATR_PKT_ILLEGAL_PKT_STP = 4
-SATR_PKT_ILLEGAL_APP_DATA = 5
-SATR_OK = 6
-SATR_ERROR = 7
-SATR_EOT = 8
-SATR_CRC_ERROR = 9
-SATR_PKT_ILLEGAL_ACK = 10
-SATR_ALREADY_SERVICING = 11
-SATR_MS_MAX_FILES = 12
-SATR_PKT_INIT = 13
-SATR_INV_STORE_ID = 14
-SATR_INV_DATA_LEN = 15
-SATR_SCHEDULE_FULL = 17  # Schedule array is full */
-SATR_SSCH_ID_INVALID = 18  # Subschedule ID invalid */
-SATR_NMR_OF_TC_INVALID = 19  # Number of telecommands invalid */
-SATR_INTRL_ID_INVALID = 20  # Interlock ID invalid */
-SATR_ASS_INTRL_ID_INVALID = 21  # Assess Interlock ID invalid */
-SATR_ASS_TYPE_ID_INVALID = 22  # Assesment type id invalid*/
-SATR_RLS_TIMET_ID_INVALID = 23  # Relese time type ID invalid */
-SATR_DEST_APID_INVALID = 24  # Destination APID in embedded TC is invalid */
-SATR_TIME_INVALID = 25  # Release time of TC is invalid */
-SATR_TIME_SPEC_INVALID = 26  # Release time of TC is specified in a invalid representation*/
-SATR_INTRL_LOGIC_ERROR = 27  # The release time of telecommand is in the execution window of its interlocking telecommand.*/
-SATR_SCHEDULE_DISABLED = 28
-SATRF_OK = 29  # (0) Succeeded */
-SATRF_DISK_ERR = 30  # (1) A hard error occurred in the low level disk I/O layer */
-SATRF_INT_ERR = 31  # (2) Assertion failed */
-SATRF_NOT_READY = 32  # (3) The physical drive cannot work */
-SATRF_NO_FILE = 33  # (4) Could not find the file */
-SATRF_NO_PATH = 34  # (5) Could not find the path */
-SATRF_INVALID_NAME = 35  # (6) The path name format is invalid */
-SATRF_DENIED = 36  # (7) Access denied due to prohibited access or directory full */
-SATRF_EXIST = 37  # (8) Access denied due to prohibited access */
-SATRF_INVALID_OBJECT = 38  # (9) The file/directory object is invalid */
-SATRF_WRITE_PROTECTED = 39  # (10) The physical drive is write protected */
-SATRF_INVALID_DRIVE = 40  # (11) The logical drive number is invalid */
-SATRF_NOT_ENABLED = 41  # (12) The volume has no work area */
-SATRF_NO_FILESYSTEM = 42  # (13) There is no valid FAT volume */
-SATRF_MKFS_ABORTED = 43  # (14) The f_mkfs() aborted due to any parameter error */
-SATRF_TIMEOUT = 44  # (15) Could not get a grant to access the volume within defined period */
-SATRF_LOCKED = 45  # (16) The operation is rejected according to the file sharing policy */
-SATRF_NOT_ENOUGH_CORE = 46  # (17) LFN working buffer could not be allocated */
-SATRF_TOO_MANY_OPEN_FILES = 47  # (18) Number of open files > _FS_SHARE */
-SATRF_INVALID_PARAMETER = 48  # (19) Given parameter is invalid */
-SATRF_DIR_ERROR = 49
-SATR_LAST = 50
-
+SAT_RETURN_STATES = {
+    0: "SATR_PKT_ILLEGAL_APPID",
+    1: "SATR_PKT_INV_LEN",
+    2: "SATR_PKT_INC_CRC",
+    3: "SATR_PKT_ILLEGAL_PKT_TP",
+    4: "SATR_PKT_ILLEGAL_PKT_STP",
+    5: "SATR_PKT_ILLEGAL_APP_DATA",
+    6: "SATR_OK",
+    7: "SATR_ERROR",
+    8: "SATR_EOT",
+    9: "SATR_CRC_ERROR",
+    10: "SATR_PKT_ILLEGAL_ACK",
+    11: "SATR_ALREADY_SERVICING",
+    12: "SATR_MS_MAX_FILES",
+    13: "SATR_PKT_INIT",
+    14: "SATR_INV_STORE_ID",
+    15: "SATR_INV_DATA_LEN",
+    17: "SATR_SCHEDULE_FULL",
+    18: "SATR_SSCH_ID_INVALID",
+    19: "SATR_NMR_OF_TC_INVALID",
+    20: "SATR_INTRL_ID_INVALID",
+    21: "SATR_ASS_INTRL_ID_INVALID",
+    22: "SATR_ASS_TYPE_ID_INVALID",
+    23: "SATR_RLS_TIMET_ID_INVALID",
+    24: "SATR_DEST_APID_INVALID",
+    25: "SATR_TIME_INVALID",
+    26: "SATR_TIME_SPEC_INVALID",
+    27: "SATR_INTRL_LOGIC_ERROR",
+    28: "SATR_SCHEDULE_DISABLED",
+    29: "SATRF_OK",
+    30: "SATRF_DISK_ERR",
+    31: "SATRF_INT_ERR",
+    32: "SATRF_NOT_READY",
+    33: "SATRF_NO_FILE",  # (4) Could not find the file */
+    34: "SATRF_NO_PATH",  # (6) The path name format is invalid */
+    35: "SATRF_INVALID_NAME",  # (6) The path name format is invalid */
+    36: "SATRF_DENIED",  # (7) Access denied due to prohibited access or directory full */
+    37: "SATRF_EXIST",  # (8) Access denied due to prohibited access */
+    38: "SATRF_INVALID_OBJECT",  # (9) The file/directory object is invalid */
+    39: "SATRF_WRITE_PROTECTED",  # (10) The physical drive is write protected */
+    40: "SATRF_INVALID_DRIVE",  # (11) The logical drive number is invalid */
+    41: "SATRF_NOT_ENABLED",  # (12) The volume has no work area */
+    42: "SATRF_NO_FILESYSTEM",  # (13) There is no valid FAT volume */
+    43: "SATRF_MKFS_ABORTED",  # (14) The f_mkfs() aborted due to any parameter error */
+    44: "SATRF_TIMEOUT",  # (15) Could not get a grant to access the volume within defined period */
+    45: "SATRF_LOCKED",  # (16) The operation is rejected according to the file sharing policy */
+    46: "SATRF_NOT_ENOUGH_CORE",  # (17) LFN working buffer could not be allocated */
+    47: "SATRF_TOO_MANY_OPEN_FILES",  # (18) Number of open files > _FS_SHARE */
+    48: "SATRF_INVALID_PARAMETER",  # (19) Given parameter is invalid */
+    49: "SATRF_DIR_ERROR",
+}
 
 HLDLC_START_FLAG = 0x7E
 HLDLC_CONTROL_FLAG = 0x7D
@@ -290,6 +291,7 @@ EXT_WOD_LOG = 10
 EVENT_LOG = 11
 FOTOS = 12
 SCHS = 13
+SRAM = 14
 
 EV_inc_pkt = 1
 EV_pkt_ack_er = 2

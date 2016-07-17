@@ -159,6 +159,12 @@ $(document).ready(function() {
                     data.splice(0, 0, store_id);
                     data.splice(1, 0, 6);  // 6 is hard delete mode
 
+                } else if(action == "Reset") {
+
+                    service_subtype = 11;
+                    data.splice(0, 0, store_id);
+                    data.splice(1, 0, 8);  // 8 is the reset fat fs mode
+
                 } else if(action == "All") {
 
                     service_subtype = 11;
