@@ -435,18 +435,19 @@ def ecss_logic(ecss_dict):
     elif ecss_dict['ser_type'] == packet_settings.TC_TIME_MANAGEMENT_SERVICE:
 
         # Check https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
-        if ecss_dict['ser_subtype'] == packet_settings.TM_REPORT_TIME_IN_UTC:
+        if ecss_dict['ser_subtype'] == packet_settings.TM_TIME_REPORT_IN_UTC:
 
-            day = ecss_dict['data'][0]
-            mon = ecss_dict['data'][1]
-            year = ecss_dict['data'][2]
-            hour = ecss_dict['data'][3]
-            mins = ecss_dict['data'][4]
-            sec = ecss_dict['data'][5]
+            wkd = ecss_dict['data'][0]
+            day = ecss_dict['data'][1]
+            mon = ecss_dict['data'][2]
+            year = ecss_dict['data'][3]
+            hour = ecss_dict['data'][4]
+            mins = ecss_dict['data'][5]
+            sec = ecss_dict['data'][6]
 
-            report = "UTC: " + str(day) + "/" + str(mon) + "/" + str(year) + " " + str(hour) + ":" + str(mins) + ":" + str(sec)
+            report = str(year) + "-" + str(mon) + "-" + str(day) + " " + str(hour) + ":" + str(mins) + ":" + str(sec) + " wkd:" + str(wkd)
 
-        elif ecss_dict['ser_subtype'] == packet_settings.TM_REPORT_TIME_IN_QB50:
+        elif ecss_dict['ser_subtype'] == packet_settings.TM_TIME_REPORT_IN_QB50:
 
             qb50 = cnv8_32(ecss_dict['data'][0:])
             utc = qb50_to_utc(qb50)
@@ -611,7 +612,7 @@ def fatfs_to_utc(fatfs):
 
 
 def qb50_to_utc(qb50):
-    utc = datetime.datetime.fromtimestamp(qb50 + 946684800).strftime("%A, %d. %B %Y %I:%M%p")
+    utc = datetime.datetime.fromtimestamp(qb50 + 946684800).strftime("%A, %d. %B %Y %H:%M:%S")
     return utc
 
 

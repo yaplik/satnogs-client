@@ -34,11 +34,10 @@ $(document).ready(function() {
     });
 
     $('#service-param-time-report').on('change', function() {
-        elem = document.getElementById('datetimepicker1');
         if ($('#service-param-time-report').find("option:selected").val() == "manual") {
-            elem.style.display = "table";
+            $('#datetimepicker-time-row').show();
         } else {
-            elem.style.display = "none";
+            $('#datetimepicker-time-row').hide();
         }
     });
 
@@ -252,29 +251,45 @@ $(document).ready(function() {
 
               selected_action = $('#service-param-time-report').find("option:selected").val();
 
+              var weekday;
+
               if (selected_action == 'manual') {
                   service_subtype = 1;
 
                   var datetime = datepicker_time.data("DateTimePicker").date();
                   dateutc = datetime;
 
-                  data.splice(0, 0, dateutc.date());
-                  data.splice(1, 0, dateutc.month() + 1);  // 7 is delete all mode
-                  data.splice(2, 0, dateutc.year() - 2000); // pads for keeping same format as delete
-                  data.splice(3, 0, dateutc.hour());
-                  data.splice(4, 0, dateutc.minute());
-                  data.splice(5, 0, dateutc.seconds());
+                  if (dateutc.day() === 0) {
+                    weekday = 7;
+                  } else {
+                    weekday = dateutc.day();
+                  }
+
+                  data.splice(0, 0, weekday);
+                  data.splice(1, 0, dateutc.date());
+                  data.splice(2, 0, dateutc.month() + 1);  // 7 is delete all mode
+                  data.splice(3, 0, dateutc.year() - 2000); // pads for keeping same format as delete
+                  data.splice(4, 0, dateutc.hour());
+                  data.splice(5, 0, dateutc.minute());
+                  data.splice(6, 0, dateutc.seconds());
               } else if (selected_action == 'auto') {
 
                   service_subtype = 1;
                   dateutc = moment();
 
-                  data.splice(0, 0, dateutc.date());
-                  data.splice(1, 0, dateutc.month() + 1);  // 7 is delete all mode
-                  data.splice(2, 0, dateutc.year() - 2000); // pads for keeping same format as delete
-                  data.splice(3, 0, dateutc.hour());
-                  data.splice(4, 0, dateutc.minute());
-                  data.splice(5, 0, dateutc.seconds());
+                  if (dateutc.day() === 0) {
+                    weekday = 7;
+                  } else {
+                    weekday = dateutc.day();
+                  }
+
+                  data.splice(0, 0, weekday);
+                  data.splice(1, 0, dateutc.date());
+                  data.splice(2, 0, dateutc.month() + 1);  // 7 is delete all mode
+                  data.splice(3, 0, dateutc.year() - 2000); // pads for keeping same format as delete
+                  data.splice(4, 0, dateutc.hour());
+                  data.splice(5, 0, dateutc.minute());
+                  data.splice(6, 0, dateutc.seconds());
               } else if (selected_action == 'utc') {
                   service_subtype = 3;
               } else if (selected_action == 'qb50') {
@@ -730,4 +745,6 @@ function init() {
     datepicker_sch = $('#datetimepicker-sch').datetimepicker({
         format: 'DD-MM-YYYY HH:mm:ss',
     });
+
+    $('#datetimepicker-time-row').hide();
 }
