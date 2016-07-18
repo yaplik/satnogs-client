@@ -8,6 +8,7 @@ $(document).ready(function() {
         else {
           mode = 'serial';
         }
+        Cookies.set('backend', mode);
         request = encode_backend_mode(mode);
         query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
     });
@@ -406,8 +407,17 @@ $(document).ready(function() {
     });
 
     $("#mode-switch li").click(function() {
-        var mode = $(this).attr("data-value");
-        display_control_view(mode);
+        var current_mode = $(this).attr("data-value");
+        var current_backend = Cookies.get('backend');
+        if (current_backend === null || typeof current_backend == 'undefined') {
+          current_backend = 'gnuradio';
+          Cookies.set('backend', current_backend);
+          request = encode_backend_mode(current_backend);
+          query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+        }
+        //request = encode_mode_switch(current_mode);
+        //query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+        display_control_view(current_mode,current_backend);
     });
 
 });
@@ -659,6 +669,11 @@ function print_command_response(data) {
         } else {
             data_type = 'other';
             log_data = resp.log_message;
+            current_mode = Cookies.get('mode');
+            if (current_mode !== null && typeof current_mode != 'undefined') {
+              request = encode_mode_switch(current_mode);
+              query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            }
         }
 
         //Check if log is just hearbeat
@@ -697,7 +712,7 @@ function query_control_backend(data, post_mode, url, content_type, data_type, pr
     });
 }
 
-function display_control_view(mode) {
+function display_control_view(mode, backend) {
     if (mode == 'Network') {
         // Disable Upsat Command and Control
         $('#cnc_mode').css('display', 'none');
@@ -708,6 +723,13 @@ function display_control_view(mode) {
         $('#cnc_mode').css('display', 'block');
         $('#backend-switch').css('display', 'block');
         $('#network_mode').css('display', 'none');
+    }
+    if (backend == 'gnuradio') {
+        // Enable GNURadio on Upsat Command and Control
+        $("[name='backend-switch']").bootstrapSwitch('state',true);
+    } else if (backend == 'serial') {
+        // Enable Serial on Upsat Command and Control
+        $("[name='backend-switch']").bootstrapSwitch('state',false);
     }
 }
 
@@ -736,6 +758,9 @@ function file_encode_and_query_backend(type, app_id, service_type, service_subty
 
 function init() {
 
+    // Various variable definition
+    var app_id, type, ack, service_type, service_subtype, dest_id, data, seq_count;
+
     // Initialize bootstrap-switch
     backend_switch = $("[name='backend-switch']");
     backend_switch.bootstrapSwitch.defaults.size = 'normal';
@@ -747,23 +772,27 @@ function init() {
     backend_switch.bootstrapSwitch();
 
     // Set initial back-end mode
-    backend = 'gnuradio';
-    request = encode_backend_mode(backend);
+    current_backend = Cookies.get('backend');
+    if (current_backend === null || typeof current_backend == 'undefined') {
+      current_backend = 'gnuradio';
+      Cookies.set('backend', current_backend);
+    }
+
+    current_mode = Cookies.get('mode');
+    if (current_mode === null || typeof current_mode == 'undefined') {
+      current_mode = "Network";
+      Cookies.set('mode', current_mode);
+    }
+
+    display_control_view(current_mode, current_backend);
+
+    // Send a request to backend in order to configure mode.
+    request = encode_backend_mode(current_backend);
     query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
 
-    // Various variable definition
-    var app_id, type, ack, service_type, service_subtype, dest_id, data, seq_count;
-
-    //mode = $("#mode-switch li").attr("data-value");
-    mode = Cookies.get('mode');
-    if (mode !== null && typeof mode != 'undefined') {
-      display_control_view(mode);
-    }
-    else {
-      default_mode = "Network";
-      Cookies.set('mode', default_mode);
-      display_control_view(default_mode);
-    }
+    // Send a request to backend in order to configure mode.
+    request = encode_mode_switch(current_mode);
+    query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
 
     // Setup the periodic packet polling
     setInterval(function() {
@@ -785,4 +814,20 @@ function init() {
     $('#file-select-row').hide();
     $('#file-action-row').hide();
     $('#folder-select-row').hide();
+}
+
+function encode_mode_switch(mode) {
+  var response = {};
+  var custom_cmd = {};
+  var comms_tx_rf = {};
+  if (mode == "Stand-Alone") {
+      custom_cmd.mode = 'cmd_ctrl';
+  }
+  else if (mode == "Network") {
+      custom_cmd.mode = 'network';
+  }
+  response.custom_cmd = custom_cmd;
+  console.log(JSON.stringify(response));
+  var json_packet = JSON.stringify(response);
+  return json_packet;
 }

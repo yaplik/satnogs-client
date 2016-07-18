@@ -36,14 +36,14 @@ $("#mode-switch li").click(function() {
           }
       }
    }
-   else if (Cookies.get('mode') === null) {
+   else if (Cookies.get('mode') === null || typeof mode === 'undefined') {
      //TODO: Fix hardcoded initialization
-     default_mode = "Network";
-     Cookies.set('mode', default_mode);
-     // Send an initial request to backend in order to configure mode.
-     request = encode_mode_switch(default_mode);
-     query_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+     current_mode = "Network";
+     Cookies.set('mode', current_mode);
    }
+   // Send a request to backend in order to configure mode.
+   request = encode_mode_switch(current_mode);
+   query_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
   }
 
   function encode_mode_switch(mode) {
