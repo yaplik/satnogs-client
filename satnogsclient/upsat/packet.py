@@ -21,15 +21,15 @@ log_path = ""
 def folder_init():
     global log_path
     log_path = settings.OUTPUT_PATH + "/files/"
-    print "Dir ", log_path, settings.OUTPUT_PATH
+    logger.info("Dir %s", log_path)
     if not os.path.exists(log_path):
-        print "Made dir", log_path
+        logger.info("Made dir %s", log_path)
         os.mkdir(log_path)
     for sid in range(8, 11):
         sid_dir = os.path.join(log_path, packet_settings.upsat_store_ids[str(sid)])
-        print "check dir", sid_dir
+        logger.info("Check dir %s", sid_dir)
         if not os.path.exists(sid_dir):
-            print "Made dir", sid_dir
+            logger.info("Made dir %s", sid_dir)
             os.mkdir(sid_dir)
 
 
@@ -50,7 +50,6 @@ def ecss_depacketizer(buf, dict_out):
     print binascii.hexlify(buf)
     assert((buf != 0) == True)
     assert((size > packet_settings.MIN_PKT_SIZE and size < packet_settings.MAX_PKT_SIZE) == True)
-    print "I should see that"
     tmp_crc1 = buf[size - 1]
     tmp_crc2 = 0
     for i in range(0, size - 2):
@@ -124,7 +123,7 @@ def ecss_depacketizer(buf, dict_out):
              'dest_id': pkt_dest_id,
              'data': pkt_data
              }
-    print "I should see that also", dict_out
+    logger.debug('Got packet: %s', dict_out)
     return (dict_out, packet_settings.SATR_OK)
 
 
@@ -179,7 +178,7 @@ def ecss_packetizer(ecss, buf):
 
     size = buf_pointer + 2
     assert((size > packet_settings.MIN_PKT_SIZE and size < packet_settings.MAX_PKT_SIZE) == True)
-    print "Packetizer ", ''.join(' {:02x} '.format(x) for x in buf)
+    logger.debug('Packet in hex: %s', ''.join(' {:02x} '.format(x) for x in buf))
     return packet_settings.SATR_OK
 
 
@@ -215,7 +214,7 @@ def custom_cmd_to_backend(data):
 
 
 def construct_packet(ecss_dict, backend):
-    print 'ecss to be sent ', ecss_dict
+    logger.info('ECSS to be sent: %s', ecss_dict)
     if backend == "serial":
         out_buf = bytearray(0)
         packet_size = len(ecss_dict['data']) + packet_settings.ECSS_DATA_HEADER_SIZE + packet_settings.ECSS_CRC_SIZE + packet_settings.ECSS_HEADER_SIZE
@@ -235,7 +234,7 @@ def deconstruct_packet(buf_in, ecss_dict, backend):
         hldlc.HLDLC_deframe(buf_in, hldlc_buf)
         print "HLDLC ", ''.join('{:02x}'.format(x) for x in buf_in), " ", ''.join('{:02x}'.format(x) for x in hldlc_buf)
         res = ecss_depacketizer(hldlc_buf, ecss_dict)
-        print "the result is ", res
+        logger.debug('The HDLC result is %s', res)
     elif backend == 'gnuradio':
         res = ecss_depacketizer(buf_in, ecss_dict)
     return res

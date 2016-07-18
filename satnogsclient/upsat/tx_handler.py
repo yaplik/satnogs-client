@@ -9,7 +9,6 @@ logger = logging.getLogger('satnogsclient')
 def send_to_backend(buf):
     logger.debug('Send to backend called with backend %s', os.environ['BACKEND'])
     curr_backend = os.environ['BACKEND']
-    print "what is backend? ", curr_backend
     if curr_backend != 'gnuradio' and curr_backend != 'serial':
         return 0
     if curr_backend == 'gnuradio':

@@ -37,13 +37,13 @@ def get_status_info():
         scheduled_pass_json = scheduled_pass_sock.send("Requesting scheduled observations\n")
         scheduled_pass_json = json.loads(scheduled_pass_json)
     else:
-        print 'No observation currently'
+        logger.info('No observation currently')
 
     if current_pass_check:
         current_pass_json = current_pass_sock.send("Requesting current observations\n")
         current_pass_json = json.loads(current_pass_json)
     else:
-        print 'No observations currently'
+        logger.info('No observation currently')
 
     # return current_pass_json
     return jsonify(observation=dict(current=current_pass_json, scheduled=scheduled_pass_json))
@@ -66,7 +66,7 @@ def get_control_rx():
         tmp = {}
         tmp['log_message'] = e
         return jsonify(tmp)
-    print "This is a packet:", data
+    logger.info("Packet: %s", data)
     packet_list = cPickle.loads(data)
     """
     The received 'packet_list' is a json string containing packets. Actually it is a list of dictionaries:
@@ -78,13 +78,12 @@ def get_control_rx():
     if packet_list:
         cnt = 0
         for str_dict in packet_list:
-            print str_dict
             ecss_dict = cPickle.loads(str_dict)
-            print "Received ECSS formated ", ecss_dict
+            logger.info("Received ECSS formated: %d", ecss_dict)
             res = packet.ecss_logic(ecss_dict)
             ecss_dicts[cnt] = res
             cnt += 1
-        print "Ready to be shipped", ecss_dicts
+        logger.info("Shipping: %d", ecss_dicts)
         return jsonify(ecss_dicts)
     else:
         tmp = {}
@@ -133,7 +132,7 @@ def get_command():
                 dict_out = {'backend': backend}
                 packet.custom_cmd_to_backend(dict_out)
         elif 'ecss_cmd' in requested_command:
-            print "Got a ecss packet from ui"
+            logger.info('Received ECSS packet from UI')
             ecss = {'app_id': int(requested_command['ecss_cmd']['PacketHeader']['PacketID']['ApplicationProcessID']),
                     'type': int(requested_command['ecss_cmd']['PacketHeader']['PacketID']['Type']),
                     'size': len(requested_command['ecss_cmd']['PacketDataField']['ApplicationData']),
@@ -146,10 +145,10 @@ def get_command():
 
             # check if ui wants a specific seq count
             if 'SequenceCount' in requested_command['ecss_cmd']['PacketHeader']['PacketSequenceControl']:
-                print "seq count from ui"
+                logger.info('Seq count from ui')
             # store packet for response check
             if ecss['ack'] == '1':
-                print "storing packet for verification"
+                logger.info('Storing packet for verification')
 
             buf = packet.construct_packet(ecss, os.environ['BACKEND'])
             response[0] = {'id': 1, 'log_message': 'ECSS command send'}

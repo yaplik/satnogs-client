@@ -1,9 +1,14 @@
+import logging
+
 from satnogsclient.upsat import packet_settings
+
+logger = logging.getLogger('satnogsclient')
+log_path = ""
 
 
 def HLDLC_deframe(buf_in, buf_out):
     size = len(buf_in)
-    print "HLDLC size: ", size, " "
+    logger.debug('HLDLC size: %s', size)
 
     r = range(1, size)
     for i in r:

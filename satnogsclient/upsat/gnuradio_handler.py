@@ -21,7 +21,7 @@ def write_to_gnuradio(buf):
 
 
 def read_from_gnuradio():
-    print 'Started gnuradio listener process'
+    logger.info('Started gnuradio listener process')
     while True:
         conn = backend_listener_sock.recv()
         buf_in = bytearray(conn[0])

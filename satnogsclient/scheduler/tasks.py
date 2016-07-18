@@ -230,7 +230,7 @@ def ecss_feeder(port1, port2):
             while not qu.empty():
                 a = qu.get()
                 new_list.append(a)
-            print "sending to conn ", new_list
+            logger.info("sending to conn: %s", new_list)
             pickled = cPickle.dumps(new_list, protocol=2)
             sock.sendto(pickled, conn[1])
         pr.join()

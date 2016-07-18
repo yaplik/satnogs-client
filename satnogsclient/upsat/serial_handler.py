@@ -42,7 +42,7 @@ def close():
 
 
 def write_to_serial(buf):
-    print "Sending data to serial ", ''.join('{:02x}'.format(x) for x in buf)
+    logger.info('Sending data to serial: %s', ''.join('{:02x}'.format(x) for x in buf))
     global port
     try:
         if port != 0:
@@ -59,7 +59,7 @@ def read_from_serial():
     global ecss_feeder_sock
     global ui_listener_sock
     global ld_socket
-    print 'Started serial listener process'
+    logger.info('Started serial listener process')
     buf_in = bytearray(0)
     while True:
         try:
@@ -81,7 +81,7 @@ def read_from_serial():
                 ret = packet.deconstruct_packet(buf_in, ecss_dict, "serial")
                 ecss_dict = ret[0]
                 pickled = cPickle.dumps(ecss_dict)
-                print "Sending to UDP", ecss_dict
+                logger.info('Sending to UDP: %s', ecss_dict)
                 if len(ecss_dict) == 0:
                     logger.error('Ecss Dictionary not properly constructed. Error occured')
                     continue
