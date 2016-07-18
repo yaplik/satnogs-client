@@ -41,6 +41,40 @@ $(document).ready(function() {
         }
     });
 
+    $('#service-param-ms-function').on('change', function() {
+        if ($('#service-param-ms-function').find("option:selected").val() == "File_system") {
+            $('#file-action-row').show();
+        } else {
+            $('#file-action-row').hide();
+            $('#file-upload-row').hide();
+            $('#file-select-row').hide();
+            $('#folder-select-row').hide();
+        }
+    });
+
+    $('#service-param-ms-action').on('change', function() {
+        if ($('#service-param-ms-action').find("option:selected").val() == "Uplink") {
+            $('#file-upload-row').show();
+            $('#file-select-row').hide();
+            $('#folder-select-row').show();
+        } else if ($('#service-param-ms-action').find("option:selected").val() == "Delete" ||
+                   $('#service-param-ms-action').find("option:selected").val() == "List" ||
+                   $('#service-param-ms-action').find("option:selected").val() == "Downlink") {
+             $('#file-upload-row').hide();
+             $('#file-select-row').show();
+             $('#folder-select-row').show();
+        } else if ($('#service-param-ms-action').find("option:selected").val() == "All" ||
+                   $('#service-param-ms-action').find("option:selected").val() == "Hard") {
+             $('#file-upload-row').hide();
+             $('#file-select-row').hide();
+             $('#folder-select-row').show();
+        } else {
+            $('#file-upload-row').hide();
+            $('#file-select-row').hide();
+            $('#folder-select-row').hide();
+        }
+    });
+
     $('#service-param-panel :button').on('click', function() {
 
         var list = $('this').parent().siblings().find('select');
@@ -679,7 +713,7 @@ function display_control_view(mode) {
 
 //Retrieve file encode command and post the request
 function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file) {
-  input = document.getElementById('file');
+  input = document.getElementById('file-upload');
   file = input.files[0];
   reader = new FileReader();
   reader.readAsBinaryString(file.slice());
@@ -747,4 +781,8 @@ function init() {
     });
 
     $('#datetimepicker-time-row').hide();
+    $('#file-upload-row').hide();
+    $('#file-select-row').hide();
+    $('#file-action-row').hide();
+    $('#folder-select-row').hide();
 }
