@@ -278,6 +278,7 @@ body {
 
 .show-log {
     display: list-item;
+    margin: 1px;
 }
 .hide-log {
     display: none;

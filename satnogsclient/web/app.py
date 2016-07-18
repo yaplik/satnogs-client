@@ -125,9 +125,11 @@ def get_command():
                 backend = requested_command['custom_cmd']['backend']
                 if requested_command['custom_cmd']['backend'] == 'gnuradio':
                     response[0] = {'id': 1, 'log_message': 'Backend changed to GNURadio'}
+                    logger.info('Backend changed to GNURadio')
                     # return jsonify(response)
                 elif requested_command['custom_cmd']['backend'] == 'serial':
                     response[0] = {'id': 1, 'log_message': 'Backend changed to Serial'}
+                    logger.info('Backend changed to Serial')
                     # return jsonify(response)
                 dict_out = {'backend': backend}
                 packet.custom_cmd_to_backend(dict_out)

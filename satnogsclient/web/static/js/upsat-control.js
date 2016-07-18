@@ -615,7 +615,6 @@ function encode_service(type, app_id, service_type, service_subtype, dest_id, ac
 
     var ecss_cmd = {};
     ecss_cmd.ecss_cmd = TestServicePacket;
-    ecss_cmd.backend = backend;
 
     console.log(JSON.stringify(ecss_cmd));
     var json_packet = JSON.stringify(ecss_cmd);
@@ -681,7 +680,8 @@ function print_command_response(data) {
             console.log('backend reported online');
             $('#backend_online').html('backend reported <span data-livestamp="'+moment().toString()+'"></span>');
         } else {
-            response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">[' + moment().format('DD-MM-YYYY HH:mm:ss').toString() + '] ' + log_data + '</li>');
+            response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">' +
+            '<span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() + '</span> ' + log_data + '</li>');
      	}
     }
     $('#response-panel-body').scrollTop(response_panel.height());
