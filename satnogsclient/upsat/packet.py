@@ -256,7 +256,7 @@ def ecss_logic(ecss_dict):
         elif ecss_dict['ser_subtype'] == packet_settings.TM_VR_ACCEPTANCE_FAILURE:
             report = "Error " + packet_settings.SAT_RETURN_STATES[ecss_dict['data'][4]]
 
-        text = "ACK {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
+        text = "ACK {0}".format(report)
 
     elif ecss_dict['ser_type'] == packet_settings.TC_HOUSEKEEPING_SERVICE and ecss_dict['ser_subtype'] == packet_settings.TM_HK_PARAMETERS_REPORT:
 
@@ -433,7 +433,7 @@ def ecss_logic(ecss_dict):
             # else:
             #     report += " Uart state unkown: " + str(uart_state)
 
-        text = "HK {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
+        text = "HK {0}".format(report)
 
     elif ecss_dict['ser_type'] == packet_settings.TC_EVENT_SERVICE and ecss_dict['ser_subtype'] == packet_settings.TM_EV_NORMAL_REPORT:
 
@@ -442,7 +442,7 @@ def ecss_logic(ecss_dict):
         if event_id == packet_settings.EV_sys_boot:
             report = "booted"
 
-        text += "EVENT {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
+        text += "EVENT {0}".format(report)
 
     elif ecss_dict['ser_type'] == packet_settings.TC_FUNCTION_MANAGEMENT_SERVICE:
         # Nothing to do here
@@ -609,7 +609,7 @@ def ecss_logic(ecss_dict):
             myfile.write(ecss_dict['data'][3:])
             myfile.close()
 
-        text = "MS {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
+        text = "MS {0}".format(report)
 
     elif ecss_dict['ser_type'] == packet_settings.TC_TEST_SERVICE:
         text = "TEST Service from {0}".format(packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
@@ -620,6 +620,7 @@ def ecss_logic(ecss_dict):
     res_dict['id'] = id
     res_dict['log_message'] = text
     res_dict['files'] = []
+    res_dict['from_id'] = ecss_dict['app_id']
     return res_dict
 
 

@@ -691,8 +691,36 @@ function print_command_response(data) {
             console.log('backend reported online');
             $('#backend_online').html('backend reported <span data-livestamp="'+moment().toString()+'"></span>');
         } else {
+            if (resp.command_sent || resp.from_id) {
+              if (resp.command_sent) {
+                sub_id = resp.command_sent.app_id;
+              } else if (resp.from_id) {
+                sub_id = resp.from_id;
+              }
+              if (sub_id == 1) {
+                sub = "OBC";
+              } else if (sub_id == 2) {
+                sub = "EPS";
+              } else if (sub_id == 3) {
+                sub = "ADCS";
+              } else if (sub_id == 4) {
+                sub = "COMMS";
+              } else if (sub_id == 6) {
+                sub = "GND";
+              } else if (sub_id == 7) {
+                sub = "UMB";
+              } else {
+                sub = "UNK";
+              }
+              if (resp.command_sent) {
+                to_log = '<span class="label label-info"> > ' + sub + '</span>';
+              } else if (resp.from_id) {
+                to_log = '<span class="label label-success"> < ' + sub + '</span>';
+              }
+            }
             response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">' +
-            '<span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() + '</span> ' + log_data + '</li>');
+            '<span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() +
+            '</span>' + to_log + ' ' + log_data +'</li>');
      	}
     }
     $('#response-panel-body').scrollTop(response_panel.height());

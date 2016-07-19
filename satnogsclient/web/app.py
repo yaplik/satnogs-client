@@ -153,7 +153,7 @@ def get_command():
                 logger.info('Storing packet for verification')
 
             buf = packet.construct_packet(ecss, os.environ['BACKEND'])
-            response[0] = {'id': 1, 'log_message': 'ECSS command send'}
+            response[0] = {'id': 1, 'log_message': 'ECSS command send', 'command_sent': ecss}
             tx_handler.send_to_backend(buf)
             return jsonify(response)
     return render_template('upsat_control.j2')

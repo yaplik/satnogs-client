@@ -84,18 +84,11 @@ body {
   margin-top: 10px;
 }
 
-#command-dropdown {
-  margin-bottom: 10px;
-}
-
-#response-panel {
-  height: 500px;
-}
-
 #response-panel-body {
-  height: 400px;
+  height: 600px;
   overflow-y: scroll;
   text-align: left;
+  padding: 10px;
 }
 
 #caret-custom {
@@ -211,74 +204,13 @@ body {
   margin-top: 15px;
 }
 
-
-/**
- *  UPLOAD BOX STYLE
- */
-
-.box {
-    font-size: 1.25rem;
-    background-color: #fff;
-    position: relative;
-    padding: 100px 20px;
-}
-
-.box__dragndrop,
-.box__uploading,
-.box__success,
-.box__error {
-  display: none;
-}
-
-.box.has-advanced-upload {
-    outline: 2px dashed #92b0b3;
-    outline-offset: -10px;
-    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
-    transition: outline-offset .15s ease-in-out, background-color .15s linear;
-}
-
-.box.has-advanced-upload .box__icon {
-    width: 100%;
-    height: 50px;
-    fill: #92b0b3;
-    display: block;
-    margin-bottom: 40px;
-}
-
-.box__file {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-}
-
-.box__file + label {
-    max-width: 80%;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: pointer;
-    display: inline-block;
-    overflow: hidden;
-}
-
-.box__button {
-    display: block;
-    margin: 40px auto 0;
-}
-
-.box.has-advanced-upload .box__dragndrop {
-  display: inline;
-}
-
 /**
  *  LOG BOX STYLE
  */
 
 .show-log {
     display: list-item;
-    margin: 1px;
+    margin-top: 3px;
 }
 .hide-log {
     display: none;
