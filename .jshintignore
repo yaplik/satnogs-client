@@ -5,4 +5,5 @@ satnogsclient/web/static/js/jquery-1.11.3.min.js
 satnogsclient/web/static/js/jquery-3.0.0.min.js
 satnogsclient/web/static/js/js.cookie.js
 satnogsclient/web/static/js/moment.js
+satnogsclient/web/static/js/FileSaver.js
 satnogsclient/web/static/js/bootstrap-switch.js

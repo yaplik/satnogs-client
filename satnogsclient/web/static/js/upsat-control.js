@@ -3,10 +3,9 @@ $(document).ready(function() {
 
     $("[name='backend-switch']").on('switchChange.bootstrapSwitch', function(event, state) {
         if (state) {
-          mode = 'gnuradio';
-        }
-        else {
-          mode = 'serial';
+            mode = 'gnuradio';
+        } else {
+            mode = 'serial';
         }
         Cookies.set('backend', mode);
         request = encode_backend_mode(mode);
@@ -59,16 +58,16 @@ $(document).ready(function() {
             $('#file-select-row').hide();
             $('#folder-select-row').show();
         } else if ($('#service-param-ms-action').find("option:selected").val() == "Delete" ||
-                   $('#service-param-ms-action').find("option:selected").val() == "List" ||
-                   $('#service-param-ms-action').find("option:selected").val() == "Downlink") {
-             $('#file-upload-row').hide();
-             $('#file-select-row').show();
-             $('#folder-select-row').show();
+            $('#service-param-ms-action').find("option:selected").val() == "List" ||
+            $('#service-param-ms-action').find("option:selected").val() == "Downlink") {
+            $('#file-upload-row').hide();
+            $('#file-select-row').show();
+            $('#folder-select-row').show();
         } else if ($('#service-param-ms-action').find("option:selected").val() == "All" ||
-                   $('#service-param-ms-action').find("option:selected").val() == "Hard") {
-             $('#file-upload-row').hide();
-             $('#file-select-row').hide();
-             $('#folder-select-row').show();
+            $('#service-param-ms-action').find("option:selected").val() == "Hard") {
+            $('#file-upload-row').hide();
+            $('#file-select-row').hide();
+            $('#folder-select-row').show();
         } else {
             $('#file-upload-row').hide();
             $('#file-select-row').hide();
@@ -137,21 +136,21 @@ $(document).ready(function() {
 
             var fun = $('#service-param-ms-function').val();
 
-            if(fun == "Format") {
+            if (fun == "Format") {
                 if (confirm('Are you sure you want to format the sd?')) {
                     service_subtype = 15;
                 } else {
                     return 0;
                 }
-            } else if(fun == "File_system") {
+            } else if (fun == "File_system") {
 
                 var action = $('#service-param-ms-action').val();
 
-                if(action == "Report") {
+                if (action == "Report") {
 
                     service_subtype = 12;
 
-                } else if(action == "List") {
+                } else if (action == "List") {
 
                     var fn_list = $('#service-param-service-ms-num').val();
                     service_subtype = 16;
@@ -160,7 +159,7 @@ $(document).ready(function() {
                     data.splice(1, 0, ((fn_list >> 8) & 0x00FF)); // next file
                     data.splice(2, 0, ((fn_list >> 0) & 0x00FF));
 
-                } else if(action == "Downlink") {
+                } else if (action == "Downlink") {
 
                     var fn_down = $('#service-param-service-ms-num').val();
                     service_subtype = 9;
@@ -170,15 +169,15 @@ $(document).ready(function() {
                     data.splice(2, 0, ((fn_down >> 0) & 0x00FF));
                     data.splice(3, 0, 1); // num of files
 
-                } else if(action == "Uplink") {
+                } else if (action == "Uplink") {
 
-                       var file = $('#service-param-service-ms-num').val();
-                       service_subtype = 14;
+                    var file = $('#service-param-service-ms-num').val();
+                    service_subtype = 14;
 
-                       file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file);
-                       return 0;
+                    file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file);
+                    return 0;
 
-                } else if(action == "Delete") {
+                } else if (action == "Delete") {
 
                     var fn_del = $('#service-param-service-ms-num').val();
                     service_subtype = 11;
@@ -187,30 +186,30 @@ $(document).ready(function() {
                     data.splice(2, 0, ((fn_del >> 8) & 0x00FF)); // num of files
                     data.splice(3, 0, ((fn_del >> 0) & 0x00FF));
 
-                } else if(action == "Hard") {
+                } else if (action == "Hard") {
 
                     service_subtype = 11;
                     data.splice(0, 0, store_id);
-                    data.splice(1, 0, 6);  // 6 is hard delete mode
+                    data.splice(1, 0, 6); // 6 is hard delete mode
 
-                } else if(action == "Reset") {
-
-                    service_subtype = 11;
-                    data.splice(0, 0, store_id);
-                    data.splice(1, 0, 8);  // 8 is the reset fat fs mode
-
-                } else if(action == "All") {
+                } else if (action == "Reset") {
 
                     service_subtype = 11;
                     data.splice(0, 0, store_id);
-                    data.splice(1, 0, 7);  // 7 is delete all mode
+                    data.splice(1, 0, 8); // 8 is the reset fat fs mode
+
+                } else if (action == "All") {
+
+                    service_subtype = 11;
+                    data.splice(0, 0, store_id);
+                    data.splice(1, 0, 7); // 7 is delete all mode
                     data.splice(2, 0, 0); // pads for keeping same format as delete
                     data.splice(3, 0, 0);
                 }
-             }
-        //      else if(fun == "Enable") {
-        //       continue;
-        //     }
+            }
+            //      else if(fun == "Enable") {
+            //       continue;
+            //     }
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
             query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
@@ -276,67 +275,67 @@ $(document).ready(function() {
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
             query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
 
-          } else if (selected_value == "time") {
-              app_id = $('#service-param-time-app_id').val();
-              type = 1;
-              ack = 0;
-              data = [];
-              service_type = 9;
-              dest_id = $('#service-param-time-dest_id').val();
+        } else if (selected_value == "time") {
+            app_id = $('#service-param-time-app_id').val();
+            type = 1;
+            ack = 0;
+            data = [];
+            service_type = 9;
+            dest_id = $('#service-param-time-dest_id').val();
 
-              selected_action = $('#service-param-time-report').find("option:selected").val();
+            selected_action = $('#service-param-time-report').find("option:selected").val();
 
-              var weekday;
+            var weekday;
 
-              if (selected_action == 'manual') {
-                  service_subtype = 1;
+            if (selected_action == 'manual') {
+                service_subtype = 1;
 
-                  var datetime = datepicker_time.data("DateTimePicker").date();
-                  dateutc = datetime;
+                var datetime = datepicker_time.data("DateTimePicker").date();
+                dateutc = datetime;
 
-                  if (dateutc.day() === 0) {
+                if (dateutc.day() === 0) {
                     weekday = 7;
-                  } else {
+                } else {
                     weekday = dateutc.day();
-                  }
+                }
 
-                  data.splice(0, 0, weekday);
-                  data.splice(1, 0, dateutc.date());
-                  data.splice(2, 0, dateutc.month() + 1);  // 7 is delete all mode
-                  data.splice(3, 0, dateutc.year() - 2000); // pads for keeping same format as delete
-                  data.splice(4, 0, dateutc.hour());
-                  data.splice(5, 0, dateutc.minute());
-                  data.splice(6, 0, dateutc.seconds());
-              } else if (selected_action == 'auto') {
+                data.splice(0, 0, weekday);
+                data.splice(1, 0, dateutc.date());
+                data.splice(2, 0, dateutc.month() + 1); // 7 is delete all mode
+                data.splice(3, 0, dateutc.year() - 2000); // pads for keeping same format as delete
+                data.splice(4, 0, dateutc.hour());
+                data.splice(5, 0, dateutc.minute());
+                data.splice(6, 0, dateutc.seconds());
+            } else if (selected_action == 'auto') {
 
-                  service_subtype = 1;
-                  dateutc = moment();
+                service_subtype = 1;
+                dateutc = moment();
 
-                  if (dateutc.day() === 0) {
+                if (dateutc.day() === 0) {
                     weekday = 7;
-                  } else {
+                } else {
                     weekday = dateutc.day();
-                  }
+                }
 
-                  data.splice(0, 0, weekday);
-                  data.splice(1, 0, dateutc.date());
-                  data.splice(2, 0, dateutc.month() + 1);  // 7 is delete all mode
-                  data.splice(3, 0, dateutc.year() - 2000); // pads for keeping same format as delete
-                  data.splice(4, 0, dateutc.hour());
-                  data.splice(5, 0, dateutc.minute());
-                  data.splice(6, 0, dateutc.seconds());
-              } else if (selected_action == 'utc') {
-                  service_subtype = 3;
-              } else if (selected_action == 'qb50') {
-                  service_subtype = 4;
-              } else {
-                  return 0;
-              }
+                data.splice(0, 0, weekday);
+                data.splice(1, 0, dateutc.date());
+                data.splice(2, 0, dateutc.month() + 1); // 7 is delete all mode
+                data.splice(3, 0, dateutc.year() - 2000); // pads for keeping same format as delete
+                data.splice(4, 0, dateutc.hour());
+                data.splice(5, 0, dateutc.minute());
+                data.splice(6, 0, dateutc.seconds());
+            } else if (selected_action == 'utc') {
+                service_subtype = 3;
+            } else if (selected_action == 'qb50') {
+                service_subtype = 4;
+            } else {
+                return 0;
+            }
 
-              request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-              query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
 
-          } else if (selected_value == "adcs") {
+        } else if (selected_value == "adcs") {
             // TODO: Is app_id needed in time service?
             //app_id = $('#service-param-time-app_id').val();
             app_id = 7;
@@ -368,27 +367,27 @@ $(document).ready(function() {
                 query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
             }
         } else if (selected_value == "mnlp") {
-           app_id = 1;
-           type = 1;
-           ack = $('#service-param-mnlp-ack').val();
-           dest_id = $('#service-param-mnlp-dest_id').val();
-           service_type = 18;
-           su_func = $('#service-param-mnlp-action').val();
-           if (su_func == 'su-reset-active') {
-             service_subtype = 13;
-             data = [];
-           } else if (su_func == 'su-service-scheduler-on') {
-             service_subtype = 24;
-             data = [1];
-           } else if (su_func == 'su-service-scheduler-off') {
-             service_subtype = 24;
-             data = [0];
-           } else if (su_func == 'su-notify-task') {
-             service_subtype = 22;
-             data = [1];
-           }
-           request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-           query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            app_id = 1;
+            type = 1;
+            ack = $('#service-param-mnlp-ack').val();
+            dest_id = $('#service-param-mnlp-dest_id').val();
+            service_type = 18;
+            su_func = $('#service-param-mnlp-action').val();
+            if (su_func == 'su-reset-active') {
+                service_subtype = 13;
+                data = [];
+            } else if (su_func == 'su-service-scheduler-on') {
+                service_subtype = 24;
+                data = [1];
+            } else if (su_func == 'su-service-scheduler-off') {
+                service_subtype = 24;
+                data = [0];
+            } else if (su_func == 'su-notify-task') {
+                service_subtype = 22;
+                data = [1];
+            }
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
         }
     });
 
@@ -409,25 +408,29 @@ $(document).ready(function() {
     });
 
     $('#clear-log').on('click', function() {
-      var itemsToFilter = $('#response-panel-body ul li');
-      for (var i = 0; i < itemsToFilter.length; i++) {
-        var currentItem = itemsToFilter[i];
-        currentItem.remove();
-      }
+        var itemsToFilter = $('#response-panel-body ul li');
+        for (var i = 0; i < itemsToFilter.length; i++) {
+            var currentItem = itemsToFilter[i];
+            currentItem.remove();
+        }
+    });
+
+    $('#save-log').on('click', function() {
+        log_console_save();
     });
 
     $("#mode-switch li").click(function() {
         var current_mode = $(this).attr("data-value");
         var current_backend = Cookies.get('backend');
         if (current_backend === null || typeof current_backend == 'undefined') {
-          current_backend = 'gnuradio';
-          Cookies.set('backend', current_backend);
-          request = encode_backend_mode(current_backend);
-          query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            current_backend = 'gnuradio';
+            Cookies.set('backend', current_backend);
+            request = encode_backend_mode(current_backend);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
         }
         //request = encode_mode_switch(current_mode);
         //query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-        display_control_view(current_mode,current_backend);
+        display_control_view(current_mode, current_backend);
     });
 
 });
@@ -468,117 +471,117 @@ function ascii_to_dec(inc, out) {
 
 function update_subservice(subservice, select) {
 
-        var VR_SERVICE = {
-            TM_VR_ACCEPTANCE_SUCCESS: 1,
-            TM_VR_ACCEPTANCE_FAILURE: 2
-        };
+    var VR_SERVICE = {
+        TM_VR_ACCEPTANCE_SUCCESS: 1,
+        TM_VR_ACCEPTANCE_FAILURE: 2
+    };
 
-        var HK_SERVICE = {
-            TC_HK_REPORT_PARAMETERS: 21,
-            TM_HK_PARAMETERS_REPORT: 23
-        };
+    var HK_SERVICE = {
+        TC_HK_REPORT_PARAMETERS: 21,
+        TM_HK_PARAMETERS_REPORT: 23
+    };
 
-        var EV_SERVICE = {
-            TM_EV_NORMAL_REPORT: 1,
-            TM_EV_ERROR_REPORT: 4
-        };
+    var EV_SERVICE = {
+        TM_EV_NORMAL_REPORT: 1,
+        TM_EV_ERROR_REPORT: 4
+    };
 
-        var FM_SERVICE = {
-            TC_FM_PERFORM_FUNCTION: 1
-        };
+    var FM_SERVICE = {
+        TC_FM_PERFORM_FUNCTION: 1
+    };
 
-        var SC_SERVICE = {
-            TC_SC_ENABLE_RELEASE: 1,
-            TC_SC_DISABLE_RELEASE: 2,
-            TC_SC_RESET_SCHEDULE: 3,
-            TC_SC_INSERT_TC: 4,
-            TC_SC_DELETE_TC: 5,
-            TC_SC_TIME_SHIFT_SPECIFIC: 7,
-            TC_SC_TIME_SHIFT_SELECTED_OTP: 8,
-            TC_SC_TIME_SHIFT_ALL: 15
-        };
+    var SC_SERVICE = {
+        TC_SC_ENABLE_RELEASE: 1,
+        TC_SC_DISABLE_RELEASE: 2,
+        TC_SC_RESET_SCHEDULE: 3,
+        TC_SC_INSERT_TC: 4,
+        TC_SC_DELETE_TC: 5,
+        TC_SC_TIME_SHIFT_SPECIFIC: 7,
+        TC_SC_TIME_SHIFT_SELECTED_OTP: 8,
+        TC_SC_TIME_SHIFT_ALL: 15
+    };
 
-        var LD_SERVICE = {
-            TM_LD_FIRST_DOWNLINK: 1,
-            TC_LD_FIRST_UPLINK: 9,
-            TM_LD_INT_DOWNLINK: 2,
-            TC_LD_INT_UPLINK: 10,
-            TM_LD_LAST_DOWNLINK: 3,
-            TC_LD_LAST_UPLINK: 11,
-            TC_LD_ACK_DOWNLINK: 5,
-            TM_LD_ACK_UPLINK: 14,
-            TC_LD_REPEAT_DOWNLINK: 6,
-            TM_LD_REPEAT_UPLINK: 15,
-            TM_LD_REPEATED_DOWNLINK: 7,
-            TC_LD_REPEATED_UPLINK: 12,
-            TM_LD_ABORT_SE_DOWNLINK: 4,
-            TC_LD_ABORT_SE_UPLINK: 13,
-            TC_LD_ABORT_RE_DOWNLINK: 8,
-            TM_LD_ABORT_RE_UPLINK: 16
-        };
+    var LD_SERVICE = {
+        TM_LD_FIRST_DOWNLINK: 1,
+        TC_LD_FIRST_UPLINK: 9,
+        TM_LD_INT_DOWNLINK: 2,
+        TC_LD_INT_UPLINK: 10,
+        TM_LD_LAST_DOWNLINK: 3,
+        TC_LD_LAST_UPLINK: 11,
+        TC_LD_ACK_DOWNLINK: 5,
+        TM_LD_ACK_UPLINK: 14,
+        TC_LD_REPEAT_DOWNLINK: 6,
+        TM_LD_REPEAT_UPLINK: 15,
+        TM_LD_REPEATED_DOWNLINK: 7,
+        TC_LD_REPEATED_UPLINK: 12,
+        TM_LD_ABORT_SE_DOWNLINK: 4,
+        TC_LD_ABORT_SE_UPLINK: 13,
+        TC_LD_ABORT_RE_DOWNLINK: 8,
+        TM_LD_ABORT_RE_UPLINK: 16
+    };
 
-        var MS_SERVICE = {
-            TC_MS_ENABLE: 1,
-            TC_MS_DISABLE: 2,
-            TC_MS_CONTENT: 8,
-            TC_MS_DOWNLINK: 9,
-            TC_MS_DELETE: 11,
-            TC_MS_REPORT: 12,
-            TM_MS_CATALOGUE_REPORT: 13,
-            TC_MS_UPLINK: 14,
-            TC_MS_FORMAT: 15
-        };
+    var MS_SERVICE = {
+        TC_MS_ENABLE: 1,
+        TC_MS_DISABLE: 2,
+        TC_MS_CONTENT: 8,
+        TC_MS_DOWNLINK: 9,
+        TC_MS_DELETE: 11,
+        TC_MS_REPORT: 12,
+        TM_MS_CATALOGUE_REPORT: 13,
+        TC_MS_UPLINK: 14,
+        TC_MS_FORMAT: 15
+    };
 
-        var CT_SERVICE = {
-            TC_CT_PERFORM_TEST: 1,
-            TM_CT_REPORT_TEST: 2
-        };
+    var CT_SERVICE = {
+        TC_CT_PERFORM_TEST: 1,
+        TM_CT_REPORT_TEST: 2
+    };
 
-        select.find('option').remove();
-        select.append('<option selected="true" style="display:none;">Service sub Type</option>');
+    select.find('option').remove();
+    select.append('<option selected="true" style="display:none;">Service sub Type</option>');
 
-        var key;
-        if (subservice == "TC_VERIFICATION_SERVICE") {
-            for (key in VR_SERVICE) {
-                select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_HOUSEKEEPING_SERVICE") {
-            for (key in HK_SERVICE) {
-                select.append('<option value=' + HK_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_EVENT_SERVICE") {
-            for (key in EV_SERVICE) {
-                select.append('<option value=' + EV_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_FUNCTION_MANAGEMENT_SERVICE") {
-            for (key in FM_SERVICE) {
-                select.append('<option value=' + FM_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_TIME_MANAGEMENT_SERVICE") {
-            for (key in VR_SERVICE) {
-                select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_SCHEDULING_SERVICE") {
-            for (key in SC_SERVICE) {
-                select.append('<option value=' + SC_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_LARGE_DATA_SERVICE") {
-            for (key in LD_SERVICE) {
-                select.append('<option value=' + LD_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_MASS_STORAGE_SERVICE") {
-            for (key in MS_SERVICE) {
-                select.append('<option value=' + MS_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_TEST_SERVICE") {
-            for (key in CT_SERVICE) {
-                select.append('<option value=' + CT_SERVICE[key] + '>' + key + '</option>');
-            }
-        } else if (subservice == "TC_SU_MNLP_SERVICE") {
-            for (key in VR_SERVICE) {
-                select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
-            }
+    var key;
+    if (subservice == "TC_VERIFICATION_SERVICE") {
+        for (key in VR_SERVICE) {
+            select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
         }
+    } else if (subservice == "TC_HOUSEKEEPING_SERVICE") {
+        for (key in HK_SERVICE) {
+            select.append('<option value=' + HK_SERVICE[key] + '>' + key + '</option>');
+        }
+    } else if (subservice == "TC_EVENT_SERVICE") {
+        for (key in EV_SERVICE) {
+            select.append('<option value=' + EV_SERVICE[key] + '>' + key + '</option>');
+        }
+    } else if (subservice == "TC_FUNCTION_MANAGEMENT_SERVICE") {
+        for (key in FM_SERVICE) {
+            select.append('<option value=' + FM_SERVICE[key] + '>' + key + '</option>');
+        }
+    } else if (subservice == "TC_TIME_MANAGEMENT_SERVICE") {
+        for (key in VR_SERVICE) {
+            select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
+        }
+    } else if (subservice == "TC_SCHEDULING_SERVICE") {
+        for (key in SC_SERVICE) {
+            select.append('<option value=' + SC_SERVICE[key] + '>' + key + '</option>');
+        }
+    } else if (subservice == "TC_LARGE_DATA_SERVICE") {
+        for (key in LD_SERVICE) {
+            select.append('<option value=' + LD_SERVICE[key] + '>' + key + '</option>');
+        }
+    } else if (subservice == "TC_MASS_STORAGE_SERVICE") {
+        for (key in MS_SERVICE) {
+            select.append('<option value=' + MS_SERVICE[key] + '>' + key + '</option>');
+        }
+    } else if (subservice == "TC_TEST_SERVICE") {
+        for (key in CT_SERVICE) {
+            select.append('<option value=' + CT_SERVICE[key] + '>' + key + '</option>');
+        }
+    } else if (subservice == "TC_SU_MNLP_SERVICE") {
+        for (key in VR_SERVICE) {
+            select.append('<option value=' + VR_SERVICE[key] + '>' + key + '</option>');
+        }
+    }
 }
 
 function encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data, seq_count) {
@@ -667,7 +670,7 @@ function print_command_response(data) {
     var data_type;
     console.log(JSON.stringify(data));
 
-    for(var key in data) {
+    for (var key in data) {
         var resp = data[key];
 
         if (resp.id == 1) {
@@ -681,15 +684,15 @@ function print_command_response(data) {
             log_data = resp.log_message;
             current_mode = Cookies.get('mode');
             if (current_mode !== null && typeof current_mode != 'undefined') {
-              request = encode_mode_switch(current_mode);
-              query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+                request = encode_mode_switch(current_mode);
+                query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
             }
         }
 
         //Check if log is just hearbeat
         if (resp.log_message == 'backend_online') {
             console.log('backend reported online');
-            $('#backend_online').html('backend reported <span data-livestamp="'+moment().toString()+'"></span>');
+            $('#backend_online').html('backend reported <span data-livestamp="' + moment().toString() + '"></span>');
         } else {
             if (resp.command_sent || resp.from_id) {
               if (resp.command_sent) {
@@ -721,7 +724,7 @@ function print_command_response(data) {
             response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">' +
             '<span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() +
             '</span>' + to_log + ' ' + log_data +'</li>');
-     	}
+        }
     }
     $('#response-panel-body').scrollTop(response_panel.height());
 }
@@ -765,34 +768,34 @@ function display_control_view(mode, backend) {
     }
     if (backend == 'gnuradio') {
         // Enable GNURadio on Upsat Command and Control
-        $("[name='backend-switch']").bootstrapSwitch('state',true);
+        $("[name='backend-switch']").bootstrapSwitch('state', true);
     } else if (backend == 'serial') {
         // Enable Serial on Upsat Command and Control
-        $("[name='backend-switch']").bootstrapSwitch('state',false);
+        $("[name='backend-switch']").bootstrapSwitch('state', false);
     }
 }
 
 //Retrieve file encode command and post the request
 function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file) {
-  input = document.getElementById('file-upload');
-  file = input.files[0];
-  reader = new FileReader();
-  reader.readAsBinaryString(file.slice());
-  reader.onloadend = function(evt) {
-    if (evt.target.readyState == FileReader.DONE) {
-      data = [];
-      result = evt.target.result;
-      ascii_to_dec(result,data);
+    input = document.getElementById('file-upload');
+    file = input.files[0];
+    reader = new FileReader();
+    reader.readAsBinaryString(file.slice());
+    reader.onloadend = function(evt) {
+        if (evt.target.readyState == FileReader.DONE) {
+            data = [];
+            result = evt.target.result;
+            ascii_to_dec(result, data);
 
-      data.unshift((file >> 0) & 0x00FF); // file to uplink, applicable only to sch sid.
-      data.unshift((file >> 8) & 0x00FF); //unshifts inserts to first of the array so the order is reversed
-                                          //first the file and then the sid so the array is [sid][file (2 bytes)][data (x bytes)]
-      data.unshift(store_id);
-      console.log(data);
-      request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-      query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-    }
-  };
+            data.unshift((file >> 0) & 0x00FF); // file to uplink, applicable only to sch sid.
+            data.unshift((file >> 8) & 0x00FF); //unshifts inserts to first of the array so the order is reversed
+            //first the file and then the sid so the array is [sid][file (2 bytes)][data (x bytes)]
+            data.unshift(store_id);
+            console.log(data);
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+        }
+    };
 }
 
 function init() {
@@ -813,14 +816,14 @@ function init() {
     // Set initial back-end mode
     current_backend = Cookies.get('backend');
     if (current_backend === null || typeof current_backend == 'undefined') {
-      current_backend = 'gnuradio';
-      Cookies.set('backend', current_backend);
+        current_backend = 'gnuradio';
+        Cookies.set('backend', current_backend);
     }
 
     current_mode = Cookies.get('mode');
     if (current_mode === null || typeof current_mode == 'undefined') {
-      current_mode = "Network";
-      Cookies.set('mode', current_mode);
+        current_mode = "Network";
+        Cookies.set('mode', current_mode);
     }
 
     display_control_view(current_mode, current_backend);
@@ -843,30 +846,43 @@ function init() {
         format: 'DD-MM-YYYY HH:mm:ss',
     });
 
-        // Setup the datetimepicker
+    // Setup the datetimepicker
     datepicker_sch = $('#datetimepicker-sch').datetimepicker({
         format: 'DD-MM-YYYY HH:mm:ss',
     });
 
-    $('#datetimepicker-time-row').hide();
-    $('#file-upload-row').hide();
-    $('#file-select-row').hide();
-    $('#file-action-row').hide();
-    $('#folder-select-row').hide();
+    // Reveal the initial service panel
+    display_service('test-select');
+
+    // $('#datetimepicker-time-row').hide();
+    // $('#file-upload-row').hide();
+    // $('#file-select-row').hide();
+    // $('#file-action-row').hide();
+    // $('#folder-select-row').hide();
 }
 
 function encode_mode_switch(mode) {
-  var response = {};
-  var custom_cmd = {};
-  var comms_tx_rf = {};
-  if (mode == "Stand-Alone") {
-      custom_cmd.mode = 'cmd_ctrl';
-  }
-  else if (mode == "Network") {
-      custom_cmd.mode = 'network';
-  }
-  response.custom_cmd = custom_cmd;
-  console.log(JSON.stringify(response));
-  var json_packet = JSON.stringify(response);
-  return json_packet;
+    var response = {};
+    var custom_cmd = {};
+    var comms_tx_rf = {};
+    if (mode == "Stand-Alone") {
+        custom_cmd.mode = 'cmd_ctrl';
+    } else if (mode == "Network") {
+        custom_cmd.mode = 'network';
+    }
+    response.custom_cmd = custom_cmd;
+    console.log(JSON.stringify(response));
+    var json_packet = JSON.stringify(response);
+    return json_packet;
+}
+
+function log_console_save() {
+  str = '';
+  $('#log-list li').each(function() {
+    console.log($(this));
+     str += $(this)[0].innerText; // This is your rel value
+     str += '\n';
+  });
+  var blob = new Blob([str], {type: "text/plain;charset=utf-8"});
+  saveAs(blob, "upsat_cnc_log.txt");
 }
