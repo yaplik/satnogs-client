@@ -367,18 +367,28 @@ $(document).ready(function() {
                 request = encode_comms_tx_rf(0);
                 query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
             }
-        }
-    });
-
-    $("#time-radio").change(function() {
-        // If checkbox not checked already
-        if ($('input[name=power-radio]').prop('checked') === true) {
-            var elem = document.getElementById('subservice-params-time');
-            var elem2 = document.getElementById('subservice-params-power');
-            elem.style.display = "block";
-            elem2.style.display = "none";
-            $('input[name=power-radio]').prop('checked', false);
-            // TODO: Uncheck every other radio
+        } else if (selected_value == "mnlp") {
+           app_id = 1;
+           type = 1;
+           ack = $('#service-param-mnlp-ack').val();
+           dest_id = $('#service-param-mnlp-dest_id').val();
+           service_type = 18;
+           su_func = $('#service-param-mnlp-action').val();
+           if (su_func == 'su-reset-active') {
+             service_subtype = 13;
+             data = [];
+           } else if (su_func == 'su-service-scheduler-on') {
+             service_subtype = 24;
+             data = [1];
+           } else if (su_func == 'su-service-scheduler-off') {
+             service_subtype = 24;
+             data = [0];
+           } else if (su_func == 'su-notify-task') {
+             service_subtype = 22;
+             data = [1];
+           }
+           request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+           query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
         }
     });
 
@@ -432,7 +442,8 @@ function display_service(selection) {
         'ms-select': 'service-param-mass-storage',
         'comms-select': 'service-param-comms',
         'hk-select': 'service-param-housekeeping',
-        'sch-select': 'service-param-schedule'
+        'sch-select': 'service-param-schedule',
+        'mnlp-select': 'service-param-mnlp'
     };
     var keys = [];
     for (var key in services) {

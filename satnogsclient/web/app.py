@@ -79,11 +79,11 @@ def get_control_rx():
         cnt = 0
         for str_dict in packet_list:
             ecss_dict = cPickle.loads(str_dict)
-            logger.info("Received ECSS formated: %d", ecss_dict)
+            logger.info("Received ECSS formated: %s", ecss_dict)
             res = packet.ecss_logic(ecss_dict)
             ecss_dicts[cnt] = res
             cnt += 1
-        logger.info("Shipping: %d", ecss_dicts)
+        logger.info("Shipping: %s", ecss_dicts)
         return jsonify(ecss_dicts)
     else:
         tmp = {}

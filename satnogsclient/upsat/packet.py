@@ -345,7 +345,16 @@ def ecss_logic(ecss_dict):
 
             time_obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
             pointer += 4
-            report += "time " + str(time_obc)
+
+            su_ser_state = ecss_dict['data'][pointer]
+            pointer += 1
+
+            su_scpt_sch = ecss_dict['data'][pointer]
+            pointer += 1
+
+            report += " time " + str(time_obc) + \
+                      " su_ser_state " + str(su_ser_state) + \
+                      " su_scpt_sch " + str(su_scpt_sch)
 
         elif struct_id == packet_settings.EXT_WOD_REP:
             pointer = 1
@@ -382,6 +391,12 @@ def ecss_logic(ecss_dict):
             vbat = cnv8_16(ecss_dict['data'][pointer:])
             pointer += 2
 
+            su_ser_state = ecss_dict['data'][pointer]
+            pointer += 1
+
+            su_scpt_sch = ecss_dict['data'][pointer]
+            pointer += 1
+
             # uart_state = ecss_dict['data'][pointer]
             # pointer += 1
 
@@ -395,7 +410,9 @@ def ecss_logic(ecss_dict):
                       " task_hk " + str(task_hk) + \
                       " task_su " + str(task_su) + \
                       " task_sch " + str(task_sch) + \
-                      " vbat " + str(vbat)
+                      " vbat " + str(vbat) + \
+                      " su_ser_state " + str(su_ser_state) + \
+                      " su_scpt_sch " + str(su_scpt_sch)
 
             # if uart_state == 0x00:
             #     report += " Uart state reset"

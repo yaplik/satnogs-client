@@ -22,18 +22,68 @@
             <div class="row">
               <div class="col-xs-4">
                 <ul class="nav nav-tabs nav-stacked" id="service-select">
-                  <li data-value="time" role="presentation" id="time-select" class="active"><a>Time</a></li>
+                  <li data-value="test" role="presentation" id="test-select" class="active"><a>Test</a></li>
+                  <li data-value="time" role="presentation" id="time-select"><a>Time</a></li>
                   <li data-value="power" role="presentation" id="power-select"><a>Power</a></li>
-                  <li data-value="test" role="presentation" id="test-select"><a>Test</a></li>
                   <li data-value="mass" role="presentation" id="ms-select"><a>Mass Storage</a></li>
                   <li data-value="house" role="presentation" id="hk-select"><a>House keeping</a></li>
-                  <li data-value="custom" role="presentation" id="custom-select"><a>Custom</a></li>
-                  <li data-value="adcs" role="presentation" id="tle-select"><a>ADCS TLE update</a></li>
+                  <li data-value="adcs" role="presentation" id="tle-select"><a>ADCS TLE</a></li>
                   <li data-value="comms" role="presentation" id="comms-select"><a>Comms</a></li>
                   <li data-value="sch" role="presentation" id="sch-select"><a>Schedule</a></li>
+                  <li data-value="mnlp" role="presentation" id="mnlp-select"><a>mNLP</a></li>
+                  <li data-value="custom" role="presentation" id="custom-select"><a>Custom</a></li>
                 </ul>
               </div>
               <div class="col-xs-8" id="service-param-panel">
+                <div id="service-param-mnlp" style="display:none;">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Function:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-mnlp-action" class="form-control">
+                        <option selected style="display:none;">Select Function</option>
+                        <option value="su-reset-active">Reset active script and script scheduler</option>
+                        <option value="su-service-scheduler-on" >SU Service Scheduler ON</option>
+                        <option value="su-service-scheduler-off" >SU Service Scheduler OFF</option>
+                        <option value="su-notify-task" >SU Scheduler notify task</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>ACK:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-mnlp-ack" class="form-control">
+                        <option selected style="display:none;">Select ACK</option>
+                        <option value="0" >NO ACK</option>
+                        <option value="1" >ACK</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Destination:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-mnlp-dest_id" class="form-control">
+                        <option selected style="display:none;">Select Dest ID</option>
+                        <option value="6" >GND</option>
+                        <option value="7" >UMB</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="text-right">
+                        <button class="btn btn-primary"> Send </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div id="service-param-tle" style="display:none;">
                   <div class="row">
                     <div class="col-md-4">
