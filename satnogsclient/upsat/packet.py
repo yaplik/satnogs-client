@@ -485,7 +485,7 @@ def ecss_logic(ecss_dict):
                 offset = (i * packet_settings.SCRIPT_REPORT_SU_OFFSET)
                 valid = ecss_dict['data'][(offset)]
                 size = cnv8_32(ecss_dict['data'][(1 + offset):])
-                fatfs = cnv8_32(ecss_dict['data'][(5 + offset):])
+                fatfs = cnv8_32_fd(ecss_dict['data'][(5 + offset):])
                 time_modfied = fatfs_to_utc(fatfs)
 
                 print "offset: " + str(offset) + " script " + packet_settings.upsat_store_ids[str(i + 1)] + " valid: " + str(valid) + " size: " + str(size) + \
@@ -502,12 +502,12 @@ def ecss_logic(ecss_dict):
 
                 fname_tail = cnv8_16(ecss_dict['data'][(2 + offset):])
                 tail_size = cnv8_32(ecss_dict['data'][(4 + offset):])
-                fatfs_tail = cnv8_32(ecss_dict['data'][(8 + offset):])
+                fatfs_tail = cnv8_32_fd(ecss_dict['data'][(8 + offset):])
                 time_modfied_tail = fatfs_to_utc(fatfs_tail)
 
                 fname_head = cnv8_16(ecss_dict['data'][(12 + offset):])
                 head_size = cnv8_32(ecss_dict['data'][(14 + offset):])
-                fatfs_head = cnv8_32(ecss_dict['data'][(18 + offset):])
+                fatfs_head = cnv8_32_fd(ecss_dict['data'][(18 + offset):])
                 time_modfied_head = fatfs_to_utc(fatfs_head)
 
                 print "offset: " + str(offset) + " script " + packet_settings.upsat_store_ids[str(i + 8)] + " number of files: " + str(fnum) + " tail size: " + str(tail_size) + \
@@ -542,7 +542,7 @@ def ecss_logic(ecss_dict):
                 for i in range(0, files):
                     filename = cnv8_16(ecss_dict['data'][(3 + (i * packet_settings.LOGS_LIST_SIZE)):])
                     size = cnv8_32(ecss_dict['data'][(5 + (i * packet_settings.LOGS_LIST_SIZE)):])
-                    fatfs = cnv8_32(ecss_dict['data'][(9 + (i * packet_settings.LOGS_LIST_SIZE)):])
+                    fatfs = cnv8_32_fd(ecss_dict['data'][(9 + (i * packet_settings.LOGS_LIST_SIZE)):])
                     time_modfied = fatfs_to_utc(fatfs)
 
                     # Ecss_dict['files'][i]['filename'] = filename
@@ -625,7 +625,13 @@ def ecss_logic(ecss_dict):
 
 
 def fatfs_to_utc(fatfs):
-    return fatfs
+    fatfs_date = str(int('{:032b}'.format(fatfs)[:7], 2) + 1980) + '-' +\
+        str(int('{:032b}'.format(fatfs)[7:11], 2)) + '-' +\
+        str(int('{:032b}'.format(fatfs)[11:16], 2)) + ' ' +\
+        str(int('{:032b}'.format(fatfs)[16:21], 2)) + ':' +\
+        str(int('{:032b}'.format(fatfs)[21:27], 2)) + ':' +\
+        str(int('{:032b}'.format(fatfs)[27:], 2) * 2)
+    return fatfs_date
 
 
 def qb50_to_utc(qb50):
@@ -655,6 +661,10 @@ def cnv16_8(inc):
 
 def cnv8_32(inc):
     return ((inc[3] << 24) | (inc[2] << 16) | (inc[1] << 8) | (inc[0]))
+
+
+def cnv8_32_fd(inc):
+    return ((inc[1] << 24) | (inc[0] << 16) | (inc[3] << 8) | (inc[2]))
 
 
 def cnv8_16(inc):
