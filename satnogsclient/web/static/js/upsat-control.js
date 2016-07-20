@@ -278,7 +278,7 @@ $(document).ready(function() {
         } else if (selected_value == "time") {
             app_id = $('#service-param-time-app_id').val();
             type = 1;
-            ack = 0;
+            ack = $('#service-param-time-ack').val();
             data = [];
             service_type = 9;
             dest_id = $('#service-param-time-dest_id').val();
@@ -854,11 +854,11 @@ function init() {
     // Reveal the initial service panel
     display_service('test-select');
 
-    // $('#datetimepicker-time-row').hide();
-    // $('#file-upload-row').hide();
-    // $('#file-select-row').hide();
-    // $('#file-action-row').hide();
-    // $('#folder-select-row').hide();
+    $('#datetimepicker-time-row').hide();
+    $('#file-upload-row').hide();
+    $('#file-select-row').hide();
+    $('#file-action-row').hide();
+    $('#folder-select-row').hide();
 }
 
 function encode_mode_switch(mode) {

@@ -629,7 +629,7 @@ def fatfs_to_utc(fatfs):
 
 
 def qb50_to_utc(qb50):
-    utc = datetime.datetime.fromtimestamp(qb50 + 946684800).strftime("%A, %d. %B %Y %H:%M:%S")
+    utc = datetime.datetime.utcfromtimestamp(qb50 + 946684800).strftime("%A, %d. %B %Y %H:%M:%S")
     return utc
 
 
