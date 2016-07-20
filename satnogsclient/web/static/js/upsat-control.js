@@ -876,13 +876,41 @@ function encode_mode_switch(mode) {
     return json_packet;
 }
 
+// A function that parses the log console, generates a string and saves it on a CSV file.
 function log_console_save() {
   str = '';
-  $('#log-list li').each(function() {
-    console.log($(this));
-     str += $(this)[0].innerText; // This is your rel value
-     str += '\n';
+  var log_content = [];
+  var strArray = [];
+  $('#log-list li').each(function(i) {
+    // Retrieve all the child nodes of the log list element
+    log_content = $.makeArray($(this)[0].childNodes);
+    // Construct a string array with the containing values
+    for (j=0; j<log_content.length; j++){
+      // Check the type of the element for appropriate handling
+      if ($(log_content[j]).is('span')) {
+        strArray.push(log_content[j].innerText);
+      }
+      else {
+        strArray.push(log_content[j].data);
+      }
+    }
+    // Encode each log message into CSV
+    str += csv_encode(strArray);
+    str += '\n';
+    log_content = [];
+    strArray = [];
   });
-  var blob = new Blob([str], {type: "text/plain;charset=utf-8"});
-  saveAs(blob, "upsat_cnc_log.txt");
+  var blob = new Blob([str], {type: "text/csv;charset=utf-8"});
+  saveAs(blob, "upsat_cnc_log.csv");
+}
+
+function csv_encode(strArray) {
+  csv_str = '';
+  $.each( strArray, function( index, value){
+    csv_str += value;
+    if (index < strArray.length - 1) {
+      csv_str += ',';
+    }
+  });
+  return csv_str;
 }
