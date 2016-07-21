@@ -469,7 +469,7 @@ def ecss_logic(ecss_dict):
             utc = qb50_to_utc(qb50)
             report = "QB50 " + str(qb50) + " UTC: " + str(utc)
 
-        text = "TIME: {0}, FROM: {1}".format(report, packet_settings.upsat_app_ids[str(ecss_dict['app_id'])])
+        text = "TIME: {0}".format(report)
 
     elif ecss_dict['ser_type'] == packet_settings.TC_SCHEDULING_SERVICE:
         text = "APO, DO LET US KNOW WHAT TO DO HERE"

@@ -700,23 +700,14 @@ function print_command_response(data) {
               } else if (resp.from_id) {
                 sub_id = resp.from_id;
               }
-              if (sub_id == 1) {
-                sub = "OBC";
-              } else if (sub_id == 2) {
-                sub = "EPS";
-              } else if (sub_id == 3) {
-                sub = "ADCS";
-              } else if (sub_id == 4) {
-                sub = "COMMS";
-              } else if (sub_id == 6) {
-                sub = "GND";
-              } else if (sub_id == 7) {
-                sub = "UMB";
+              if (sub_id) {
+                sub = ecss_var.var_app_id[sub_id];
               } else {
                 sub = "UNK";
               }
               if (resp.command_sent) {
                 to_log = '<span class="label label-info"> > ' + sub + '</span>';
+                log_data = ecss_var.var_serv_id[resp.command_sent.ser_type] + ' command sent';
               } else if (resp.from_id) {
                 to_log = '<span class="label label-success"> < ' + sub + '</span>';
               }
@@ -914,3 +905,29 @@ function csv_encode(strArray) {
   });
   return csv_str;
 }
+
+// Packet settings for resolving
+var ecss_var = {
+  'var_app_id':{
+    '1':'OBC',
+    '2':'EPS',
+    '3':'ADCS',
+    '4':'COMMS',
+    '5':'IAC',
+    '6':'GND',
+    '7':'UMB'
+  },
+  'var_serv_id':{
+    '1':'Verification',
+    '3':'Housekeeping',
+    '5':'Event',
+    '8':'Function Management',
+    '9':'Time Management',
+    '11':'Scheduling',
+    '13':'Large Data',
+    '15':'Mass Storage',
+    '17':'Test',
+    '18':'SU mNLP'
+  },
+  'subserv_id':{}
+};
