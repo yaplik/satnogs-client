@@ -11,7 +11,8 @@ install_requires = [
     'pytz',
     'flask',
     'pyopenssl',
-    'pyserial'
+    'pyserial',
+    'flask-socketio'
 ]
 
 flake8 = [

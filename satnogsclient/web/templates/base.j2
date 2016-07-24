@@ -73,6 +73,9 @@
                 </ul>
               </div>
             </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <div id="backend-status" class="offline-circle" title="Backend Status"></div>
+            </ul>
           </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
       </nav>
@@ -88,6 +91,7 @@
     <script src="{{ url_for('static', filename='js/bootstrap-datetimepicker.js') }}"></script>
     <script src="{{ url_for('static', filename='js/js.cookie.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap-switch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.io-1.4.5.js') }}"></script>
     <script src="{{ url_for('static', filename='js/satnogs.js') }}"></script>
     {% block js %}{% endblock %}
   </body>

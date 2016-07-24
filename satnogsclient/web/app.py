@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, json, jsonify
+from flask.ext.socketio import SocketIO, emit
 
 
 from satnogsclient import settings as client_settings
@@ -11,6 +12,8 @@ import os
 
 logger = logging.getLogger('satnogsclient')
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 
 @app.route('/update_status', methods=['GET', 'POST'])
@@ -108,18 +111,6 @@ def get_command():
                     packet.comms_on()
                     response[0] = {'id': 1, 'log_message': 'COMMS_ON command sent'}
                     return jsonify(response)
-            elif 'mode' in requested_command['custom_cmd']:
-                # TODO: Handle the comms_tx_rf request
-                mode = requested_command['custom_cmd']['mode']
-                if requested_command['custom_cmd']['mode'] == 'cmd_ctrl':
-                    response[0] = {'log_message': 'Mode changed to Stand-Alone'}
-                    response[0] = {'id': 1}
-                    # return jsonify(response)
-                elif requested_command['custom_cmd']['mode'] == 'network':
-                    response[0] = {'id': 1, 'log_message': 'Mode changed to Network'}
-                    # return jsonify(response)
-                dict_out = {'mode': mode}
-                packet.custom_cmd_to_backend(dict_out)
             elif 'backend' in requested_command['custom_cmd']:
                 # TODO: Handle the comms_tx_rf request
                 backend = requested_command['custom_cmd']['backend']
@@ -193,3 +184,19 @@ def configuration():
     }
 
     return render_template('configuration.j2', **ctx)
+
+
+@socketio.on('mode_change', namespace='/config')
+def handle_mode_change(data):
+    logger.info('Received mode change: ' + str(data))
+    requested_command = json.loads(data)
+    if json is not None:
+        if 'custom_cmd' in requested_command:
+            if 'mode' in requested_command['custom_cmd']:
+                mode = requested_command['custom_cmd']['mode']
+                dict_out = {'mode': mode}
+                packet.custom_cmd_to_backend(dict_out)
+                emit('backend_msg', dict_out)
+
+if __name__ == '__main__':
+    socketio.run(app)

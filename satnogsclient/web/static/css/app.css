@@ -229,3 +229,18 @@ body {
   text-align: right;
   font-size: 10px;
 }
+
+#backend-status {
+  margin: 15px;
+  border-radius: 50%;
+	width: 20px;
+	height: 20px;
+}
+
+.offline-circle {
+  background-image: -moz-radial-gradient(45px 45px -45deg, circle cover, red 0%, orangered 100%);
+}
+
+.online-circle {
+  background-image: -moz-radial-gradient(45px 45px -45deg, circle cover, green 0%, lightgreen 100%);
+}
