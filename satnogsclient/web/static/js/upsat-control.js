@@ -52,6 +52,25 @@ $(document).ready(function() {
         }
     });
 
+    $('#service-param-adcs-action').on('change', function() {
+        if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_SPIN") {
+            $('[id ^=adcs][id $=row]').hide();
+            $('#adcs-spin-row').show();
+        } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_MAGNETO") {
+            $('[id ^=adcs][id $=row]').hide();
+            $('#adcs-magneto-row').show();
+        } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_CTRL_GAIN") {
+            $('[id ^=adcs][id $=row]').hide();
+            $('#adcs-gain-row').show();
+        } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_TLE"){
+            $('[id ^=adcs][id $=row]').hide();
+            $('#adcs-tle-row').show();
+        } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_CONTROL_SP"){
+            $('[id ^=adcs][id $=row]').hide();
+            $('#adcs-control-row').show();
+        }
+    });
+
     $('#service-param-ms-action').on('change', function() {
         if ($('#service-param-ms-action').find("option:selected").val() == "Uplink") {
             $('#file-upload-row').show();
@@ -338,21 +357,68 @@ $(document).ready(function() {
         } else if (selected_value == "adcs") {
             // TODO: Is app_id needed in time service?
             //app_id = $('#service-param-time-app_id').val();
-            app_id = 7;
-            type = 0;
-            ack = 0;
+            app_id = 3;
+            type = 1;
+            ack = $('#service-param-adcs-ack').val();
 
-            service_type = 3;
-            service_subtype = 23;
-            dest_id = 3;
+            service_type = 8;
+            service_subtype = 1;
+            dest_id = $('#service-param-adcs-dest_id').val();
 
             data = [];
-            ascii_to_dec($('#service-param-service-tle').val().split(''), data);
-            data.unshift(6);
-            //number of TLE chanacters
-            if (data.length != 137) {
-                alert("TLE shouldnt be: " + data.length);
-                return 0;
+            data.splice(0, 0, 3);
+            var adcs_action = $('#service-param-adcs-action').val();
+
+            if (adcs_action == "ADCS_SPIN") {
+                var spin = $('#service-param-service-spin').val();
+                data.splice(1, 0, 13);
+                data.splice(2, 0, ((spin >> 24) & 0x000000ff));
+                data.splice(3, 0, ((spin >> 16) & 0x000000ff));
+                data.splice(4, 0, ((spin >> 8) & 0x000000ff));
+                data.splice(5, 0, ((spin >> 0) & 0x000000ff));
+            } else if (adcs_action == "ADCS_MAGNETO") {
+                var x = $('#service-param-service-x').val();
+                var y = $('#service-param-service-y').val();
+                data.splice(1, 0, 12);
+                data.splice(2, 0, ((x >> 24) & 0x000000ff));
+                data.splice(3, 0, ((x >> 16) & 0x000000ff));
+                data.splice(4, 0, ((x >> 8) & 0x000000ff));
+                data.splice(5, 0, ((x >> 0) & 0x000000ff));
+                data.splice(6, 0, ((y >> 24) & 0x000000ff));
+                data.splice(7, 0, ((y >> 16) & 0x000000ff));
+                data.splice(8, 0, ((y >> 8) & 0x000000ff));
+                data.splice(9, 0, ((y >> 0) & 0x000000ff));
+            } else if (adcs_action == "ADCS_CTRL_GAIN") {
+                var g1 = $('#service-param-service-g1').val();
+                var g2 = $('#service-param-service-g2').val();
+                var g3 = $('#service-param-service-g3').val();
+                data.splice(1, 0, 15);
+                data.splice(2, 0, ((g1 >> 8) & 0x00FF));
+                data.splice(3, 0, ((g1 >> 0) & 0x00FF));
+                data.splice(4, 0, ((g2 >> 8) & 0x00FF));
+                data.splice(5, 0, ((g2 >> 0) & 0x00FF));
+                data.splice(6, 0, ((g3 >> 8) & 0x00FF));
+                data.splice(7, 0, ((g3 >> 0) & 0x00FF));
+            } else if (adcs_action == "ADCS_CONTROL_SP") {
+                var c1 = $('#service-param-service-c1').val();
+                var c2 = $('#service-param-service-c2').val();
+                var c3 = $('#service-param-service-c3').val();
+                data.splice(1, 0, 16);
+                data.splice(2, 0, ((c1 >> 8) & 0x00FF));
+                data.splice(3, 0, ((c1 >> 0) & 0x00FF));
+                data.splice(4, 0, ((c2 >> 8) & 0x00FF));
+                data.splice(5, 0, ((c2 >> 0) & 0x00FF));
+                data.splice(6, 0, ((c3 >> 8) & 0x00FF));
+                data.splice(7, 0, ((c3 >> 0) & 0x00FF));
+            } else if (adcs_action == "ADCS_TLE") {
+                ascii_to_dec($('#service-param-service-tle').val(), data);
+                data.unshift(14);
+                data.unshift(3);
+                //number of TLE chanacters
+                if (data.length != 142) {
+                    console.log("TLE should be 140 long, instead saw: " + data.length-2);
+                    return 0;
+                }
             }
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
@@ -441,7 +507,7 @@ function display_service(selection) {
         'power-select': 'service-param-power',
         'test-select': 'service-param-test',
         'time-select': 'service-param-time',
-        'tle-select': 'service-param-tle',
+        'adcs-select': 'service-param-adcs',
         'ms-select': 'service-param-mass-storage',
         'comms-select': 'service-param-comms',
         'hk-select': 'service-param-housekeeping',
@@ -845,11 +911,13 @@ function init() {
     // Reveal the initial service panel
     display_service('test-select');
 
+    // Initially hide the UI components below
     $('#datetimepicker-time-row').hide();
     $('#file-upload-row').hide();
     $('#file-select-row').hide();
     $('#file-action-row').hide();
     $('#folder-select-row').hide();
+    $('[id ^=adcs][id $=row]').hide();
 }
 
 function encode_mode_switch(mode) {

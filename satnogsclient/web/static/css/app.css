@@ -239,8 +239,12 @@ body {
 
 .offline-circle {
   background-image: -moz-radial-gradient(45px 45px -45deg, circle cover, red 0%, orangered 100%);
+  background-image: -webkit-radial-gradient(45px 45px -45deg, circle cover, red 0%, orangered 100%);
+  background-image: radial-gradient(45px 45px -45deg, circle cover, red 0%, orangered 100%);
 }
 
 .online-circle {
   background-image: -moz-radial-gradient(45px 45px -45deg, circle cover, green 0%, lightgreen 100%);
+  background-image: -webkit-radial-gradient(45px 45px -45deg, circle cover, green 0%, lightgreen 100%);
+  background-image: radial-gradient(45px 45px -45deg, circle cover, green 0%, lightgreen 100%);
 }

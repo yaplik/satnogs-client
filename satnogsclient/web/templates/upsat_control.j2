@@ -27,7 +27,7 @@
                   <li data-value="power" role="presentation" id="power-select"><a><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Power</a></li>
                   <li data-value="mass" role="presentation" id="ms-select"><a><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Mass Storage</a></li>
                   <li data-value="house" role="presentation" id="hk-select"><a><span class="glyphicon glyphicon-home" aria-hidden="true"></span> House keeping</a></li>
-                  <li data-value="adcs" role="presentation" id="tle-select"><a><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> ADCS</a></li>
+                  <li data-value="adcs" role="presentation" id="adcs-select"><a><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> ADCS</a></li>
                   <li data-value="comms" role="presentation" id="comms-select"><a><span class="glyphicon glyphicon-sort" aria-hidden="true"></span> Comms</a></li>
                   <li data-value="sch" role="presentation" id="sch-select"><a><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Schedule</a></li>
                   <li data-value="mnlp" role="presentation" id="mnlp-select"><a><span class="glyphicon glyphicon-education" aria-hidden="true"></span> mNLP</a></li>
@@ -84,13 +84,99 @@
                     </div>
                   </div>
                 </div>
-                <div id="service-param-tle" style="display:none;">
+                <div id="service-param-adcs" style="display:none;">
                   <div class="row">
+                    <div class="col-md-4">
+                      <label>Action:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-adcs-action" class="form-control">
+                        <option selected style="display:none;">Action:</option>
+                        <option value="ADCS_SPIN" >Set spin</option>
+                        <option value="ADCS_MAGNETO" >Set magnetotorquers</option>
+                        <option value="ADCS_CTRL_GAIN" >Set control gains</option>
+                        <option value="ADCS_CONTROL_SP" >Set control sp</option>
+                        <option value="ADCS_TLE" >Set TLE</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row" id="adcs-spin-row">
+                    <div class="col-md-4">
+                      <label>Spin:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <input class="form-control" type="text" id="service-param-service-spin">
+                    </div>
+                  </div>
+                  <div class="row" id="adcs-magneto-row">
+                    <div class="col-md-5">
+                      <label>Magnetotorquers:</label>
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-service-magneto-x">
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-service-magneto-y">
+                    </div>
+                  </div>
+                  <div class="row" id="adcs-control-row">
+                    <div class="col-md-3">
+                      <label>Control SP:</label>
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-service-c1">
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-service-c2">
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-service-c3">
+                    </div>
+                  </div>
+                  <div class="row" id="adcs-gain-row">
+                    <div class="col-md-3">
+                      <label>Control Gains:</label>
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-service-g1">
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-service-g2">
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-service-g3">
+                    </div>
+                  </div>
+                  <div class="row" id="adcs-tle-row">
                     <div class="col-md-4">
                       <label>TLE:</label>
                     </div>
                     <div class="col-md-8">
                       <input class="form-control" type="text" id="service-param-service-tle">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>ACK:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-adcs-ack" class="form-control">
+                        <option selected style="display:none;">Select ACK</option>
+                        <option value="0" >NO ACK</option>
+                        <option value="1" >ACK</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Destination:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-adcs-dest_id" class="form-control">
+                        <option selected style="display:none;">Select Dest ID</option>
+                        <option value="6" >GND</option>
+                        <option value="7" >UMB</option>
+                      </select>
                     </div>
                   </div>
                   <div class="row">
@@ -411,62 +497,6 @@
                   </div>
                 </div>
                 <div id="service-param-mass-storage" style="display:none;">
-                  <!-- To be populated <div class="row">
-                    <div class="col-md-12">
-                      <div class="panel panel-default" id="file-browser-panel">
-                        <div class="panel-body">
-                          <table class="table table-hover table-condensed table-responsive">
-                          	<thead>
-                          		<tr>
-                          			<th>
-                          				ID
-                          			</th>
-                          			<th>
-                          				Filename
-                          			</th>
-                          			<th>
-                          				Size
-                          			</th>
-                                <th>
-                          				Last Modified
-                          			</th>
-                          		</tr>
-                          	</thead>
-                          	<tbody>
-                          		<tr>
-                          			<td>
-                          				1
-                          			</td>
-                          			<td>
-                          				Test.txt
-                          			</td>
-                          			<td>
-                          				32Kb
-                          			</td>
-                                <td>
-                          				21/05/16 19:56:4
-                          			</td>
-                          		</tr>
-                              <tr>
-                          			<td>
-                          				3
-                          			</td>
-                          			<td>
-                          				Test2.dat
-                          			</td>
-                          			<td>
-                          				456Kb
-                          			</td>
-                                <td>
-                          				20/05/16 19:12:2
-                          			</td>
-                          		</tr>
-                          	</tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div> -->
                   <div class="row">
                     <div class="col-md-4">
                       <label>Function:</label>
