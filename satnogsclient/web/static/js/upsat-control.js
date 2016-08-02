@@ -94,6 +94,14 @@ $(document).ready(function() {
         }
     });
 
+    $('#service-param-eps-action').on('change', function() {
+        if ($('#service-param-eps-action').find("option:selected").val() == "eps-set-safety-limits") {
+          $('#eps-safety-limits-row').show();
+        } else {
+          $('#eps-safety-limits-row').hide();
+        }
+    });
+
     $('#service-param-panel :button').on('click', function() {
 
         var list = $('this').parent().siblings().find('select');
@@ -142,6 +150,33 @@ $(document).ready(function() {
             query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
 
 
+        } else if (selected_value == "eps") {
+            app_id = 2;
+            type = 1;
+            ack = $('#service-param-eps-ack').val();
+            service_type = 8;
+            service_subtype = 1;
+            dest_id = $('#service-param-eps-dest_id').val();
+
+            data = [];
+
+            var safety_address = $('#service-param-eps-safety-address').val();
+            var safety_value = $('#service-param-eps-safety-value').val();
+
+            data.splice(0, 0, 3);
+            data.splice(1, 0, 17);
+            data.splice(2, 0, ((safety_address >> 0) & 0x000000ff));
+            data.splice(3, 0, ((safety_address >> 8) & 0x000000ff));
+            data.splice(4, 0, ((safety_address >> 16) & 0x000000ff));
+            data.splice(5, 0, ((safety_address >> 24) & 0x000000ff));
+            data.splice(6, 0, ((safety_value >> 0) & 0x000000ff));
+            data.splice(7, 0, ((safety_value >> 8) & 0x000000ff));
+            data.splice(8, 0, ((safety_value >> 16) & 0x000000ff));
+            data.splice(9, 0, ((safety_value >> 24) & 0x000000ff));
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+
         } else if (selected_value == "mass") {
 
             app_id = 1;
@@ -155,6 +190,8 @@ $(document).ready(function() {
 
             var fun = $('#service-param-ms-function').val();
 
+            var action = $('#service-param-ms-action').val();
+
             if (fun == "Format") {
                 if (confirm('Are you sure you want to format the sd?')) {
                     service_subtype = 15;
@@ -162,8 +199,6 @@ $(document).ready(function() {
                     return 0;
                 }
             } else if (fun == "File_system") {
-
-                var action = $('#service-param-ms-action').val();
 
                 if (action == "Report") {
 
@@ -231,7 +266,15 @@ $(document).ready(function() {
             //     }
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+            if (action == "All" || action == "Hard") {
+                if (window.confirm("Do you really want to delete all files in the folder?")) {
+                    query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+                }
+            } else {
+                query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            }
+
 
         } else if (selected_value == "power") {
 
@@ -372,22 +415,22 @@ $(document).ready(function() {
             if (adcs_action == "ADCS_SPIN") {
                 var spin = $('#service-param-service-spin').val();
                 data.splice(1, 0, 13);
-                data.splice(2, 0, ((spin >> 24) & 0x000000ff));
-                data.splice(3, 0, ((spin >> 16) & 0x000000ff));
-                data.splice(4, 0, ((spin >> 8) & 0x000000ff));
-                data.splice(5, 0, ((spin >> 0) & 0x000000ff));
+                data.splice(2, 0, ((spin >> 0) & 0x000000ff));
+                data.splice(3, 0, ((spin >> 8) & 0x000000ff));
+                data.splice(4, 0, ((spin >> 16) & 0x000000ff));
+                data.splice(5, 0, ((spin >> 24) & 0x000000ff));
             } else if (adcs_action == "ADCS_MAGNETO") {
-                var x = $('#service-param-service-x').val();
-                var y = $('#service-param-service-y').val();
+                var x = $('#service-param-service-magneto-x').val();
+                var y = $('#service-param-service-magneto-y').val();
                 data.splice(1, 0, 12);
-                data.splice(2, 0, ((x >> 24) & 0x000000ff));
-                data.splice(3, 0, ((x >> 16) & 0x000000ff));
-                data.splice(4, 0, ((x >> 8) & 0x000000ff));
-                data.splice(5, 0, ((x >> 0) & 0x000000ff));
-                data.splice(6, 0, ((y >> 24) & 0x000000ff));
-                data.splice(7, 0, ((y >> 16) & 0x000000ff));
-                data.splice(8, 0, ((y >> 8) & 0x000000ff));
-                data.splice(9, 0, ((y >> 0) & 0x000000ff));
+                data.splice(2, 0, ((x >> 0) & 0x000000FF));
+                data.splice(3, 0, ((x >> 8) & 0x000000FF));
+                data.splice(4, 0, ((x >> 16) & 0x000000FF));
+                data.splice(5, 0, ((x >> 24) & 0x000000FF));
+                data.splice(6, 0, ((y >> 0) & 0x000000FF));
+                data.splice(7, 0, ((y >> 8) & 0x000000FF));
+                data.splice(8, 0, ((y >> 16) & 0x000000FF));
+                data.splice(9, 0, ((y >> 24) & 0x000000FF));
             } else if (adcs_action == "ADCS_CTRL_GAIN") {
                 var g1 = $('#service-param-service-g1').val();
                 var g2 = $('#service-param-service-g2').val();
@@ -430,7 +473,9 @@ $(document).ready(function() {
                 query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
             } else if ($(this).attr("id") == "comms-tx-off") {
                 request = encode_comms_tx_rf(0);
-                query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+                if (window.confirm("Do you really want to shutdown COMMS TX?")) {
+                    query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+                }
             }
         } else if (selected_value == "mnlp") {
             app_id = 1;
@@ -512,7 +557,8 @@ function display_service(selection) {
         'comms-select': 'service-param-comms',
         'hk-select': 'service-param-housekeeping',
         'sch-select': 'service-param-schedule',
-        'mnlp-select': 'service-param-mnlp'
+        'mnlp-select': 'service-param-mnlp',
+        'eps-select': 'service-param-eps'
     };
     var keys = [];
     for (var key in services) {
@@ -918,6 +964,7 @@ function init() {
     $('#file-action-row').hide();
     $('#folder-select-row').hide();
     $('[id ^=adcs][id $=row]').hide();
+    $('#eps-safety-limits-row').hide();
 }
 
 function encode_mode_switch(mode) {

@@ -264,16 +264,76 @@ def ecss_logic(ecss_dict):
 
         if ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.HEALTH_REP:
 
-            report = "data "
+            report = "VBAT:" + str(ecss_dict['data'][1] * 0.0716) + "V "
+            report += "IBAT:" + str(ecss_dict['data'][2] * 4.6 + 1000) + "mA "
+            report += "3V3:" + str(ecss_dict['data'][3] * 11.72) + "mA "
+            report += "5V0:" + str(ecss_dict['data'][4] * 11.72) + "mA "
+            report += "TCPU:" + str((ecss_dict['data'][5] / 4) - 15) + "C "
+            report += "TBAT:" + str((ecss_dict['data'][6] / 4) - 15) + "C"
+
+        elif ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.EPS_FLS_REP:
+
+            pointer = 1
+            report = "Safety Limit memory values:"
+
+            report += "1: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "2: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "3: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "4: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "5: " + str(cnv8_32(ecss_dict['data'][pointer:]))
 
         elif ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
 
             pointer = 1
             report = "EX_HEALTH_REP "
 
-            time_obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            report += "Time: " + str(cnv8_32(ecss_dict['data'][pointer:]) * 0.001) + ", "
             pointer += 4
-            report += "time " + str(time_obc) + " "
+            report += "RST source: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Last Assertion F: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Last Assertion L: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Batt Temp Health Status: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Heater status: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "TOP Voltage: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "TOP Current: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "TOP Duty: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "BOTTOM Voltage: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "BOTTOM Current: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "BOTTOM Duty: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "LEFT Voltage: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "LEFT Current: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "LEFT Duty: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "RIGHT Voltage: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "RIGHT Current: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "RIGHT Duty: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "ConC1: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "ConC2: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Temp sensor PWR SW: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Soft error status: " + str(ecss_dict['data'][pointer])
 
         elif ecss_dict['app_id'] == packet_settings.COMMS_APP_ID and struct_id == packet_settings.HEALTH_REP:
 
@@ -284,18 +344,114 @@ def ecss_logic(ecss_dict):
             pointer = 1
             report = "EX_HEALTH_REP "
 
-            time_obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            report += "Time: " + str(cnv8_32(ecss_dict['data'][pointer:]) * 0.001) + ", "
             pointer += 4
-            report += "time " + str(time_obc) + " "
+            report += "RST source: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Last Assertion F: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Last Assertion L: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Flash read transmit: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "Beacon pattern: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "RX Failed: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "RX CRC Failed: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "TX Failed: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "TX Frames: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "RX Frames: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Last TX Error: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Last RX Error: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Invalid Dest Frames Cnt: " + str(cnv8_16(ecss_dict['data'][pointer:]))
 
         elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
 
             pointer = 1
             report = "EX_HEALTH_REP "
 
-            time_obc = cnv8_32(ecss_dict['data'][pointer:]) * 0.001
+            report += "Time: " + str(cnv8_32(ecss_dict['data'][pointer:]) * 0.001) + ", "
             pointer += 4
-            report += "time " + str(time_obc) + " "
+            report += "QB50: " + str(cnv8_32(ecss_dict['data'][pointer:])) + " " + qb50_to_utc(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "RST source: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Boot Cnt: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "Last Assertion F: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Last Assertion L: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "TX error: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "Roll: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Pitch: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Yaw: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Roll Dot: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Pitch Dot: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Yaw Dot: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "X ECI: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Y ECI: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Z ECI: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "GPS Status: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "GPS Sats: " + str(ecss_dict['data'][pointer]) + ", "
+            pointer += 1
+            report += "GPS Week: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "GPS Time: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "Gyr X: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Gyr Y: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Gyr Z: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "XM X: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "XM Y: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "XM Z: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "RM X: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "RM Y: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "RM Z: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "RM Z: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "Sun V 0: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Sun V 1: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Sun V 2: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Sun V 3: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Sun V 4: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Spin RPM: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+            pointer += 2
+            report += "Mg Torq V Y: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+            pointer += 4
+            report += "MG Torq V Z: " + str(cnv8_32(ecss_dict['data'][pointer:]))
 
         elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.SU_SCI_HDR_REP:
 

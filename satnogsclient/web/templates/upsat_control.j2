@@ -24,11 +24,12 @@
                 <ul class="nav nav-tabs nav-stacked" id="service-select">
                   <li data-value="test" role="presentation" id="test-select" class="active"><a><span class="glyphicon glyphicon-check" aria-hidden="true"></span> Test</a></li>
                   <li data-value="time" role="presentation" id="time-select"><a><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Time</a></li>
-                  <li data-value="power" role="presentation" id="power-select"><a><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Power</a></li>
+                  <li data-value="power" role="presentation" id="power-select"><a><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Power</a></li>
                   <li data-value="mass" role="presentation" id="ms-select"><a><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Mass Storage</a></li>
                   <li data-value="house" role="presentation" id="hk-select"><a><span class="glyphicon glyphicon-home" aria-hidden="true"></span> House keeping</a></li>
                   <li data-value="adcs" role="presentation" id="adcs-select"><a><span class="glyphicon glyphicon-plane" aria-hidden="true"></span> ADCS</a></li>
-                  <li data-value="comms" role="presentation" id="comms-select"><a><span class="glyphicon glyphicon-sort" aria-hidden="true"></span> Comms</a></li>
+                  <li data-value="comms" role="presentation" id="comms-select"><a><span class="glyphicon glyphicon-sort" aria-hidden="true"></span> COMMS</a></li>
+                  <li data-value="eps" role="presentation" id="eps-select"><a><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> EPS</a></li>
                   <li data-value="sch" role="presentation" id="sch-select"><a><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Schedule</a></li>
                   <li data-value="mnlp" role="presentation" id="mnlp-select"><a><span class="glyphicon glyphicon-education" aria-hidden="true"></span> mNLP</a></li>
                   <li data-value="custom" role="presentation" id="custom-select"><a><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Custom</a></li>
@@ -68,6 +69,63 @@
                     </div>
                     <div class="col-md-8">
                       <select id="service-param-mnlp-dest_id" class="form-control">
+                        <option selected style="display:none;">Select Dest ID</option>
+                        <option value="6" >GND</option>
+                        <option value="7" >UMB</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="text-right">
+                        <button class="btn btn-primary"> Send </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="service-param-eps" style="display:none;">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Function:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-eps-action" class="form-control">
+                        <option selected style="display:none;">Select Function</option>
+                        <option value="eps-set-safety-limits" >Set safety limits</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row" id="eps-safety-limits-row">
+                    <div class="col-md-5">
+                      <label>Safety limits:</label>
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-eps-safety-address" placeholder="Addr">
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" type="text" id="service-param-eps-safety-value" placeholder="Value">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>ACK:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-eps-ack" class="form-control">
+                        <option selected style="display:none;">Select ACK</option>
+                        <option value="0" >NO ACK</option>
+                        <option value="1" >ACK</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Destination:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-eps-dest_id" class="form-control">
                         <option selected style="display:none;">Select Dest ID</option>
                         <option value="6" >GND</option>
                         <option value="7" >UMB</option>
@@ -471,6 +529,8 @@
                         <option value="1" >HEALTH_REP</option>
                         <option value="2" >EX_HEALTH_REP</option>
                         <option value="6" >SCIENCE HEADER</option>
+                        <option value="7" >GET TLE</option>
+                        <option value="8" >SAFETY LIMITS</option>
                       </select>
                     </div>
                   </div>
