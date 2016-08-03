@@ -3,7 +3,7 @@ from flask.ext.socketio import SocketIO, emit
 
 
 from satnogsclient import settings as client_settings
-from satnogsclient.upsat import packet, tx_handler
+from satnogsclient.upsat import packet, tx_handler, ecss_logic_utils
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
 import logging
@@ -83,7 +83,7 @@ def get_control_rx():
         for str_dict in packet_list:
             ecss_dict = cPickle.loads(str_dict)
             logger.info("Received ECSS formated: %s", ecss_dict)
-            res = packet.ecss_logic(ecss_dict)
+            res = ecss_logic_utils.ecss_logic(ecss_dict)
             ecss_dicts[cnt] = res
             cnt += 1
         logger.info("Shipping: %s", ecss_dicts)
