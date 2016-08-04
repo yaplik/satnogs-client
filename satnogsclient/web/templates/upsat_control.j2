@@ -370,16 +370,15 @@
                     <div class="col-md-8">
                       <select id="service-param-sch-action" class="form-control">
                         <option selected style="display:none;">Action:</option>
-                        <option value="ins_qb" >Insert qb50</option>
-                        <option value="ins_abs" >Insert absolute</option>
-                        <option value="del" >Delete</option>
+                        <option value="insert" >Insert</option>
+                        <option value="delete" >Delete</option>
                         <option value="shift_all" >Timeshift all</option>
                         <option value="shift_sel" >Timeshift selected</option>
-                        <option value="shift_seq" >Timeshift sequence</option>
+                        <option value="report" >Report</option>
                       </select>
                     </div>
                   </div>
-                  <div class="row">
+                  <div class="row" id="sch-time-row">
                     <div class="col-md-4">
                       <label>Time:</label>
                     </div>
@@ -392,31 +391,41 @@
                       </div>
                     </div>
                   </div>
-                  <div class="row">
+                  <div class="row" id="sch-time-int-row">
+                    <div class="col-md-4">
+                      <label>Time int:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <input class="form-control" type="text" id="service-param-sch-time-int">
+                    </div>
+                  </div>
+                  <div class="row" id="sch-payload-row">
+                    <div class="col-md-4">
+                      <label>Payload:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <input class="form-control" type="text" id="service-param-sch-payload">
+                    </div>
+                  </div>
+                  <div class="row" id="sch-seq-row">
+                    <div class="col-md-4">
+                      <label>Sequence:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <input class="form-control" type="text" id="service-param-sch-seq">
+                    </div>
+                  </div>
+                  <div class="row" id="sch-app_id-row">
                     <div class="col-md-4">
                       <label>Application:</label>
                     </div>
                     <div class="col-md-8">
-                      <select id="service-param-sch-app-id" class="form-control">
-                        <option selected style="display:none;">Application ID</option>
+                      <select id="service-param-sch-app_id" class="form-control">
+                        <option selected style="display:none;">Select App ID</option>
                         <option value="1" >OBC</option>
                         <option value="2" >EPS</option>
                         <option value="3" >ADCS</option>
                         <option value="4" >COMMS</option>
-                        <option value="6" >GND</option>
-                        <option value="7" >UMB</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <label>Type:</label>
-                    </div>
-                    <div class="col-md-8">
-                      <select id="service-param-sch-type" class="form-control">
-                        <option selected style="display:none;">Type</option>
-                        <option value="0" >TM</option>
-                        <option value="1" >TC</option>
                       </select>
                     </div>
                   </div>
@@ -434,64 +443,14 @@
                   </div>
                   <div class="row">
                     <div class="col-md-4">
-                      <label>Service Type:</label>
-                    </div>
-                    <div class="col-md-8">
-                      <select id="service-param-sch-service-type" class="form-control">
-                        <option selected style="display:none;">Service Type</option>
-                        <option value="1" >TC_VERIFICATION_SERVICE</option>
-                        <option value="3" >TC_HOUSEKEEPING_SERVICE</option>
-                        <option value="5" >TC_EVENT_SERVICE</option>
-                        <option value="8" >TC_FUNCTION_MANAGEMENT_SERVICE</option>
-                        <option value="9" >TC_TIME_MANAGEMENT_SERVICE</option>
-                        <option value="11" >TC_SCHEDULING_SERVICE</option>
-                        <option value="13" >TC_LARGE_DATA_SERVICE</option>
-                        <option value="15" >TC_MASS_STORAGE_SERVICE</option>
-                        <option value="17" >TC_TEST_SERVICE</option>
-                        <option value="18" >TC_SU_MNLP_SERVICE</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <label>Service Subtype:</label>
-                    </div>
-                    <div class="col-md-8">
-                      <select id="service-param-sch-service-subtype" class="form-control">
-                        <option selected style="display:none;">Service sub Type</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4">
                       <label>Destination:</label>
                     </div>
                     <div class="col-md-8">
                       <select id="service-param-sch-dest-id" class="form-control">
                         <option selected style="display:none;">Dest ID</option>
-                        <option value="1" >OBC</option>
-                        <option value="2" >EPS</option>
-                        <option value="3" >ADCS</option>
-                        <option value="4" >COMMS</option>
                         <option value="6" >GND</option>
                         <option value="7" >UMB</option>
                       </select>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <label>Sequence count:</label>
-                    </div>
-                    <div class="col-md-8">
-                      <input class="form-control" type="text" id="service-param-sch-seq-count">
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <label>Application Data:</label>
-                    </div>
-                    <div class="col-md-8">
-                      <input class="form-control" type="text" id="service-param-sch-service-data">
                     </div>
                   </div>
                   <div class="row">
@@ -904,6 +863,22 @@
       </div>
     </div>
     <div class="row" id="network_mode">
+    </div>
+  </div>
+
+  <!-- JSON Prettify Modal -->
+  <div class="modal fade" id="json-prettify" tabindex="-1" role="dialog" aria-labelledby="json-prettify">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="json-prettify-label">JSON Prettify</h4>
+        </div>
+        <div class="modal-body"><pre></pre></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 

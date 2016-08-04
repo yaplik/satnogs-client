@@ -216,6 +216,10 @@ body {
     display: none;
 }
 
+.glyphicon-list-alt {
+  cursor: pointer;
+}
+
 #service-param-panel .row {
   margin-top: 10px;
 }

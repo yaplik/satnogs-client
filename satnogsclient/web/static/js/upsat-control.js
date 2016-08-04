@@ -19,13 +19,6 @@ $(document).ready(function() {
         display_service(selected_service_id);
     });
 
-    $('#service-param-sch-service-type').on('change', function() {
-        // Handle change on service parameter dropdowns
-        var subservice = $(this).find("option:selected").text();
-        var select = $('#service-param-sch-service-subtype');
-        update_subservice(subservice, select);
-    });
-
     $('#service-param-service_type').on('change', function() {
         // Handle change on service parameter dropdowns
         var subservice = $(this).find("option:selected").text();
@@ -68,6 +61,29 @@ $(document).ready(function() {
         } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_CONTROL_SP"){
             $('[id ^=adcs][id $=row]').hide();
             $('#adcs-control-row').show();
+        }
+    });
+
+    $('#service-param-sch-action').on('change', function() {
+        if ($('#service-param-sch-action').find("option:selected").val() == "insert") {
+            $('[id ^=sch][id $=row]').hide();
+            $('#sch-time-row').show();
+            $('#sch-time-int-row').show();
+            $('#sch-payload-row').show();
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "delete") {
+            $('[id ^=sch][id $=row]').hide();
+            $('#sch-app_id-row').show();
+            $('#sch-seq-row').show();
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "shift_all") {
+            $('[id ^=sch][id $=row]').hide();
+            $('#sch-time-int-row').show();
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "shift_sel"){
+            $('[id ^=sch][id $=row]').hide();
+            $('#sch-time-int-row').show();
+            $('#sch-app_id-row').show();
+            $('#sch-seq-row').show();
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "report"){
+            $('[id ^=sch][id $=row]').hide();
         }
     });
 
@@ -333,6 +349,76 @@ $(document).ready(function() {
             service_subtype = 1;
             dest_id = $('#service-param-test-dest_id').val();
             data = [];
+
+            request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+
+        } else if (selected_value == "sch") {
+            app_id = 1;
+            type = 1;
+            ack = $('#service-param-sch-ack').val();
+            dest_id = $('#service-param-sch-dest-id').val();
+            data = [];
+            service_type = 11;
+
+            var time_int = $('#service-param-sch-time-int').val();
+            var time_sch = datepicker_sch.data("DateTimePicker").date();
+            var time_qb50_sch = moment(time_sch).unix() - 946684800;
+            var sch_app_id = $('#service-param-sch-app_id').val();
+            var sch_seq_cnt = $('#service-param-sch-seq').val();
+
+            selected_action = $('#service-param-sch-action').find("option:selected").val();
+            if (selected_action == 'insert') {
+
+                service_subtype = 4;
+
+                data.splice(0, 0, 1);
+                data.splice(1, 0, 1);
+                data.splice(2, 0, 0);
+                data.splice(3, 0, 0);
+                data.splice(4, 0, 1);
+                data.splice(5, 0, 5);
+                data.splice(6, 0, ((time_qb50_sch >> 0) & 0x000000ff));
+                data.splice(7, 0, ((time_qb50_sch >> 8) & 0x000000ff));
+                data.splice(8, 0, ((time_qb50_sch >> 16) & 0x000000ff));
+                data.splice(9, 0, ((time_qb50_sch >> 24) & 0x000000ff));
+                data.splice(10, 0, ((time_int >> 0) & 0x000000ff));
+                data.splice(11, 0, ((time_int >> 8) & 0x000000ff));
+                data.splice(12, 0, ((time_int >> 16) & 0x000000ff));
+                data.splice(13, 0, ((time_int >> 24) & 0x000000ff));
+                data.concat($('#service-param-service-data').val().split(","));
+            } else if (selected_value == 'delete') {
+
+                service_subtype = 5;
+
+                data.splice(0, 0, 1);
+                data.splice(1, 0, sch_app_id);
+                data.splice(2, 0, sch_seq_cnt);
+                data.splice(3, 0, 1);
+            } else if (selected_value == 'shift_all') {
+
+                service_subtype = 15;
+
+                data.splice(0, 0, ((time_int >> 0) & 0x000000ff));
+                data.splice(1, 0, ((time_int >> 8) & 0x000000ff));
+                data.splice(2, 0, ((time_int >> 16) & 0x000000ff));
+                data.splice(3, 0, ((time_int >> 24) & 0x000000ff));
+            } else if (selected_value == 'shift_sel') {
+
+                service_subtype = 7;
+
+                data.splice(0, 0, ((time_int >> 0) & 0x000000ff));
+                data.splice(1, 0, ((time_int >> 8) & 0x000000ff));
+                data.splice(2, 0, ((time_int >> 16) & 0x000000ff));
+                data.splice(3, 0, ((time_int >> 24) & 0x000000ff));
+                data.splice(4, 0, 1);
+                data.splice(5, 0, sch_app_id);
+                data.splice(6, 0, sch_seq_cnt);
+                data.splice(4, 0, 1);
+            } else if (selected_value == 'report') {
+
+                service_subtype = 16;
+            }
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
             query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
@@ -822,6 +908,12 @@ function print_command_response(data) {
                 log_data = ecss_var.var_serv_id[resp.command_sent.ser_type] + ' command sent';
               } else if (resp.from_id) {
                 to_log = '<span class="label label-success"> < ' + sub + '</span>';
+                try {
+                  json_reponse = JSON.parse(log_data);
+                  log_data = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true" data-toggle="modal" data-target="#json-prettify"></span> <span>' + log_data + '</span>';
+                } catch(e) {
+                  console.log("Couldn't find JSON in the response.");
+                }
               }
             }
             response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">' +
@@ -964,6 +1056,7 @@ function init() {
     $('#file-action-row').hide();
     $('#folder-select-row').hide();
     $('[id ^=adcs][id $=row]').hide();
+    $('[id ^=sch][id $=row]').hide();
     $('#eps-safety-limits-row').hide();
 }
 
@@ -1020,6 +1113,15 @@ function csv_encode(strArray) {
   });
   return csv_str;
 }
+
+// Populating Log modals
+$('#json-prettify').on('show.bs.modal', function (event) {
+  var span = $(event.relatedTarget); // Button that triggered the modal
+  var modal = $(this);
+  var json_body = JSON.parse($(event.relatedTarget).next().text());
+  modal.find('.modal-title').text('Json response');
+  modal.find('.modal-body pre').html(JSON.stringify(json_body, undefined, 2));
+});
 
 // Packet settings for resolving
 var ecss_var = {

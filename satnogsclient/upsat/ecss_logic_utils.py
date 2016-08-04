@@ -1,6 +1,7 @@
 import datetime
 import logging
 import time
+import json
 
 from satnogsclient.upsat import packet_settings
 
@@ -121,17 +122,24 @@ def ecss_logic(ecss_dict):
             report = obc_hk(ecss_dict['data'][pointer:])
 
         elif struct_id == packet_settings.EXT_WOD_REP:
-            pointer = packet_settings.OBC_EXT_WOD_OFFSET
-            report = "EXT WOD: "
-            report += obc_hk(ecss_dict['data'][pointer:])
-            pointer = packet_settings.COMMS_EXT_WOD_OFFSET
-            report += comms_hk(ecss_dict['data'][pointer:])
-            pointer = packet_settings.ADCS_EXT_WOD_OFFSET
-            report += adcs_hk(ecss_dict['data'][pointer:])
-            pointer = packet_settings.EPS_EXT_WOD_OFFSET
-            report += eps_hk(ecss_dict['data'][pointer:])
+            content = [{}]
 
-        text = "HK {0}".format(report)
+            pointer = packet_settings.OBC_EXT_WOD_OFFSET
+            content[0]['OBC'] = obc_hk(ecss_dict['data'][pointer:])
+            pointer = packet_settings.COMMS_EXT_WOD_OFFSET
+            content[0]['COMMS'] = comms_hk(ecss_dict['data'][pointer:])
+            pointer = packet_settings.ADCS_EXT_WOD_OFFSET
+            content[0]['ADCS'] = adcs_hk(ecss_dict['data'][pointer:])
+            pointer = packet_settings.EPS_EXT_WOD_OFFSET
+            content[0]['EPS'] = eps_hk(ecss_dict['data'][pointer:])
+
+            report_pre = [{
+                "type": "EX_WOD",
+                "content": content
+            }]
+            report = json.dumps(report_pre, indent=2, sort_keys=True)
+
+        text = report
 
     elif ecss_dict['ser_type'] == packet_settings.TC_EVENT_SERVICE and ecss_dict['ser_subtype'] == packet_settings.TM_EV_NORMAL_REPORT:
 
@@ -324,228 +332,248 @@ def ecss_logic(ecss_dict):
 
 # Decoding extened health report from OBC
 def obc_hk(ecss_data):
-    report = "OBC EX_HEALTH_REP "
+    content = [{}]
     pointer = 0
 
-    report += "Time: " + str(cnv8_32(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Time'] = str(cnv8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    report += "QB50: " + str(cnv8_32(ecss_data[pointer:])) + " " + qb50_to_utc(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['QB50'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "RST source: " + str(ecss_data[pointer]) + ", "
+    content[0]['RST source'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Boot Cnt: " + str(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['Boot Cnt'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "Boot Cnt COMMS: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Boot Cnt COMMS'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Boot Cnt EPS: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Boot Cnt EPS'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Last Assertion F: " + str(ecss_data[pointer]) + ", "
+    content[0]['Last Assertion F'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Last Assertion L: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Last Assertion L'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "RTC VBAT: " + str(cnv8_16(ecss_data[pointer:]) * 0.000805664) + ", "
+    content[0]['RTC VBAT'] = str(cnv8_16(ecss_data[pointer:]) * 0.001611328)  # 2 * ( raw * ( 3.3 / 2 ^ 12 ))
     pointer += 2
-    report += "Task time UART: " + str(cnv8_32(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Task time UART'] = str(cnv8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    report += "Task time HK: " + str(cnv8_16(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Task time HK'] = str(cnv8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    report += "Task time IDLE: " + str(cnv8_16(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Task time IDLE'] = str(cnv8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    report += "Task time SU: " + str(cnv8_16(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Task time SU'] = str(cnv8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    report += "Task time SCH: " + str(cnv8_16(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Task time SCH'] = str(cnv8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    report += "MS Last Err: " + str(ecss_data[pointer]) + ", "
+    content[0]['MS Last Err'] = str(ecss_data[pointer])
     pointer += 1
-    report += "SD Enabled: " + str(ecss_data[pointer]) + ", "
+    content[0]['SD Enabled'] = str(ecss_data[pointer])
     pointer += 1
-    report += "MS Err line: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['MS Err line'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "IAC State: " + str(ecss_data[pointer]) + ", "
+    content[0]['IAC State'] = str(ecss_data[pointer])
     pointer += 1
-    report += "SU Init Func Run time: " + str(cnv8_32(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['SU Init Func Run time'] = str(cnv8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    report += "SU Last Active script: " + str(ecss_data[pointer]) + ", "
+    content[0]['SU Last Active script'] = str(ecss_data[pointer])
     pointer += 1
-    report += "SU Script Sch Active: " + str(ecss_data[pointer]) + ", "
+    content[0]['SU Script Sch Active'] = str(ecss_data[pointer])
     pointer += 1
-    report += "SU Service Sch Active: " + str(ecss_data[pointer]) + ", "
+    content[0]['SU Service Sch Active'] = str(ecss_data[pointer])
     pointer += 1
-    report += "tt_perm_norm_exec_count: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['tt_perm_norm_exec_count'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "tt_perm_exec_on_span_count: " + str(cnv8_16(ecss_data[pointer:]))
-    return report
+    content[0]['tt_perm_exec_on_span_count'] = str(cnv8_16(ecss_data[pointer:]))
+
+    report = [{
+        "source": "OBC",
+        "content": content
+    }]
+    return json.dumps(report, indent=2, sort_keys=True)
 
 
 # Decoding extened health report from EPS
 def eps_hk(ecss_data):
-    report = "EPS EX_HEALTH_REP "
+    content = [{}]
     pointer = 0
 
-    report += "Time: " + str(cnv8_32(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Time'] = str(cnv8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    report += "RST source: " + str(ecss_data[pointer]) + ", "
+    content[0]['RST source'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Last Assertion F: " + str(ecss_data[pointer]) + ", "
+    content[0]['Last Assertion F'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Last Assertion L: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Last Assertion L'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Batt Temp Health Status: " + str(ecss_data[pointer]) + ", "
+    content[0]['Batt Temp Health Status'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Heater status: " + str(ecss_data[pointer]) + ", "
+    content[0]['Heater status'] = str(ecss_data[pointer])
     pointer += 1
-    report += "TOP Voltage: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['TOP Voltage'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "TOP Current: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['TOP Current'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "TOP Duty: " + str(ecss_data[pointer]) + ", "
+    content[0]['TOP Duty'] = str(ecss_data[pointer])
     pointer += 1
-    report += "BOTTOM Voltage: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['BOTTOM Voltage'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "BOTTOM Current: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['BOTTOM Current'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "BOTTOM Duty: " + str(ecss_data[pointer]) + ", "
+    content[0]['BOTTOM Duty'] = str(ecss_data[pointer])
     pointer += 1
-    report += "LEFT Voltage: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['LEFT Voltage'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "LEFT Current: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['LEFT Current'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "LEFT Duty: " + str(ecss_data[pointer]) + ", "
+    content[0]['LEFT Duty'] = str(ecss_data[pointer])
     pointer += 1
-    report += "RIGHT Voltage: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['RIGHT Voltage'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "RIGHT Current: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['RIGHT Current'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "RIGHT Duty: " + str(ecss_data[pointer]) + ", "
+    content[0]['RIGHT Duty'] = str(ecss_data[pointer])
     pointer += 1
-    report += "ConC1: " + str(ecss_data[pointer]) + ", "
+    content[0]['ConC1'] = str(ecss_data[pointer])
     pointer += 1
-    report += "ConC2: " + str(ecss_data[pointer]) + ", "
+    content[0]['ConC2'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Temp sensor PWR SW: " + str(ecss_data[pointer]) + ", "
+    content[0]['Temp sensor PWR SW'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Soft error status: " + str(ecss_data[pointer])
-    return report
+    content[0]['Soft error status'] = str(ecss_data[pointer])
+
+    report = [{
+        "source": "EPS",
+        "content": content
+    }]
+    return json.dumps(report, indent=2, sort_keys=True)
 
 
 # Decoding extened health report from COMMS
 def comms_hk(ecss_data):
-    report = "COMMS EX_HEALTH_REP "
+    content = [{}]
     pointer = 0
 
-    report += "Time: " + str(cnv8_32(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Time'] = str(cnv8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    report += "RST source: " + str(ecss_data[pointer]) + ", "
+    content[0]['RST source'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Last Assertion F: " + str(ecss_data[pointer]) + ", "
+    content[0]['Last Assertion F'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Last Assertion L: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Last Assertion L'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Flash read transmit: " + str(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['Flash read transmit'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "Beacon pattern: " + str(ecss_data[pointer]) + ", "
+    content[0]['Beacon pattern'] = str(ecss_data[pointer])
     pointer += 1
-    report += "RX Failed: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['RX Failed'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "RX CRC Failed: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['RX CRC Failed'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "TX Failed: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['TX Failed'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "TX Frames: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['TX Frames'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "RX Frames: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['RX Frames'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Last TX Error: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Last TX Error'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Last RX Error: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Last RX Error'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Invalid Dest Frames Cnt: " + str(cnv8_16(ecss_data[pointer:]))
-    return report
+    content[0]['Invalid Dest Frames Cnt'] = str(cnv8_16(ecss_data[pointer:]))
+
+    report = [{
+        "source": "COMMS",
+        "content": content
+    }]
+    return json.dumps(report, indent=2, sort_keys=True)
 
 
 # Decoding extened health report from ADCS
 def adcs_hk(ecss_data):
-    report = "ADCS EX_HEALTH_REP "
+    content = [{}]
     pointer = 0
 
-    report += "Time: " + str(cnv8_32(ecss_data[pointer:]) * 0.001) + ", "
+    content[0]['Time'] = str(cnv8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    report += "QB50: " + str(cnv8_32(ecss_data[pointer:])) + " " + qb50_to_utc(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['QB50'] = str(cnv8_32(ecss_data[pointer:])) + " " + qb50_to_utc(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "RST source: " + str(ecss_data[pointer]) + ", "
+    content[0]['RST source'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Boot Cnt: " + str(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['Boot Cnt'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "Last Assertion F: " + str(ecss_data[pointer]) + ", "
+    content[0]['Last Assertion F'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Last Assertion L: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Last Assertion L'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "TX error: " + str(ecss_data[pointer]) + ", "
+    content[0]['TX error'] = str(ecss_data[pointer])
     pointer += 1
-    report += "Roll: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Roll'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Pitch: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Pitch'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Yaw: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Yaw'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Roll Dot: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Roll Dot'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Pitch Dot: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Pitch Dot'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Yaw Dot: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Yaw Dot'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "X ECI: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['ECI X'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Y ECI: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['ECI Y'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Z ECI: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['ECI Z'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "GPS Status: " + str(ecss_data[pointer]) + ", "
+    content[0]['GPS Status'] = str(ecss_data[pointer])
     pointer += 1
-    report += "GPS Sats: " + str(ecss_data[pointer]) + ", "
+    content[0]['GPS Sats'] = str(ecss_data[pointer])
     pointer += 1
-    report += "GPS Week: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['GPS Week'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "GPS Time: " + str(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['GPS Time'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "Temp: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Temp'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Gyr X: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Gyr X'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Gyr Y: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Gyr Y'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Gyr Z: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Gyr Z'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "XM X: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['XM X'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "XM Y: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['XM Y'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "XM Z: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['XM Z'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "RM X: " + str(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['RM X'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "RM Y: " + str(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['RM Y'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "RM Z: " + str(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['RM Z'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "RM Z: " + str(cnv8_32(ecss_data[pointer:])) + ", "
+    content[0]['RM Z'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    report += "Sun V 0: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Sun V 0'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Sun V 1: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Sun V 1'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Sun V 2: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Sun V 2'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Sun V 3: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Sun V 3'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Sun V 4: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Sun V 4'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Spin RPM: " + str(cnv8_16(ecss_data[pointer:])) + ", "
+    content[0]['Spin RPM'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    report += "Mg Torq V Y: " + str(ecss_data[pointer]) + ", "
+    content[0]['Mg Torq V Y'] = str(ecss_data[pointer])
     pointer += 1
-    report += "MG Torq V Z: " + str(ecss_data[pointer])
-    return report
+    content[0]['MG Torq V Z'] = str(ecss_data[pointer])
+
+    report = [{
+        "source": "ADCS",
+        "content": content
+    }]
+    return json.dumps(report, indent=2, sort_keys=True)
 
 
 def fatfs_to_utc(fatfs):
