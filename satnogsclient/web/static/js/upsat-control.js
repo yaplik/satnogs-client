@@ -1108,7 +1108,7 @@ function csv_encode(strArray) {
   $.each( strArray, function( index, value){
     csv_str += value;
     if (index < strArray.length - 1) {
-      csv_str += ',';
+      csv_str += ';';
     }
   });
   return csv_str;

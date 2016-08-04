@@ -125,13 +125,13 @@ def ecss_logic(ecss_dict):
             content = [{}]
 
             pointer = packet_settings.OBC_EXT_WOD_OFFSET
-            content[0]['OBC'] = obc_hk(ecss_dict['data'][pointer:])
+            content[0]['OBC'] = json.loads(obc_hk(ecss_dict['data'][pointer:]))
             pointer = packet_settings.COMMS_EXT_WOD_OFFSET
-            content[0]['COMMS'] = comms_hk(ecss_dict['data'][pointer:])
+            content[0]['COMMS'] = json.loads(comms_hk(ecss_dict['data'][pointer:]))
             pointer = packet_settings.ADCS_EXT_WOD_OFFSET
-            content[0]['ADCS'] = adcs_hk(ecss_dict['data'][pointer:])
+            content[0]['ADCS'] = json.loads(adcs_hk(ecss_dict['data'][pointer:]))
             pointer = packet_settings.EPS_EXT_WOD_OFFSET
-            content[0]['EPS'] = eps_hk(ecss_dict['data'][pointer:])
+            content[0]['EPS'] = json.loads(eps_hk(ecss_dict['data'][pointer:]))
 
             report_pre = [{
                 "type": "EX_WOD",
@@ -548,8 +548,6 @@ def adcs_hk(ecss_data):
     content[0]['RM X'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
     content[0]['RM Y'] = str(cnv8_32(ecss_data[pointer:]))
-    pointer += 4
-    content[0]['RM Z'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
     content[0]['RM Z'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
