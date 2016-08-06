@@ -69,7 +69,7 @@ def get_control_rx():
         tmp = {}
         tmp['log_message'] = e
         return jsonify(tmp)
-    logger.info("Packet: %s", data)
+    logger.debug("Packet: %s", data)
     packet_list = cPickle.loads(data)
     """
     The received 'packet_list' is a json string containing packets. Actually it is a list of dictionaries:
@@ -82,7 +82,7 @@ def get_control_rx():
         cnt = 0
         for str_dict in packet_list:
             ecss_dict = cPickle.loads(str_dict)
-            logger.info("Received ECSS formated: %s", ecss_dict)
+            logger.debug("Received ECSS formated: %s", ecss_dict)
             res = ecss_logic_utils.ecss_logic(ecss_dict)
             ecss_dicts[cnt] = res
             cnt += 1

@@ -76,12 +76,14 @@ def read_from_serial():
             if len(buf_in) == 1 and buf_in[0] != 0x7E:
                 buf_in = bytearray(0)
             elif len(buf_in) > 1 and buf_in[len(buf_in) - 1] == 0x7E:
-                print "From serial got pkt", ''.join('{:02x}'.format(x) for x in buf_in)
+                logger_packet = ''.join('{:02x}'.format(x) for x in buf_in)
+                logger.info('Received packet from serial.')
+                logger.debug('From serial: %s', logger_packet)
                 ecss_dict = {}
                 ret = packet.deconstruct_packet(buf_in, ecss_dict, "serial")
                 ecss_dict = ret[0]
                 pickled = cPickle.dumps(ecss_dict)
-                logger.info('Sending to UDP: %s', ecss_dict)
+                logger.debug('Sending to UDP: %s', ecss_dict)
                 if len(ecss_dict) == 0:
                     logger.error('Ecss Dictionary not properly constructed. Error occured')
                     continue

@@ -29,6 +29,10 @@ def folder_init():
         if not os.path.exists(sid_dir):
             logger.info("Made dir %s", sid_dir)
             os.mkdir(sid_dir)
+    ext_wod_rx_path = os.path.join(log_path, "EXT_WOD_RX")
+    if not os.path.exists(ext_wod_rx_path):
+        os.mkdir(ext_wod_rx_path)
+        logger.info("Made dir %s", ext_wod_rx_path)
 
 
 def ecss_encoder(port):

@@ -3,11 +3,12 @@ import logging
 import time
 import json
 
+from satnogsclient import settings
 from satnogsclient.upsat import packet_settings
 
 
 logger = logging.getLogger('satnogsclient')
-log_path = ""
+log_path = settings.OUTPUT_PATH + "/files/"
 
 
 def ecss_logic(ecss_dict):
@@ -134,10 +135,16 @@ def ecss_logic(ecss_dict):
             content[0]['EPS'] = json.loads(eps_hk(ecss_dict['data'][pointer:]))
 
             report_pre = [{
-                "type": "EX_WOD",
+                "type": "EXT_WOD",
                 "content": content
             }]
             report = json.dumps(report_pre, indent=2, sort_keys=True)
+
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            fwname = log_path + "EXT_WOD_RX/ext_wod_" + timestr + ".json"
+            myfile = open(fwname, 'w')
+            myfile.write(report)
+            myfile.close()
 
         text = report
 
@@ -383,11 +390,7 @@ def obc_hk(ecss_data):
     pointer += 2
     content[0]['tt_perm_exec_on_span_count'] = str(cnv8_16(ecss_data[pointer:]))
 
-    report = [{
-        "source": "OBC",
-        "content": content
-    }]
-    return json.dumps(report, indent=2, sort_keys=True)
+    return json.dumps(content, indent=2, sort_keys=True)
 
 
 # Decoding extened health report from EPS
@@ -439,11 +442,7 @@ def eps_hk(ecss_data):
     pointer += 1
     content[0]['Soft error status'] = str(ecss_data[pointer])
 
-    report = [{
-        "source": "EPS",
-        "content": content
-    }]
-    return json.dumps(report, indent=2, sort_keys=True)
+    return json.dumps(content, indent=2, sort_keys=True)
 
 
 # Decoding extened health report from COMMS
@@ -479,11 +478,7 @@ def comms_hk(ecss_data):
     pointer += 2
     content[0]['Invalid Dest Frames Cnt'] = str(cnv8_16(ecss_data[pointer:]))
 
-    report = [{
-        "source": "COMMS",
-        "content": content
-    }]
-    return json.dumps(report, indent=2, sort_keys=True)
+    return json.dumps(content, indent=2, sort_keys=True)
 
 
 # Decoding extened health report from ADCS
@@ -493,7 +488,7 @@ def adcs_hk(ecss_data):
 
     content[0]['Time'] = str(cnv8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    content[0]['QB50'] = str(cnv8_32(ecss_data[pointer:])) + " " + qb50_to_utc(cnv8_32(ecss_data[pointer:]))
+    content[0]['QB50'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
     content[0]['RST source'] = str(ecss_data[pointer])
     pointer += 1
@@ -567,11 +562,7 @@ def adcs_hk(ecss_data):
     pointer += 1
     content[0]['MG Torq V Z'] = str(ecss_data[pointer])
 
-    report = [{
-        "source": "ADCS",
-        "content": content
-    }]
-    return json.dumps(report, indent=2, sort_keys=True)
+    return json.dumps(content, indent=2, sort_keys=True)
 
 
 def fatfs_to_utc(fatfs):
