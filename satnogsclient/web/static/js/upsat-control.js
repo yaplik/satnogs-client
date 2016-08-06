@@ -509,14 +509,8 @@ $(document).ready(function() {
                 var x = $('#service-param-service-magneto-x').val();
                 var y = $('#service-param-service-magneto-y').val();
                 data.splice(1, 0, 12);
-                data.splice(2, 0, ((x >> 0) & 0x000000FF));
-                data.splice(3, 0, ((x >> 8) & 0x000000FF));
-                data.splice(4, 0, ((x >> 16) & 0x000000FF));
-                data.splice(5, 0, ((x >> 24) & 0x000000FF));
-                data.splice(6, 0, ((y >> 0) & 0x000000FF));
-                data.splice(7, 0, ((y >> 8) & 0x000000FF));
-                data.splice(8, 0, ((y >> 16) & 0x000000FF));
-                data.splice(9, 0, ((y >> 24) & 0x000000FF));
+                data.splice(2, 0, x);
+                data.splice(3, 0, y);
             } else if (adcs_action == "ADCS_CTRL_GAIN") {
                 var g1 = $('#service-param-service-g1').val();
                 var g2 = $('#service-param-service-g2').val();
