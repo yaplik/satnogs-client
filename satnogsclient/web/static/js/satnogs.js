@@ -10,6 +10,9 @@ $(document).ready(function() {
     config_socket.on('connect', function() {
         $('#backend-status').addClass('online-circle').removeClass('offline-circle').attr('title','Backend Online');
         console.log('Frontend connected to backend!');
+        current_mode = Cookies.get('mode');
+        request = encode_mode_switch(current_mode);
+        config_socket.emit('mode_change', request);
     });
 
     config_socket.on('connect_error', function() {

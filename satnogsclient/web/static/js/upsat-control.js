@@ -387,7 +387,7 @@ $(document).ready(function() {
                 data.splice(12, 0, ((time_int >> 16) & 0x000000ff));
                 data.splice(13, 0, ((time_int >> 24) & 0x000000ff));
                 data.concat($('#service-param-service-data').val().split(","));
-            } else if (selected_value == 'delete') {
+            } else if (selected_action == 'delete') {
 
                 service_subtype = 5;
 
@@ -395,7 +395,7 @@ $(document).ready(function() {
                 data.splice(1, 0, sch_app_id);
                 data.splice(2, 0, sch_seq_cnt);
                 data.splice(3, 0, 1);
-            } else if (selected_value == 'shift_all') {
+            } else if (selected_action == 'shift_all') {
 
                 service_subtype = 15;
 
@@ -403,7 +403,7 @@ $(document).ready(function() {
                 data.splice(1, 0, ((time_int >> 8) & 0x000000ff));
                 data.splice(2, 0, ((time_int >> 16) & 0x000000ff));
                 data.splice(3, 0, ((time_int >> 24) & 0x000000ff));
-            } else if (selected_value == 'shift_sel') {
+            } else if (selected_action == 'shift_sel') {
 
                 service_subtype = 7;
 
@@ -415,7 +415,7 @@ $(document).ready(function() {
                 data.splice(5, 0, sch_app_id);
                 data.splice(6, 0, sch_seq_cnt);
                 data.splice(4, 0, 1);
-            } else if (selected_value == 'report') {
+            } else if (selected_action == 'report') {
 
                 service_subtype = 16;
             }
