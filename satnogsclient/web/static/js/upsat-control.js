@@ -1,5 +1,59 @@
 $(document).ready(function() {
-    init();
+
+    var config_socket = io.connect('http://' + document.domain + ':' + location.port + '/config', {
+        rememberTransport: false,
+        'reconnect': true,
+        'reconnection delay': 500,
+        'max reconnection attempts': 10
+    });
+
+    var rx_socket = io.connect('http://' + document.domain + ':' + location.port + '/control_rx', {
+        rememberTransport: false,
+        'reconnect': true,
+        'reconnection delay': 500,
+        'max reconnection attempts': 10
+    });
+
+    rx_socket.on('backend_msg', function(data) {
+        print_command_response(data);
+    });
+
+    var ecss_cmd_socket = io.connect('http://' + document.domain + ':' + location.port + '/cmd', {
+        rememberTransport: false,
+        'reconnect': true,
+        'reconnection delay': 500,
+        'max reconnection attempts': 10
+    });
+
+    config_socket.on('connect', function() {
+        $('#backend-status').addClass('online-circle').removeClass('offline-circle').attr('title','Backend Online');
+        console.log('Frontend connected to backend!');
+        current_backend = Cookies.get('backend');
+        if (current_backend === null || typeof current_backend == 'undefined') {
+            current_backend = 'gnuradio';
+            Cookies.set('backend', current_backend);
+        }
+        request = encode_backend_mode(current_backend);
+        config_socket.emit('backend_change', request);
+        console.log('Resend backend mode confirmation!');
+    });
+
+
+    config_socket.on('connect_error', function() {
+        $('#backend-status').removeClass('online-circle').addClass('offline-circle').attr('title','Backend Offline');
+        console.log('Frontend cannot connect to backend!');
+    });
+
+    config_socket.on('backend_msg', function(data) {
+        console.log('Received from backend: ' + JSON.stringify(data));
+    });
+
+    ecss_cmd_socket.on('backend_msg', function(data) {
+        console.log('Received from backend: ' + JSON.stringify(data));
+        print_command_response(data);
+    });
+
+    init(config_socket);
 
     $("[name='backend-switch']").on('switchChange.bootstrapSwitch', function(event, state) {
         if (state) {
@@ -9,7 +63,7 @@ $(document).ready(function() {
         }
         Cookies.set('backend', mode);
         request = encode_backend_mode(mode);
-        query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+        config_socket.emit('backend_change', request);
     });
 
     $('#service-select li').on('click', function() {
@@ -151,7 +205,7 @@ $(document).ready(function() {
             seq_count = 0;
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "house") {
             app_id = $('#service-param-hk-app_id').val();
@@ -163,8 +217,7 @@ $(document).ready(function() {
 
             data = $('#service-param-hk-sid').val();
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-
+            ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "eps") {
             app_id = 2;
@@ -190,8 +243,6 @@ $(document).ready(function() {
             data.splice(8, 0, ((safety_value >> 16) & 0x000000ff));
             data.splice(9, 0, ((safety_value >> 24) & 0x000000ff));
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-
 
         } else if (selected_value == "mass") {
 
@@ -285,10 +336,10 @@ $(document).ready(function() {
 
             if (action == "All" || action == "Hard") {
                 if (window.confirm("Do you really want to delete all files in the folder?")) {
-                    query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+			ecss_cmd_socket.emit('ecss_command', request);
                 }
             } else {
-                query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+		ecss_cmd_socket.emit('ecss_command', request);
             }
 
 
@@ -338,7 +389,7 @@ $(document).ready(function() {
             data = [fun_id, dev_id];
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "test") {
             app_id = $('#service-param-test-app_id').val();
@@ -351,7 +402,7 @@ $(document).ready(function() {
             data = [];
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "sch") {
             app_id = 1;
@@ -421,7 +472,6 @@ $(document).ready(function() {
             }
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
 
         } else if (selected_value == "time") {
             app_id = $('#service-param-time-app_id').val();
@@ -481,7 +531,7 @@ $(document).ready(function() {
             }
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "adcs") {
             // TODO: Is app_id needed in time service?
@@ -545,18 +595,18 @@ $(document).ready(function() {
             }
 
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "comms") {
             if ($(this).attr("id") == "comms-tx-on") {
                 request = encode_comms_tx_rf(1);
-                query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
             } else if ($(this).attr("id") == "comms-tx-off") {
                 request = encode_comms_tx_rf(0);
                 if (window.confirm("Do you really want to shutdown COMMS TX?")) {
-                    query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+                    ecss_cmd_socket.emit('comms_switch_command', request);
                 }
             }
+            ecss_cmd_socket.emit('comms_switch_command', request);
         } else if (selected_value == "mnlp") {
             app_id = 1;
             type = 1;
@@ -578,7 +628,7 @@ $(document).ready(function() {
                 data = [1];
             }
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            ecss_cmd_socket.emit('ecss_command', request);
         }
     });
 
@@ -611,16 +661,20 @@ $(document).ready(function() {
     });
 
     $("#mode-switch li").click(function() {
-        var current_mode = $(this).attr("data-value");
+        var current_mode = Cookies.get('mode');
         var current_backend = Cookies.get('backend');
+        if (current_mode === null || typeof current_mode == 'undefined') {
+            current_mode = 'network';
+            Cookies.set('mode', current_mode);
+            request = encode_mode_switch(current_mode);
+            config_socket.emit('mode_change', request);
+        }
         if (current_backend === null || typeof current_backend == 'undefined') {
             current_backend = 'gnuradio';
             Cookies.set('backend', current_backend);
-            request = encode_backend_mode(current_backend);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            request = encode_backend_mode(current_mode);
+            config_socket.emit('current_backend_change', request);
         }
-        //request = encode_mode_switch(current_mode);
-        //query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
         display_control_view(current_mode, current_backend);
     });
 
@@ -822,7 +876,6 @@ function encode_service(type, app_id, service_type, service_subtype, dest_id, ac
     var ecss_cmd = {};
     ecss_cmd.ecss_cmd = TestServicePacket;
 
-    console.log(JSON.stringify(ecss_cmd));
     var json_packet = JSON.stringify(ecss_cmd);
     return json_packet;
 }
@@ -852,7 +905,6 @@ function encode_backend_mode(mode) {
         custom_cmd.backend = 'serial';
     }
     response.custom_cmd = custom_cmd;
-    console.log(JSON.stringify(response));
     var json_packet = JSON.stringify(response);
     return json_packet;
 }
@@ -862,59 +914,52 @@ function print_command_response(data) {
     var data_type;
     console.log(JSON.stringify(data));
 
-    for (var key in data) {
-        var resp = data[key];
+    var resp = data;
 
-        if (resp.id == 1) {
-            data_type = 'cmd';
-            log_data = resp.log_message;
-        } else if (resp.id == 2) {
-            data_type = 'ecss';
-            log_data = resp.log_message;
-        } else {
-            data_type = 'other';
-            log_data = resp.log_message;
-            current_mode = Cookies.get('mode');
-            if (current_mode !== null && typeof current_mode != 'undefined') {
-                request = encode_mode_switch(current_mode);
-                query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-            }
-        }
-
-        //Check if log is just hearbeat
-        if (resp.log_message == 'backend_online') {
-            console.log('backend reported online');
-            $('#backend_online').html('backend reported <span data-livestamp="' + moment().toString() + '"></span>');
-        } else {
-            if (resp.command_sent || resp.from_id) {
-              if (resp.command_sent) {
-                sub_id = resp.command_sent.app_id;
-              } else if (resp.from_id) {
-                sub_id = resp.from_id;
-              }
-              if (sub_id) {
-                sub = ecss_var.var_app_id[sub_id];
-              } else {
-                sub = "UNK";
-              }
-              if (resp.command_sent) {
-                to_log = '<span class="label label-info"> > ' + sub + '</span>';
-                log_data = ecss_var.var_serv_id[resp.command_sent.ser_type] + ' command sent';
-              } else if (resp.from_id) {
-                to_log = '<span class="label label-success"> < ' + sub + '</span>';
-                try {
-                  json_reponse = JSON.parse(log_data);
-                  log_data = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true" data-toggle="modal" data-target="#json-prettify"></span> <span>' + log_data + '</span>';
-                } catch(e) {
-                  console.log("Couldn't find JSON in the response.");
-                }
-              }
-            }
-            response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">' +
-            '<span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() +
-            '</span>' + to_log + ' ' + log_data +'</li>');
+    if (resp.id == 1) {
+        data_type = 'cmd';
+        log_data = resp.log_message;
+    } else if (resp.id == 2) {
+        data_type = 'ecss';
+        log_data = resp.log_message;
+    } else {
+        data_type = 'other';
+        log_data = resp.log_message;
+        current_mode = Cookies.get('mode');
+        if (current_mode === null || typeof current_mode == 'undefined') {
+            request = encode_mode_switch(current_mode);
+            //config_socket.emit('mode_change', request);
+            //FIXME:
         }
     }
+    if (resp.command_sent || resp.from_id) {
+      if (resp.command_sent) {
+        sub_id = resp.command_sent.app_id;
+      } else if (resp.from_id) {
+        sub_id = resp.from_id;
+      }
+      if (sub_id) {
+        sub = ecss_var.var_app_id[sub_id];
+      } else {
+        sub = "UNK";
+      }
+      if (resp.command_sent) {
+        to_log = '<span class="label label-info"> > ' + sub + '</span>';
+        log_data = ecss_var.var_serv_id[resp.command_sent.ser_type] + ' command sent';
+      } else if (resp.from_id) {
+        to_log = '<span class="label label-success"> < ' + sub + '</span>';
+        try {
+          json_reponse = JSON.parse(log_data);
+          log_data = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true" data-toggle="modal" data-target="#json-prettify"></span> <span>' + log_data + '</span>';
+        } catch(e) {
+          console.log("Couldn't find JSON in the response.");
+        }
+      }
+    }
+    response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">' +
+    '<span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() +
+    '</span>' + to_log + ' ' + log_data +'</li>');
+
     $('#response-panel-body').scrollTop(response_panel.height());
 }
 
@@ -982,12 +1027,12 @@ function file_encode_and_query_backend(type, app_id, service_type, service_subty
             data.unshift(store_id);
             console.log(data);
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
-            query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+            ecss_cmd_socket.emit('ecss_command', request);
         }
     };
 }
 
-function init() {
+function init(config_socket) {
 
     // Various variable definition
     var app_id, type, ack, service_type, service_subtype, dest_id, data, seq_count;
@@ -1019,16 +1064,11 @@ function init() {
 
     // Send a request to backend in order to configure mode.
     request = encode_backend_mode(current_backend);
-    query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
+    config_socket.emit('backend_change', request);
 
     // Send a request to backend in order to configure mode.
     request = encode_mode_switch(current_mode);
-    query_control_backend(request, 'POST', '/command', "application/json; charset=utf-8", "json", true);
-
-    // Setup the periodic packet polling
-    setInterval(function() {
-        query_control_backend({}, 'POST', '/control_rx', "application/json; charset=utf-8", "json", true);
-    }, 10000);
+    config_socket.emit('mode_change', request);
 
     // Setup the datetimepicker
     datepicker_time = $('#datetimepicker-time').datetimepicker({

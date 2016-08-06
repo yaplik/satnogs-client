@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 import logging
 
-from satnogsclient.settings import (NETWORK_API_QUERY_INTERVAL,
-                                    NETWORK_API_POST_INTERVAL)
 from satnogsclient.scheduler import scheduler
-from satnogsclient.scheduler.tasks import get_jobs, post_data, task_feeder, ecss_feeder, status_listener
-from satnogsclient import settings as client_settings
-from satnogsclient.web.app import app
+from satnogsclient.scheduler.tasks import status_listener
+from satnogsclient.web.app import app, socketio
 from satnogsclient.upsat.packet import folder_init
 import threading
 
@@ -23,6 +20,6 @@ if __name__ == '__main__':
 
     try:
         logger.info('Press Ctrl+C to exit SatNOGS poller')
-        app.run(host='0.0.0.0', port=5000, threaded=True)
+        socketio.run(app)
     except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown()
+        socketio.stop()

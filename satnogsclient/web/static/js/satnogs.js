@@ -83,15 +83,4 @@ $(document).ready(function() {
         return json_packet;
     }
 
-    function query_backend(data, post_mode, url, content_type, data_type, process_data) {
-        $.ajax({
-            type: post_mode,
-            url: url,
-            contentType: content_type,
-            dataType: data_type,
-            data: data,
-            processData: process_data
-        });
-    }
-
 });

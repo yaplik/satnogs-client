@@ -8,9 +8,10 @@ import cPickle
 from datetime import datetime, timedelta
 from dateutil import parser
 from urlparse import urljoin
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 import json
 from satnogsclient.scheduler import scheduler
+from flask_socketio import SocketIO
 
 import pytz
 import requests
@@ -20,11 +21,12 @@ from satnogsclient.observer.observer import Observer
 from satnogsclient.receiver import SignalReceiver
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
-from satnogsclient.upsat import serial_handler
+from satnogsclient.upsat import serial_handler, ecss_logic_utils
 from satnogsclient.upsat.gnuradio_handler import read_from_gnuradio
 from time import sleep
 
 logger = logging.getLogger('satnogsclient')
+socketio = SocketIO(message_queue='redis://127.0.0.1:6379')
 
 
 def signal_term_handler(signal, frame):
@@ -136,7 +138,7 @@ def get_jobs():
         if job.name in [spawn_observer.__name__, spawn_receiver.__name__]:
             job.remove()
 
-    sock = Commsocket('127.0.0.1', settings.TASK_LISTENER_TCP_PORT)
+    sock = Commsocket('127.0.0.1', settings.TASK_FEEDER_TCP_PORT)
 
     tasks = []
     for obj in response.json():
@@ -169,87 +171,37 @@ def get_jobs():
         logger.info('Task listener thread not online')
 
 
-def task_feeder(port1, port2):
+def task_feeder(port):
     sleep(1)
-    child_pid = 0
-    try:
-        logger.info('Started task feeder')
-        sock = Commsocket('127.0.0.1', port1)
-        sock.bind()
-        q = Queue(maxsize=1)
-        p = Process(target=task_listener, args=(port2, q))
-        p.daemon = True
-        p.start()
-        child_pid = p.pid
-        sock.listen()
-        while 1:
-            conn = sock.accept()
-            if conn:
-                conn.recv(sock.tasks_buffer_size)
-                if not q.empty():
-                    conn.send(q.get())
-                else:
-                    conn.send('[]')
-        p.join()
-    except IOError:  # Handle SIGTERM signal
-        if child_pid != 0:
-            logger.info('Killing task_listener pid %d', child_pid)
-            os.kill(child_pid, signal.SIGKILL)
-
-
-def task_listener(port, queue):
-    logger.info('Started task listener')
+    logger.info('Started task feeder')
     sock = Commsocket('127.0.0.1', port)
     sock.bind()
     sock.listen()
     while 1:
-        conn = sock.accept()
+        try:
+            conn = sock.accept()
+        except IOError:
+            logger.info('Task feeder is terminated or something bad happened to accept')
+            return
         if conn:
             data = conn.recv(sock.tasks_buffer_size)
-            if not queue.empty():
-                queue.get()
-                queue.put(data)
-            else:
-                queue.put(data)
+            # Data must be sent to socket.io here
+            socketio.emit('backend_msg', data, namespace='/control_rx')
 
 
-def ecss_feeder(port1, port2):
+def ecss_feeder(port):
     sleep(1)
-    child_pid = 0
-    try:
-        logger.info('Started ecss feeder')
-        sock = Udpsocket(('127.0.0.1', port1))
-        qu = Queue(maxsize=10)
-        pr = Process(target=ecss_listener, args=(port2, qu))
-        pr.daemon = True
-        pr.start()
-        child_pid = pr.pid
-        while 1:
-            conn = sock.recv()
-            new_list = []
-            while not qu.empty():
-                a = qu.get()
-                new_list.append(a)
-            logger.info("sending to conn: %s", new_list)
-            pickled = cPickle.dumps(new_list, protocol=2)
-            sock.sendto(pickled, conn[1])
-        pr.join()
-    except IOError:  # Handle SIGTERM signal
-        if child_pid != 0:
-            logger.info('Killing ecss listener pid %d', child_pid)
-            os.kill(child_pid, signal.SIGKILL)
-
-
-def ecss_listener(port, queue):
-    logger.info('Started ecss listener')
+    logger.info('Started ecss feeder')
     sock = Udpsocket(('127.0.0.1', port))
     while 1:
-        conn = sock.recv()
-        data = conn[0]
-        if not queue.empty():
-            queue.put(data)
-        else:
-            queue.put(data)
+        try:
+            conn = sock.recv()
+        except IOError:
+            logger.info('Ecss feeder is terminated or something bad happened to accept')
+            return
+        data = ecss_logic_utils.ecss_logic(cPickle.loads(conn[0]))
+        # Data must be sent to socket.io here
+        socketio.emit('backend_msg', data, namespace='/control_rx')
 
 
 def status_listener():
@@ -265,7 +217,7 @@ def status_listener():
     msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
     logger.info(msg)
     scheduler.add_job(post_data, 'interval', minutes=interval)
-    tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT, settings.TASK_LISTENER_TCP_PORT,))
+    tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT,))
     tf.start()
     os.environ['TASK_FEEDER_PID'] = str(tf.pid)
     sock = Udpsocket(('127.0.0.1', settings.STATUS_LISTENER_PORT))
@@ -306,7 +258,7 @@ def status_listener():
                 logger.info('Starting ecss feeder thread...')
                 os.environ['MODE'] = 'cmd_ctrl'
                 kill_netw_proc()
-                ef = Process(target=ecss_feeder, args=(settings.ECSS_FEEDER_UDP_PORT, settings.ECSS_LISTENER_UDP_PORT,))
+                ef = Process(target=ecss_feeder, args=(settings.ECSS_FEEDER_UDP_PORT,))
                 ef.start()
                 os.environ['ECSS_FEEDER_PID'] = str(ef.pid)
                 logger.info('Started ecss_feeder process %d', ef.pid)
@@ -318,7 +270,7 @@ def status_listener():
                     os.environ['ECSS_FEEDER_PID'] = '0'
                 os.environ['SCHEDULER'] = 'ON'
                 scheduler.start()
-                tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT, settings.TASK_LISTENER_TCP_PORT,))
+                tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT,))
                 tf.start()
                 os.environ['TASK_FEEDER_PID'] = str(tf.pid)
                 logger.info('Started task feeder process %d', tf.pid)
