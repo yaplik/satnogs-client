@@ -316,6 +316,7 @@ EXT_WOD_REP = 5
 SU_SCI_HDR_REP = 6
 ADCS_TLE_REP = 7
 EPS_FLS_REP = 8
+ECSS_STATS_REP = 9
 
 # Housekeeping EX WOD offsets and sizes
 OBC_EXT_WOD_SIZE = 50

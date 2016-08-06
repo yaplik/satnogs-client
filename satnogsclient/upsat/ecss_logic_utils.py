@@ -122,6 +122,25 @@ def ecss_logic(ecss_dict):
                 pointer = 1
                 report = obc_hk(ecss_dict['data'][pointer:])
 
+            elif struct_id == packet_settings.ECSS_STATS_REP:
+
+                pointer = 1
+                content = [{}]
+
+                content[0]['Dropped HLDLC'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                pointer += 2
+                content[0]['Dropped Unpacked'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                pointer += 2
+
+                for i in range(1, packet_settings.LAST_APP_ID):
+                    sub_content = [{}]
+                    for j in range(1, packet_settings.LAST_APP_ID):
+                        sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                        pointer += 2
+                    content[0][i] = sub_content
+
+                report = json.dumps(content, indent=2, sort_keys=True)
+
             elif struct_id == packet_settings.EXT_WOD_REP:
                 content = [{}]
 
@@ -510,23 +529,23 @@ def adcs_hk(ecss_data):
     pointer += 2
     content[0]['TX error'] = str(ecss_data[pointer])
     pointer += 1
-    content[0]['Roll'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Roll'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Pitch'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Pitch'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Yaw'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Yaw'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Roll Dot'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Roll Dot'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['Pitch Dot'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Pitch Dot'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['Yaw Dot'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Yaw Dot'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['ECI X'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['ECI X'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.5)
     pointer += 2
-    content[0]['ECI Y'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['ECI Y'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.5)
     pointer += 2
-    content[0]['ECI Z'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['ECI Z'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.5)
     pointer += 2
     content[0]['GPS Status'] = str(ecss_data[pointer])
     pointer += 1
@@ -536,41 +555,41 @@ def adcs_hk(ecss_data):
     pointer += 2
     content[0]['GPS Time'] = str(cnv8_32(ecss_data[pointer:]))
     pointer += 4
-    content[0]['Temp'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Temp'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Gyr X'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Gyr X'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['Gyr Y'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Gyr Y'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['Gyr Z'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Gyr Z'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['XM X'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['XM X'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['XM Y'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['XM Y'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['XM Z'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['XM Z'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['RM X'] = str(cnv8_32(ecss_data[pointer:]))
+    content[0]['RM X'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    content[0]['RM Y'] = str(cnv8_32(ecss_data[pointer:]))
+    content[0]['RM Y'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    content[0]['RM Z'] = str(cnv8_32(ecss_data[pointer:]))
+    content[0]['RM Z'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 0.001)
     pointer += 4
-    content[0]['Sun V 0'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Sun V 0'] = str(cnv8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Sun V 1'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Sun V 1'] = str(cnv8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Sun V 2'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Sun V 2'] = str(cnv8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Sun V 3'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Sun V 3'] = str(cnv8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Sun V 4'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Sun V 4'] = str(cnv8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
-    content[0]['Spin RPM'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Spin RPM'] = str(cnv_signed_8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['Mg Torq V Y'] = str(ecss_data[pointer])
+    content[0]['MG Torq I Y'] = str(cnv_signed_8_8(ecss_data[pointer]))
     pointer += 1
-    content[0]['MG Torq V Z'] = str(ecss_data[pointer])
+    content[0]['MG Torq I Z'] = str(cnv_signed_8_8(ecss_data[pointer]))
 
     return json.dumps(content, indent=2, sort_keys=True)
 
@@ -633,4 +652,11 @@ def cnv_signed_8_16(inc):
     res = ((inc[1] << 8) | (inc[0]))
     if (res >> 15) == 1:
         res = (0xFFFF - res) * -1
+    return res
+
+
+def cnv_signed_8_8(inc):
+    res = inc
+    if (res >> 7) == 1:
+        res = (0xFF - res) * -1
     return res
