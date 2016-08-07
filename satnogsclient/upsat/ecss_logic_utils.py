@@ -162,12 +162,23 @@ def ecss_logic(ecss_dict):
                 content[0]['Dropped Unpacked'] = str(cnv8_16(ecss_dict['data'][pointer:]))
                 pointer += 2
 
+                content_in = [{}]
                 for i in range(1, packet_settings.LAST_APP_ID):
                     sub_content = [{}]
                     for j in range(1, packet_settings.LAST_APP_ID):
                         sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
                         pointer += 2
-                    content[0][i] = sub_content
+                    content_in[0][i] = sub_content
+                content[0]['In'] = json.loads(json.dumps(content_in, indent=2, sort_keys=True))
+
+                content_out = [{}]
+                for i in range(1, packet_settings.LAST_APP_ID):
+                    sub_content = [{}]
+                    for j in range(1, packet_settings.LAST_APP_ID):
+                        sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                        pointer += 2
+                    content_out[0][i] = sub_content
+                content[0]['Out'] = json.loads(json.dumps(content_out, indent=2, sort_keys=True))
 
                 report = json.dumps(content, indent=2, sort_keys=True)
 
