@@ -1,4 +1,3 @@
-import binascii
 import ctypes
 import json
 import logging
@@ -10,7 +9,7 @@ from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.udpsocket import Udpsocket
 from satnogsclient.upsat import hldlc
 from satnogsclient.upsat import packet_settings
-
+from _socket import htons
 
 logger = logging.getLogger('satnogsclient')
 log_path = ""
@@ -49,7 +48,6 @@ def ecss_encoder(port):
 
 def ecss_depacketizer(buf, dict_out):
     size = len(buf)
-    print binascii.hexlify(buf)
     assert((buf != 0) == True)
     assert((size > packet_settings.MIN_PKT_SIZE and size < packet_settings.MAX_PKT_SIZE) == True)
     tmp_crc1 = buf[size - 1]
@@ -146,19 +144,19 @@ def ecss_packetizer(ecss, buf):
     assert(((ecss['type'] == 0) or (ecss['type'] == 1)) == True)
     assert((ecss['app_id'] < packet_settings.LAST_APP_ID) == True)
     data_size = ecss['size']
-    app_id = ecss['app_id']
+    app_id = htons(ecss['app_id'])
     app_id_ms = app_id & 0xFF00
     app_id_ls = app_id & 0x00FF
     app_id_ms = app_id_ms >> 8
     buf[0] = (packet_settings.ECSS_VER_NUMBER << 5 | ecss['type']
-               << 4 | packet_settings.ECSS_DATA_FIELD_HDR_FLG << 3 | app_id_ms)
-    buf[1] = app_id_ls
+               << 4 | packet_settings.ECSS_DATA_FIELD_HDR_FLG << 3 | app_id_ls)
+    buf[1] = app_id_ms
     seq_flags = packet_settings.TC_TM_SEQ_SPACKET
-    seq_count = ecss['seq_count']
+    seq_count = htons(ecss['seq_count'])
     seq_count_ms = (seq_count >> 8) & 0x00FF
     seq_count_ls = seq_count & 0x00FF
-    buf[2] = (seq_flags << 6 | seq_count_ms)
-    buf[3] = seq_count_ls
+    buf[2] = (seq_flags << 6 | seq_count_ls)
+    buf[3] = seq_count_ms
     if ecss['type'] == 0:
         buf[6] = packet_settings.ECSS_PUS_VER << 4
     elif ecss['type'] == 1:
@@ -170,10 +168,10 @@ def ecss_packetizer(ecss, buf):
     for i in range(0, data_size):
         buf[buf_pointer + i] = ecss['data'][i]
     data_w_headers = data_size + packet_settings.ECSS_DATA_HEADER_SIZE + packet_settings.ECSS_CRC_SIZE - 1
-    packet_size_ms = (data_w_headers >> 8) & 0x00FF
-    packet_size_ls = data_w_headers & 0x00FF
-    buf[4] = packet_size_ms
-    buf[5] = packet_size_ls
+    packet_size_ms = htons(data_w_headers) & 0xFF00
+    packet_size_ls = htons(data_w_headers) & 0x00FF
+    buf[4] = packet_size_ls
+    buf[5] = packet_size_ms >> 8
     buf_pointer = buf_pointer + data_size
     for i in range(0, buf_pointer):
         buf[buf_pointer + 1] = buf[buf_pointer + 1] ^ buf[i]
@@ -204,7 +202,6 @@ def comms_on():
     struct.pack_into("<I", data, 13, settings.RF_SW_CMD_ON_2)
     struct.pack_into("<I", data, 17, settings.RF_SW_CMD_ON_3)
     struct.pack_into("<I", data, 21, settings.RF_SW_CMD_ON_4)
-    print data.raw
     d = bytearray(data)
     sock.sendto(d, (packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT))
 

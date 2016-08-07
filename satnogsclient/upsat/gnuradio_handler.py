@@ -9,7 +9,7 @@ from satnogsclient.upsat import packet
 
 logger = logging.getLogger('satnogsclient')
 
-backend_listener_sock = Udpsocket(('127.0.0.1', client_settings.BACKEND_LISTENER_PORT))  # Port in which client listens for frames from gnuradio
+backend_listener_sock = Udpsocket(('0.0.0.0', client_settings.BACKEND_LISTENER_PORT))  # Port in which client listens for frames from gnuradio
 ui_listener_sock = Udpsocket(('127.0.0.1', client_settings.BACKEND_FEEDER_PORT))
 ecss_feeder_sock = Udpsocket([])  # The socket with which we communicate with the ecss feeder thread
 backend_feeder_sock = Udpsocket([])
@@ -33,7 +33,7 @@ def read_from_gnuradio():
             logger.error('Ecss Dictionary not properly constructed. Error occured')
             continue
         try:
-            if not ecss_dict and ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
+            if ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
                 ld_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
             else:
                 ecss_feeder_sock.sendto(pickled, ('127.0.0.1', client_settings.ECSS_FEEDER_UDP_PORT))

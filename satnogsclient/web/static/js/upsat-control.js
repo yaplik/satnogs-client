@@ -305,7 +305,7 @@ $(document).ready(function() {
                     var file = $('#service-param-service-ms-num').val();
                     service_subtype = 14;
 
-                    file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file);
+                    file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file, ecss_cmd_socket);
                     return 0;
 
                 } else if (action == "Delete") {
@@ -999,21 +999,6 @@ function apply_log_filter(log_data_type) {
     }
 }
 
-function query_control_backend(data, post_mode, url, content_type, data_type, process_data) {
-    $.ajax({
-        type: post_mode,
-        url: url,
-        contentType: content_type,
-        dataType: data_type,
-        data: data,
-        processData: process_data,
-        success: function(data) {
-            print_command_response(data);
-        },
-        error: function(data) {}
-    });
-}
-
 function display_control_view(mode, backend) {
     if (mode == 'Network') {
         // Disable Upsat Command and Control
@@ -1036,7 +1021,7 @@ function display_control_view(mode, backend) {
 }
 
 //Retrieve file encode command and post the request
-function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file) {
+function file_encode_and_query_backend(type, app_id, service_type, service_subtype, dest_id, ack, store_id, file, ecss_cmd_socket) {
     input = document.getElementById('file-upload');
     file = input.files[0];
     reader = new FileReader();
