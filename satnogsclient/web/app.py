@@ -12,7 +12,7 @@ import os
 logger = logging.getLogger('satnogsclient')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, message_queue='redis://127.0.0.1:6379')
+socketio = SocketIO(app, message_queue='redis://')
 
 
 @app.route('/update_status', methods=['GET', 'POST'])

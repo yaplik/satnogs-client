@@ -26,7 +26,7 @@ from satnogsclient.upsat.gnuradio_handler import read_from_gnuradio
 from time import sleep
 
 logger = logging.getLogger('satnogsclient')
-socketio = SocketIO(message_queue='redis://127.0.0.1:6379')
+socketio = SocketIO(message_queue='redis://')
 
 
 def signal_term_handler(signal, frame):
@@ -201,7 +201,11 @@ def ecss_feeder(port):
             return
         data = ecss_logic_utils.ecss_logic(cPickle.loads(conn[0]))
         # Data must be sent to socket.io here
-        socketio.emit('backend_msg', data, namespace='/control_rx')
+        socketio.emit('backend_msg', data, namespace='/control_rx', callback=success_message_to_frontend())
+
+
+def success_message_to_frontend():
+    logger.debug('Successfuly emit to frontend')
 
 
 def status_listener():

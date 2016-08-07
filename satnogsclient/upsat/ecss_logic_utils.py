@@ -2,6 +2,7 @@ import datetime
 import logging
 import time
 import json
+import math
 
 from satnogsclient import settings
 from satnogsclient.upsat import packet_settings
@@ -32,6 +33,8 @@ def ecss_logic(ecss_dict):
         elif ecss_dict['ser_type'] == packet_settings.TC_HOUSEKEEPING_SERVICE and ecss_dict['ser_subtype'] == packet_settings.TM_HK_PARAMETERS_REPORT:
 
             struct_id = ecss_dict['data'][0]
+
+            report = "No HK handler found"
 
             if ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.HEALTH_REP:
 
@@ -75,6 +78,33 @@ def ecss_logic(ecss_dict):
 
                 pointer = 1
                 report = adcs_hk(ecss_dict['data'][pointer:])
+
+            elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.ADCS_TLE_REP:
+
+                pointer = 1
+                report = "TLE > "
+
+                report += "Argument of Periapsis: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
+                pointer += 4
+                report += "Ascending node: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
+                pointer += 4
+                report += "BSTAR drag term: " + str(cnv_signed_8_32(ecss_dict['data'][pointer:]) * (10 ** -12)) + ", "
+                pointer += 4
+                report += "Eccentricity: " + str(cnv_signed_8_32(ecss_dict['data'][pointer:]) * (10 ** -6)) + ", "
+                pointer += 4
+                report += "Epoch day: " + str(cnv8_32(ecss_dict['data'][pointer:]) * (10 ** -4)) + ", "
+                pointer += 4
+                report += "Inclination: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
+                pointer += 4
+                report += "Mean anomaly: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
+                pointer += 4
+                report += "Mean motion: " + str(cnv8_32(ecss_dict['data'][pointer:]) * 0.1) + ", "
+                pointer += 4
+                report += "Sat No: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+                pointer += 2
+                report += "Epoch year: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
+                pointer += 2
+                report += "Revolution No: " + str(cnv8_32(ecss_dict['data'][pointer:]))
 
             elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.SU_SCI_HDR_REP:
 
@@ -462,10 +492,10 @@ def eps_hk(ecss_data):
     content[0]['Safety Battery Mode'] = str(int('{0:08b}'.format(ecss_data[pointer])[2:5], 2))
     content[0]['Safety Temp Mode'] = str(int('{0:08b}'.format(ecss_data[pointer])[5:], 2))
     pointer += 1
-    content[0]['SU Switch'] = str(int('{0:08b}'.format(ecss_data[pointer])[:2], 2))
-    content[0]['OBC Switch'] = str(int('{0:08b}'.format(ecss_data[pointer])[2:4], 2))
-    content[0]['ADCS Switch'] = str(int('{0:08b}'.format(ecss_data[pointer])[4:6], 2))
-    content[0]['COMMS Switch'] = str(int('{0:08b}'.format(ecss_data[pointer])[6:], 2))
+    content[0]['Switch SU'] = str(int('{0:08b}'.format(ecss_data[pointer])[:2], 2))
+    content[0]['Switch OBC'] = str(int('{0:08b}'.format(ecss_data[pointer])[2:4], 2))
+    content[0]['Switch ADCS'] = str(int('{0:08b}'.format(ecss_data[pointer])[4:6], 2))
+    content[0]['Switch COMMS'] = str(int('{0:08b}'.format(ecss_data[pointer])[6:], 2))
     pointer += 1
     content[0]['Temp sensor PWR SW'] = str(ecss_data[pointer])
     pointer += 1
