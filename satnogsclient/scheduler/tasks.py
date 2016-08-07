@@ -12,6 +12,7 @@ from multiprocessing import Process
 import json
 from satnogsclient.scheduler import scheduler
 from flask_socketio import SocketIO
+import subprocess
 
 import pytz
 import requests
@@ -29,12 +30,16 @@ logger = logging.getLogger('satnogsclient')
 socketio = SocketIO(message_queue='redis://')
 
 
-def signal_term_handler(signal, frame):
-    dictionary = frame.f_locals
-    if 'child_pid' in dictionary:
-        os.kill(dictionary['child_pid'], signal.SIGKILL)
+def signal_term_handler(a, b):
+    p = subprocess.Popen(['ps', '-ef'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    for line in out.splitlines():
+        if 'satnogs-poller' in line:
+            pid = int(line.split(None, 2)[1])
+            os.kill(pid, signal.SIGKILL)
 
-signal.signal(signal.SIGTERM, signal_term_handler)
+
+signal.signal(signal.SIGINT, signal_term_handler)
 
 
 def spawn_observer(*args, **kwargs):
