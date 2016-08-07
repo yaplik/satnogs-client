@@ -154,45 +154,40 @@ def ecss_logic(ecss_dict):
 
             elif struct_id == packet_settings.ECSS_STATS_REP:
 
-                pointer = 1
-                content = [{}]
+                if len(ecss_dict['data']) == packet_settings.ECSS_STATS_REP_SIZE:
 
-                content[0]['Dropped HLDLC'] = str(cnv8_16(ecss_dict['data'][pointer:]))
-                pointer += 2
-                content[0]['Dropped Unpacked'] = str(cnv8_16(ecss_dict['data'][pointer:]))
-                pointer += 2
+                    pointer = 1
+                    content = [{}]
 
-                content_in = [{}]
-                for i in range(1, packet_settings.LAST_APP_ID):
-                    sub_content = [{}]
-                    for j in range(1, packet_settings.LAST_APP_ID):
-                        sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
-                        pointer += 2
-                    content_in[0][i] = sub_content
-                content[0]['In'] = json.loads(json.dumps(content_in, indent=2, sort_keys=True))
+                    content[0]['Dropped HLDLC'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                    pointer += 2
+                    content[0]['Dropped Unpacked'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                    pointer += 2
 
-                content_out = [{}]
-                for i in range(1, packet_settings.LAST_APP_ID):
-                    sub_content = [{}]
-                    for j in range(1, packet_settings.LAST_APP_ID):
-                        sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
-                        pointer += 2
-                    content_out[0][i] = sub_content
-                content[0]['Out'] = json.loads(json.dumps(content_out, indent=2, sort_keys=True))
+                    content_in = [{}]
+                    for i in range(1, packet_settings.LAST_APP_ID):
+                        sub_content = [{}]
+                        for j in range(1, packet_settings.LAST_APP_ID):
+                            sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                            pointer += 2
+                        content_in[0][i] = sub_content
+                    content[0]['In'] = json.loads(json.dumps(content_in, indent=2, sort_keys=True))
 
-                report = json.dumps(content, indent=2, sort_keys=True)
+                    content_out = [{}]
+                    for i in range(1, packet_settings.LAST_APP_ID):
+                        sub_content = [{}]
+                        for j in range(1, packet_settings.LAST_APP_ID):
+                            sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                            pointer += 2
+                        content_out[0][i] = sub_content
+                    content[0]['Out'] = json.loads(json.dumps(content_out, indent=2, sort_keys=True))
+
+                    report = json.dumps(content, indent=2, sort_keys=True)
+                else:
+                    report = "ECSS Stats package has invalid length"
 
             elif struct_id == packet_settings.EXT_WOD_REP:
-                content = [{}]
-
-                pointer = packet_settings.OBC_EXT_WOD_OFFSET
-                content[0]['OBC'] = json.loads(obc_hk(ecss_dict['data'][pointer:]))
-                pointer = packet_settings.COMMS_EXT_WOD_OFFSET
-                content[0]['COMMS'] = json.loads(comms_hk(ecss_dict['data'][pointer:]))
-                pointer = packet_settings.ADCS_EXT_WOD_OFFSET
-                content[0]['ADCS'] = json.loads(adcs_hk(ecss_dict['data'][pointer:]))
-                pointer = packet_settings.EPS_EXT_WOD_OFFSET
-                content[0]['EPS'] = json.loads(eps_hk(ecss_dict['data'][pointer:]))
+                content = ext_wod_decode(ecss_dict['data'])
 
                 report_pre = [{
                     "type": "EXT_WOD",
@@ -339,7 +334,7 @@ def ecss_logic(ecss_dict):
                 if sid == packet_settings.SU_LOG:
                     logs = (ecss_dict['size'] - 1) / (packet_settings.SU_LOG_SIZE + 2)
 
-                    if logs % 2 == 0:
+                    if logs % 1 == 0:
                         report += " received " + str(logs) + " su logs "
                         pointer = 1
 
@@ -360,7 +355,7 @@ def ecss_logic(ecss_dict):
                 elif sid == packet_settings.WOD_LOG:
                     logs = (ecss_dict['size'] - 1) / (packet_settings.WOD_LOG_SIZE + 2)
 
-                    if logs % 2 == 0:
+                    if logs % 1 == 0:
                         report += " received " + str(logs) + " wod logs "
                         pointer = 1
 
@@ -381,7 +376,7 @@ def ecss_logic(ecss_dict):
                 elif sid == packet_settings.EXT_WOD_LOG:
                     logs = (ecss_dict['size'] - 1) / (packet_settings.EXT_WOD_LOG_SIZE + 2)
 
-                    if logs % 2 == 0:
+                    if logs % 1 == 0:
                         report += " received " + str(logs) + " ext wod logs "
                         pointer = 1
 
@@ -393,7 +388,7 @@ def ecss_logic(ecss_dict):
 
                             write_log_file(sid, fname, ecss_dict['data'][pointer:pointer + packet_settings.EXT_WOD_LOG_SIZE])
 
-                            report += " |File #" + str(i) + " " + str(fname) + " EXT WOD LOG, with QB50 " + str(qb50) + " UTC: " + str(utc)
+                            report += " | File #" + str(i) + " " + str(fname) + " EXT WOD LOG, with QB50 " + str(qb50) + " UTC: " + str(utc)
 
                             pointer += packet_settings.EXT_WOD_LOG_SIZE
                     else:
@@ -427,6 +422,22 @@ def ecss_logic(ecss_dict):
     res_dict['files'] = []
     res_dict['from_id'] = ecss_dict['app_id']
     return res_dict
+
+
+# Decoding extended WOD report
+def ext_wod_decode(ecss_data):
+    content = [{}]
+
+    pointer = packet_settings.OBC_EXT_WOD_OFFSET
+    content[0]['OBC'] = json.loads(obc_hk(ecss_data[pointer:]))
+    pointer = packet_settings.COMMS_EXT_WOD_OFFSET
+    content[0]['COMMS'] = json.loads(comms_hk(ecss_data[pointer:]))
+    pointer = packet_settings.ADCS_EXT_WOD_OFFSET
+    content[0]['ADCS'] = json.loads(adcs_hk(ecss_data[pointer:]))
+    pointer = packet_settings.EPS_EXT_WOD_OFFSET
+    content[0]['EPS'] = json.loads(eps_hk(ecss_data[pointer:]))
+
+    return content
 
 
 # Decoding extened health report from OBC

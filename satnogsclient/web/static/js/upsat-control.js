@@ -608,15 +608,31 @@ $(document).ready(function() {
             ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "comms") {
-            if ($(this).attr("id") == "comms-tx-on") {
-                request = encode_comms_tx_rf(1);
-            } else if ($(this).attr("id") == "comms-tx-off") {
-                request = encode_comms_tx_rf(0);
-                if (window.confirm("Do you really want to shutdown COMMS TX?")) {
-                    ecss_cmd_socket.emit('comms_switch_command', request);
+            if ($(this).attr("id") == "comms-tx-on" || $(this).attr("id") == "comms-tx-off"){
+                if ($(this).attr("id") == "comms-tx-on") {
+                    request = encode_comms_tx_rf(1);
+                } else if ($(this).attr("id") == "comms-tx-off") {
+                    request = encode_comms_tx_rf(0);
+                    if (window.confirm("Do you really want to shutdown COMMS TX?")) {
+                        ecss_cmd_socket.emit('comms_switch_command', request);
+                    }
                 }
+                ecss_cmd_socket.emit('comms_switch_command', request);
+            } else {
+                app_id = 4;
+                type = 1;
+                ack = $('#service-param-comms-ack').val();
+                dest_id = $('#service-param-comms-dest_id').val();
+                pattern = $('#service-param-comms-pattern').val();
+                service_type = 8;
+                service_subtype = 1;
+                data = [];
+                data.splice(0, 0, 3);
+                data.splice(1, 0, 19);
+                data.splice(2, 0, ((pattern >> 0) & 0xFF));
+                request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+                ecss_cmd_socket.emit('ecss_command', request);
             }
-            ecss_cmd_socket.emit('comms_switch_command', request);
         } else if (selected_value == "mnlp") {
             app_id = 1;
             type = 1;

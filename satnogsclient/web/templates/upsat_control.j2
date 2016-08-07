@@ -256,6 +256,47 @@
                       <button type="button" class="btn label-danger" name="comms-tx-off" id="comms-tx-off">Shutdown</button>
                     </div>
                   </div>
+                  <div class="row" id="comms-pattern-row">
+                    <div class="col-md-4">
+                      <label>Pattern:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <input class="form-control" type="text" id="service-param-comms-pattern">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>ACK:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-comms-ack" class="form-control">
+                        <option selected style="display:none;">Select ACK</option>
+                        <option value="0" >NO ACK</option>
+                        <option value="1" >ACK</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Destination:</label>
+                    </div>
+                    <div class="col-md-8">
+                      <select id="service-param-comms-dest_id" class="form-control">
+                        <option selected style="display:none;">Select Dest ID</option>
+                        <option value="6" >GND</option>
+                        <option value="7" >UMB</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="text-right">
+                        <button class="btn btn-primary"> Send </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div id="service-param-custom" style="display:none;">
                   <div class="row">
