@@ -12,7 +12,8 @@ install_requires = [
     'flask',
     'pyopenssl',
     'pyserial',
-    'flask-socketio'
+    'flask-socketio',
+    'redis'
 ]
 
 flake8 = [

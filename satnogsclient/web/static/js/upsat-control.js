@@ -93,6 +93,7 @@ $(document).ready(function() {
             $('#file-action-row').show();
         } else {
             $('#file-action-row').hide();
+            $('#file-multiple-row').hide();
             $('#file-upload-row').hide();
             $('#file-select-row').hide();
             $('#folder-select-row').hide();
@@ -145,21 +146,29 @@ $(document).ready(function() {
         if ($('#service-param-ms-action').find("option:selected").val() == "Uplink") {
             $('#file-upload-row').show();
             $('#file-select-row').hide();
+            $('#file-multiple-row').hide();
             $('#folder-select-row').show();
         } else if ($('#service-param-ms-action').find("option:selected").val() == "Delete" ||
-            $('#service-param-ms-action').find("option:selected").val() == "List" ||
-            $('#service-param-ms-action').find("option:selected").val() == "Downlink") {
+            $('#service-param-ms-action').find("option:selected").val() == "List") {
             $('#file-upload-row').hide();
             $('#file-select-row').show();
+            $('#file-multiple-row').hide();
             $('#folder-select-row').show();
-        } else if ($('#service-param-ms-action').find("option:selected").val() == "All" ||
+        } else if ($('#service-param-ms-action').find("option:selected").val() == "Downlink") {
+            $('#file-upload-row').hide();
+            $('#file-select-row').show();
+            $('#file-multiple-row').show();
+            $('#folder-select-row').show();
+        }else if ($('#service-param-ms-action').find("option:selected").val() == "All" ||
             $('#service-param-ms-action').find("option:selected").val() == "Hard") {
             $('#file-upload-row').hide();
             $('#file-select-row').hide();
+            $('#file-multiple-row').hide();
             $('#folder-select-row').show();
         } else {
             $('#file-upload-row').hide();
             $('#file-select-row').hide();
+            $('#file-multiple-row').hide();
             $('#folder-select-row').hide();
         }
     });
@@ -283,12 +292,13 @@ $(document).ready(function() {
                 } else if (action == "Downlink") {
 
                     var fn_down = $('#service-param-service-ms-num').val();
+                    var fn_down_num = $('#service-param-service-ms-mult').val();
                     service_subtype = 9;
 
                     data.splice(0, 0, store_id);
                     data.splice(1, 0, ((fn_down >> 8) & 0x00FF)); // file from
                     data.splice(2, 0, ((fn_down >> 0) & 0x00FF));
-                    data.splice(3, 0, 1); // num of files
+                    data.splice(3, 0, fn_down_num); // num of files
 
                 } else if (action == "Uplink") {
 
@@ -1088,6 +1098,7 @@ function init(config_socket) {
     $('#file-upload-row').hide();
     $('#file-select-row').hide();
     $('#file-action-row').hide();
+    $('#file-multiple-row').hide();
     $('#folder-select-row').hide();
     $('[id ^=adcs][id $=row]').hide();
     $('[id ^=sch][id $=row]').hide();
