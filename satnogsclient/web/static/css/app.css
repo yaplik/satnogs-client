@@ -91,6 +91,13 @@ body {
   padding: 10px;
 }
 
+#response-panel-body-wod {
+  height: 300px;
+  overflow-y: scroll;
+  text-align: left;
+  padding: 10px;
+}
+
 #caret-custom {
   margin-left: 5px;
 }
@@ -226,12 +233,6 @@ body {
 
 .font-bold {
   font-weight: 600;
-}
-
-#backend_online {
-  margin-top: 10px;
-  text-align: right;
-  font-size: 10px;
 }
 
 #backend-status {
