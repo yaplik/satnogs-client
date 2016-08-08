@@ -26,7 +26,7 @@ $(document).ready(function() {
     });
 
     config_socket.on('connect', function() {
-        $('#backend-status').addClass('online-circle').removeClass('offline-circle').attr('title','Backend Online');
+        $('#backend-status').addClass('online-circle').removeClass('offline-circle').attr('title', 'Backend Online');
         console.log('Frontend connected to backend!');
         current_backend = Cookies.get('backend');
         if (current_backend === null || typeof current_backend == 'undefined') {
@@ -40,7 +40,7 @@ $(document).ready(function() {
 
 
     config_socket.on('connect_error', function() {
-        $('#backend-status').removeClass('online-circle').addClass('offline-circle').attr('title','Backend Offline');
+        $('#backend-status').removeClass('online-circle').addClass('offline-circle').attr('title', 'Backend Offline');
         console.log('Frontend cannot connect to backend!');
     });
 
@@ -110,10 +110,10 @@ $(document).ready(function() {
         } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_CTRL_GAIN") {
             $('[id ^=adcs][id $=row]').hide();
             $('#adcs-gain-row').show();
-        } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_TLE"){
+        } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_TLE") {
             $('[id ^=adcs][id $=row]').hide();
             $('#adcs-tle-row').show();
-        } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_CONTROL_SP"){
+        } else if ($('#service-param-adcs-action').find("option:selected").val() == "ADCS_CONTROL_SP") {
             $('[id ^=adcs][id $=row]').hide();
             $('#adcs-control-row').show();
         }
@@ -132,12 +132,12 @@ $(document).ready(function() {
         } else if ($('#service-param-sch-action').find("option:selected").val() == "shift_all") {
             $('[id ^=sch][id $=row]').hide();
             $('#sch-time-int-row').show();
-        } else if ($('#service-param-sch-action').find("option:selected").val() == "shift_sel"){
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "shift_sel") {
             $('[id ^=sch][id $=row]').hide();
             $('#sch-time-int-row').show();
             $('#sch-app_id-row').show();
             $('#sch-seq-row').show();
-        } else if ($('#service-param-sch-action').find("option:selected").val() == "report"){
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "report") {
             $('[id ^=sch][id $=row]').hide();
         }
     });
@@ -159,7 +159,7 @@ $(document).ready(function() {
             $('#file-select-row').show();
             $('#file-multiple-row').show();
             $('#folder-select-row').show();
-        }else if ($('#service-param-ms-action').find("option:selected").val() == "All" ||
+        } else if ($('#service-param-ms-action').find("option:selected").val() == "All" ||
             $('#service-param-ms-action').find("option:selected").val() == "Hard") {
             $('#file-upload-row').hide();
             $('#file-select-row').hide();
@@ -175,9 +175,9 @@ $(document).ready(function() {
 
     $('#service-param-eps-action').on('change', function() {
         if ($('#service-param-eps-action').find("option:selected").val() == "eps-set-safety-limits") {
-          $('#eps-safety-limits-row').show();
+            $('#eps-safety-limits-row').show();
         } else {
-          $('#eps-safety-limits-row').hide();
+            $('#eps-safety-limits-row').hide();
         }
     });
 
@@ -346,10 +346,10 @@ $(document).ready(function() {
 
             if (action == "All" || action == "Hard") {
                 if (window.confirm("Do you really want to delete all files in the folder?")) {
-			ecss_cmd_socket.emit('ecss_command', request);
+                    ecss_cmd_socket.emit('ecss_command', request);
                 }
             } else {
-		ecss_cmd_socket.emit('ecss_command', request);
+                ecss_cmd_socket.emit('ecss_command', request);
             }
 
 
@@ -566,10 +566,10 @@ $(document).ready(function() {
                 data.splice(4, 0, ((spin >> 16) & 0x000000ff));
                 data.splice(5, 0, ((spin >> 24) & 0x000000ff));
             } else if (adcs_action == "ADCS_MAGNETO") {
-                var x = $('#service-param-service-magneto-x').val();
+                var z = $('#service-param-service-magneto-z').val();
                 var y = $('#service-param-service-magneto-y').val();
                 data.splice(1, 0, 12);
-                data.splice(2, 0, ((x >> 0) & 0xFF));
+                data.splice(2, 0, ((z >> 0) & 0xFF));
                 data.splice(3, 0, ((y >> 0) & 0xFF));
             } else if (adcs_action == "ADCS_CTRL_GAIN") {
                 var g1 = $('#service-param-service-g1').val();
@@ -599,7 +599,7 @@ $(document).ready(function() {
                 data.unshift(3);
                 //number of TLE chanacters
                 if (data.length != 142) {
-                    console.log("TLE should be 140 long, instead saw: " + data.length-2);
+                    console.log("TLE should be 140 long, instead saw: " + data.length - 2);
                     return 0;
                 }
             }
@@ -608,7 +608,7 @@ $(document).ready(function() {
             ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "comms") {
-            if ($(this).attr("id") == "comms-tx-on" || $(this).attr("id") == "comms-tx-off"){
+            if ($(this).attr("id") == "comms-tx-on" || $(this).attr("id") == "comms-tx-off") {
                 if ($(this).attr("id") == "comms-tx-on") {
                     request = encode_comms_tx_rf(1);
                 } else if ($(this).attr("id") == "comms-tx-off") {
@@ -959,32 +959,32 @@ function print_command_response(data) {
         }
     }
     if (resp.command_sent || resp.from_id) {
-      if (resp.command_sent) {
-        sub_id = resp.command_sent.app_id;
-      } else if (resp.from_id) {
-        sub_id = resp.from_id;
-      }
-      if (sub_id) {
-        sub = ecss_var.var_app_id[sub_id];
-      } else {
-        sub = "UNK";
-      }
-      if (resp.command_sent) {
-        to_log = '<span class="label label-info"> > ' + sub + '</span>';
-        log_data = ecss_var.var_serv_id[resp.command_sent.ser_type] + ' command sent';
-      } else if (resp.from_id) {
-        to_log = '<span class="label label-success"> < ' + sub + '</span>';
-        try {
-          json_reponse = JSON.parse(log_data);
-          log_data = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true" data-toggle="modal" data-target="#json-prettify"></span> <span>' + log_data + '</span>';
-        } catch(e) {
-          console.log("Couldn't find JSON in the response.");
+        if (resp.command_sent) {
+            sub_id = resp.command_sent.app_id;
+        } else if (resp.from_id) {
+            sub_id = resp.from_id;
         }
-      }
+        if (sub_id) {
+            sub = ecss_var.var_app_id[sub_id];
+        } else {
+            sub = "UNK";
+        }
+        if (resp.command_sent) {
+            to_log = '<span class="label label-info"> > ' + sub + '</span>';
+            log_data = ecss_var.var_serv_id[resp.command_sent.ser_type] + ' command sent';
+        } else if (resp.from_id) {
+            to_log = '<span class="label label-success"> < ' + sub + '</span>';
+            try {
+                json_reponse = JSON.parse(log_data);
+                log_data = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true" data-toggle="modal" data-target="#json-prettify"></span> <span>' + log_data + '</span>';
+            } catch (e) {
+                console.log("Couldn't find JSON in the response.");
+            }
+        }
     }
     response_panel.append('<li class="' + apply_log_filter(data_type) + '"' + ' data-type="' + data_type + '">' +
-    '<span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() +
-    '</span>' + to_log + ' ' + log_data +'</li>');
+        '<span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() +
+        '</span>' + to_log + ' ' + log_data + '</li>');
 
     $('#response-panel-body').scrollTop(response_panel.height());
 }
@@ -1123,74 +1123,75 @@ function encode_mode_switch(mode) {
 
 // A function that parses the log console, generates a string and saves it on a CSV file.
 function log_console_save() {
-  str = '';
-  var log_content = [];
-  var strArray = [];
-  $('#log-list li').each(function(i) {
-    // Retrieve all the child nodes of the log list element
-    log_content = $.makeArray($(this)[0].childNodes);
-    // Construct a string array with the containing values
-    for (j=0; j<log_content.length; j++){
-      // Check the type of the element for appropriate handling
-      if ($(log_content[j]).is('span')) {
-        strArray.push(log_content[j].innerText);
-      }
-      else {
-        strArray.push(log_content[j].data);
-      }
-    }
-    // Encode each log message into CSV
-    str += csv_encode(strArray);
-    str += '\n';
-    log_content = [];
-    strArray = [];
-  });
-  var blob = new Blob([str], {type: "text/csv;charset=utf-8"});
-  saveAs(blob, "upsat_cnc_log.csv");
+    str = '';
+    var log_content = [];
+    var strArray = [];
+    $('#log-list li').each(function(i) {
+        // Retrieve all the child nodes of the log list element
+        log_content = $.makeArray($(this)[0].childNodes);
+        // Construct a string array with the containing values
+        for (j = 0; j < log_content.length; j++) {
+            // Check the type of the element for appropriate handling
+            if ($(log_content[j]).is('span')) {
+                strArray.push(log_content[j].innerText);
+            } else {
+                strArray.push(log_content[j].data);
+            }
+        }
+        // Encode each log message into CSV
+        str += csv_encode(strArray);
+        str += '\n';
+        log_content = [];
+        strArray = [];
+    });
+    var blob = new Blob([str], {
+        type: "text/csv;charset=utf-8"
+    });
+    saveAs(blob, "upsat_cnc_log.csv");
 }
 
 function csv_encode(strArray) {
-  csv_str = '';
-  $.each( strArray, function( index, value){
-    csv_str += value;
-    if (index < strArray.length - 1) {
-      csv_str += ';';
-    }
-  });
-  return csv_str;
+    csv_str = '';
+    $.each(strArray, function(index, value) {
+        csv_str += value;
+        if (index < strArray.length - 1) {
+            csv_str += ';';
+        }
+    });
+    return csv_str;
 }
 
 // Populating Log modals
-$('#json-prettify').on('show.bs.modal', function (event) {
-  var span = $(event.relatedTarget); // Button that triggered the modal
-  var modal = $(this);
-  var json_body = JSON.parse($(event.relatedTarget).next().text());
-  modal.find('.modal-title').text('Json response');
-  modal.find('.modal-body pre').html(JSON.stringify(json_body, undefined, 2));
+$('#json-prettify').on('show.bs.modal', function(event) {
+    var span = $(event.relatedTarget); // Button that triggered the modal
+    var modal = $(this);
+    var json_body = JSON.parse($(event.relatedTarget).next().text());
+    modal.find('.modal-title').text('Json response');
+    modal.find('.modal-body pre').html(JSON.stringify(json_body, undefined, 2));
 });
 
 // Packet settings for resolving
 var ecss_var = {
-  'var_app_id':{
-    '1':'OBC',
-    '2':'EPS',
-    '3':'ADCS',
-    '4':'COMMS',
-    '5':'IAC',
-    '6':'GND',
-    '7':'UMB'
-  },
-  'var_serv_id':{
-    '1':'Verification',
-    '3':'Housekeeping',
-    '5':'Event',
-    '8':'Function Management',
-    '9':'Time Management',
-    '11':'Scheduling',
-    '13':'Large Data',
-    '15':'Mass Storage',
-    '17':'Test',
-    '18':'SU mNLP'
-  },
-  'subserv_id':{}
+    'var_app_id': {
+        '1': 'OBC',
+        '2': 'EPS',
+        '3': 'ADCS',
+        '4': 'COMMS',
+        '5': 'IAC',
+        '6': 'GND',
+        '7': 'UMB'
+    },
+    'var_serv_id': {
+        '1': 'Verification',
+        '3': 'Housekeeping',
+        '5': 'Event',
+        '8': 'Function Management',
+        '9': 'Time Management',
+        '11': 'Scheduling',
+        '13': 'Large Data',
+        '15': 'Mass Storage',
+        '17': 'Test',
+        '18': 'SU mNLP'
+    },
+    'subserv_id': {}
 };
