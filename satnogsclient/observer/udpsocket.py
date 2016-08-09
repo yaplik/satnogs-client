@@ -59,7 +59,7 @@ class Udpsocket:
         return self.s
 
     def recv(self):
-        if self.s.gettimeout() != None:
+        if self.s.gettimeout() is not None:
             self.s.settimeout(None)
         data, addr = self.s.recvfrom(3000)
         return (data, addr)

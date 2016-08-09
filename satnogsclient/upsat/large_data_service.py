@@ -72,8 +72,8 @@ def uplink(buf_in):
         got_ack = 0
         retries = 0
         while (retries < 30) and (got_ack == 0):
-            print 'ecss to be sent ', ecss
-            print ' retries = ', retries, 'got ack = ', got_ack
+            logger.info('[LD] ECSS to be sent: %s', str(ecss))
+            logger.info('[LD] Retries = %s, got ACK = %s', retries, got_ack)
             try:
                 logger.info('Waiting for ack')
                 ack = uplink_socket.recv_timeout(client_settings.LD_UPLINK_TIMEOUT)
@@ -81,33 +81,33 @@ def uplink(buf_in):
                 if len(ecss_dict) == 0:
                     continue
                 if hex(ecss_dict['data'][0]) == hex(large_data_id):
-                    print 'Seq count = ', (ecss_dict['data'][0] << 8) | ecss_dict['data'][1]
+                    logger.info('[LD] Seq count = %s', str(((ecss_dict['data'][0] << 8) | ecss_dict['data'][1])))
                     if ((ecss_dict['data'][2] << 8) | ecss_dict['data'][1]) == packet_count:
                         got_ack = 1
                         sleep(0.5)
-                        logger.info('Got the right ack')
+                        logger.info('[LD] Got the right ack')
                     else:
                         sleep(0.5)
                         gnuradio_sock.sendto(hldlc_buf, (client_settings.GNURADIO_IP, client_settings.GNURADIO_UDP_PORT))  # Resend previous frame
                         retries = retries + 1
-                        logger.error('Wrong large data sequence number')
+                        logger.error('[LD] Wrong large data sequence number')
                 else:
-                    logger.error('Wrong large data ID')
+                    logger.error('[LD] Wrong large data ID')
                     retries = retries + 1
             except Exception, e:
                 traceback.print_exc()
-                print str(e)
+                logger.error('[LD] exception: %s', str(e))
                 sleep(0.5)
                 gnuradio_sock.sendto(hldlc_buf, (client_settings.GNURADIO_IP, client_settings.GNURADIO_UDP_PORT))
                 retries = retries + 1
-                logger.error('Timed out')
+                logger.error('[LD] [LD] Timed out')
         if got_ack == 1:
             if ser_subtype == packet_settings.TC_LD_LAST_UPLINK:
                 global large_data_id
                 large_data_id = large_data_id + 1
             packet_count = packet_count + 1
         else:
-            logger.info('Aborted operation')
+            logger.info('[LD] Aborted operation')
             return
 
 
@@ -119,21 +119,20 @@ def downlink():
     while 1:
         if receiving:
             try:
-                logger.info('Downlink thread awaits for next frame')
+                logger.info('[LD] Downlink thread awaits for next frame')
                 data = downlink_socket.recv_timeout(end_time - time.time())
-                logger.info('Downlink packet received!')
+                logger.info('[LD] Downlink packet received!')
             except:
-                logger.info('Downlink operation not completed on time. Going to fallback operation')
+                logger.info('[LD] Downlink operation not completed on time. Going to fallback operation')
                 ret = fallback(received_packets, prev_id)
                 prev_id = -1
                 receiving = False
                 if ret[1] == 1:
                     frame = construct_downlink_packet(received_packets)
-                    logger.info('Packet received is: ')
-                    print binascii.hexlify(frame)
-                    logger.info('Downlink operation completed')
+                    logger.debug('[LD] Packet received is: %s', str(binascii.hexlify(frame)))
+                    logger.info('[LD] Downlink operation completed')
                     decode_and_send(frame)
-                    logger.info('Packet sent to front end')
+                    logger.info('[LD] Packet sent to front end')
                     received_packets.clear()
                     global total_downlink_packets
                     total_downlink_packets = 0
@@ -145,19 +144,19 @@ def downlink():
                     continue
             ecss_dict = cPickle.loads(data[0])
         else:
-            logger.info('Downlink thread waiting for first downlink packet')
+            logger.info('[LD] Downlink thread waiting for first downlink packet')
             data = downlink_socket.recv()
-            logger.info('First downlink packet received')
+            logger.info('[LD] First downlink packet received')
             end_time = time.time() + client_settings.LD_DOWNLINK_TIMEOUT
             ecss_dict = cPickle.loads(data[0])
             receiving = True
             prev_id = ecss_dict['data'][0]
         if len(ecss_dict) == 0:
-            logger.error('Received empty ecss_dict. Ignoring frame')
+            logger.error('[LD] Received empty ecss_dict. Ignoring frame')
             continue
         seq_count = (ecss_dict['data'][2] << 8) | ecss_dict['data'][1]
         if hex(prev_id) != hex(ecss_dict['data'][0]):
-            logger.error('Wrong large data id during downlink operation. Aborting')
+            logger.error('[LD] Wrong large data id during downlink operation. Aborting')
             prev_id = -1
             receiving = False
             received_packets.clear()
@@ -169,16 +168,15 @@ def downlink():
             global total_downlink_packets
             total_downlink_packets = seq_count + 1
             ret = fallback(received_packets, prev_id)
-            logger.info('Returned from callback')
+            logger.debug('[LD] Returned from callback')
             prev_id = -1
             receiving = False
             if ret[1] == 1:
                 frame = construct_downlink_packet(received_packets)
-                logger.info('Packet received is: ')
-                print binascii.hexlify(frame)
-                logger.info('Downlink operation completed')
+                logger.debug('[LD] Packet received is: %s', str(binascii.hexlify(frame)))
+                logger.info('[LD] Downlink operation completed')
                 decode_and_send(frame)
-                logger.info('Packet sent to front end')
+                logger.info('[LD] Packet sent to front end')
                 received_packets.clear()
                 global total_downlink_packets
                 total_downlink_packets = 0
@@ -190,13 +188,13 @@ def downlink():
 
 
 def fallback(received_packets, prev_id):
-    logger.info('Callback function takes over')
-    logger.info('Total packets received: ' + str(total_downlink_packets))
+    logger.info('[LD] Callback function takes over')
+    logger.info('[LD] Total packets received: ' + str(total_downlink_packets))
     finished = False
     requested_seq_num = 0
     packet_retries = 0
     while not finished:
-        logger.info('Requested sequence number =  ' + str(requested_seq_num))
+        logger.info('[LD] Requested sequence number =  ' + str(requested_seq_num))
         if requested_seq_num not in received_packets:
             request_packet(prev_id, requested_seq_num, 'gnuradio')
             try:
@@ -204,33 +202,33 @@ def fallback(received_packets, prev_id):
                 data = downlink_socket.recv_timeout(end_time - time.time())
             except IOError:
                 if packet_retries < client_settings.LD_DOWNLINK_RETRIES_LIM:
-                    logger.error('Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed on time.Retrying')
+                    logger.error('[LD] Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed on time.Retrying')
                     packet_retries += 1
                     continue
                 else:
-                    logger.error('Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Aborting')
+                    logger.error('[LD] Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Aborting')
                     return(received_packets, -1)
             ecss_dict = cPickle.loads(data[0])
             if len(ecss_dict) == 0:
-                logger.error('Received empty ecss dict in fallback operation. Ignoring frame')
+                logger.error('[LD] Received empty ecss dict in fallback operation. Ignoring frame')
                 continue
             seq_count = (ecss_dict['data'][2] << 8) | ecss_dict['data'][1]
             if seq_count != requested_seq_num:
                 if packet_retries < client_settings.LD_DOWNLINK_RETRIES_LIM:
-                    logger.error('Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Wrong seq num.Retrying')
+                    logger.error('[LD] Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Wrong seq num.Retrying')
                     packet_retries += 1
                     continue
                 else:
-                    logger.error('Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Wrong seq num.Aborting')
+                    logger.error('[LD] Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Wrong seq num.Aborting')
                     return(received_packets, -1)
             if hex(prev_id) != hex(ecss_dict['data'][0]):
-                logger.error('Wrong large data id during fallback of downlink operation. Aborting')
+                logger.error('[LD] Wrong large data id during fallback of downlink operation. Aborting')
                 if packet_retries < client_settings.LD_DOWNLINK_RETRIES_LIM:
-                    logger.error('Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Wrong LD ID.Retrying')
+                    logger.error('[LD] Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Wrong LD ID.Retrying')
                     packet_retries += 1
                     continue
                 else:
-                    logger.error('Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Wrong LD ID.Aborting')
+                    logger.error('[LD] Fallback operation for packet number ' + str(requested_seq_num) + ' was not completed.Wrong LD ID.Aborting')
                     return(received_packets, -1)
             buf = ecss_dict['data'][3:ecss_dict['size']]
             received_packets[seq_count] = buf
@@ -282,11 +280,9 @@ def decode_and_send(buf_in):
     ecss_dict = {}
     ret = packet.deconstruct_packet(buf_in, ecss_dict, "gnuradio")
     ecss_dict = ret[0]
-    print 'Got ECSS dict : '
-    print ecss_dict
     data = ecss_logic_utils.ecss_logic(ecss_dict)
     socketio.emit('backend_msg', data, namespace='/control_rx', callback=success_message_to_frontend())
 
 
 def success_message_to_frontend():
-    logger.debug('Successfuly emit to frontend')
+    logger.debug('[LD] Successfuly emit to frontend')
