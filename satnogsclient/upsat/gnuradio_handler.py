@@ -14,6 +14,8 @@ ui_listener_sock = Udpsocket(('127.0.0.1', client_settings.BACKEND_FEEDER_PORT))
 ecss_feeder_sock = Udpsocket([])  # The socket with which we communicate with the ecss feeder thread
 backend_feeder_sock = Udpsocket([])
 ld_socket = Udpsocket([])
+ld_uplink_socket = Udpsocket([])
+ld_downlink_socket = Udpsocket([])
 
 
 def write_to_gnuradio(buf):
@@ -34,7 +36,10 @@ def read_from_gnuradio():
             continue
         try:
             if ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
-                ld_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
+                if ecss_dict['ser_subtype'] <= 8: # 8 is sthe maximum service subtype corresponding to Large Data downlink
+                    ld_downlink_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_DOWNLINK_LISTEN_PORT))
+                else:
+                    ld_uplink_socket.sendto(pickled, ('127.0.0.1', client_settings.LD_UPLINK_LISTEN_PORT))
             else:
                 ecss_feeder_sock.sendto(pickled, ('127.0.0.1', client_settings.ECSS_FEEDER_UDP_PORT))
         except KeyError:
