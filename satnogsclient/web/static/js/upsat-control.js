@@ -137,9 +137,21 @@ $(document).ready(function() {
             $('#sch-time-int-row').show();
             $('#sch-app_id-row').show();
             $('#sch-seq-row').show();
-        } else if ($('#service-param-sch-action').find("option:selected").val() == "report") {
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "report_summary") {
             $('[id ^=sch][id $=row]').hide();
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "report_detailed") {
+            $('[id ^=sch][id $=row]').hide();
+            $('#sch-seq-row').show();
+            $('#sch-app_id-row').show();
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "enable_apid"){
+            $('[id ^=sch][id $=row]').hide();
+            $('#sch-app_id-row').show();
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "disable_apid"){
+            $('[id ^=sch][id $=row]').hide();
+            $('#sch-app_id-row').show();
         }
+        
+        
     });
 
     $('#service-param-ms-action').on('change', function() {
@@ -438,7 +450,7 @@ $(document).ready(function() {
                 data.splice(2, 0, 0);
                 data.splice(3, 0, 0);
                 data.splice(4, 0, 1);
-                data.splice(5, 0, 5);
+                data.splice(5, 0, 4);
                 data.splice(6, 0, ((time_qb50_sch >> 0) & 0x000000ff));
                 data.splice(7, 0, ((time_qb50_sch >> 8) & 0x000000ff));
                 data.splice(8, 0, ((time_qb50_sch >> 16) & 0x000000ff));
@@ -447,7 +459,7 @@ $(document).ready(function() {
                 data.splice(11, 0, ((time_int >> 8) & 0x000000ff));
                 data.splice(12, 0, ((time_int >> 16) & 0x000000ff));
                 data.splice(13, 0, ((time_int >> 24) & 0x000000ff));
-                data.concat($('#service-param-service-data').val().split(","));
+                data = data.concat($('#service-param-sch-payload').val().split(","));
             } else if (selected_action == 'delete') {
 
                 service_subtype = 5;
@@ -475,13 +487,32 @@ $(document).ready(function() {
                 data.splice(4, 0, 1);
                 data.splice(5, 0, sch_app_id);
                 data.splice(6, 0, sch_seq_cnt);
-                data.splice(4, 0, 1);
-            } else if (selected_action == 'report') {
+                data.splice(7, 0, 1);
+            } else if (selected_action == 'report_summary') {
 
+                service_subtype = 17;
+            } else if (selected_action == 'report_detailed') {
+                data.splice(0, 0, sch_app_id);
+                data.splice(1, 0, sch_seq_cnt);
                 service_subtype = 16;
-            }
+            } else if (selected_action == 'enable_apid') {
 
+                service_subtype = 1;
+                data.splice(0, 0, 1);
+                data.splice(1, 0, 1);
+                data.splice(2, 0, 0);
+                data.splice(3, 0, sch_app_id);
+            } else if (selected_action == 'disable_apid') {
+
+                service_subtype = 2;
+                data.splice(0, 0, 1);
+                data.splice(1, 0, 1);
+                data.splice(2, 0, 0);
+                data.splice(3, 0, sch_app_id);
+            }
+            
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
+            ecss_cmd_socket.emit('ecss_command', request);
 
         } else if (selected_value == "time") {
             app_id = $('#service-param-time-app_id').val();

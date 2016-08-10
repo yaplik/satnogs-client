@@ -38,12 +38,12 @@ def ecss_logic(ecss_dict):
 
             if ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.HEALTH_REP:
 
-                report = "VBAT:" + str((ecss_dict['data'][1] << 4) * 0.00447583) + "V "
-                report += "IBAT:" + str(cnv_signed_8_8(ecss_dict['data'][2]) * 0.28759) + "mA "
-                report += "3V3:" + str((ecss_dict['data'][3] << 4) * 0.73242) + "mA "
-                report += "5V0:" + str((ecss_dict['data'][4] << 4) * 0.73242) + "mA "
-                report += "TCPU:" + str(ecss_dict['data'][5] - 15) + "C "
-                report += "TBAT:" + str(ecss_dict['data'][6] - 15) + "C"
+                report = "VBAT:" + str((ecss_dict['data'][1] * 0.05) + 3) + "V "
+                report += "IBAT:" + str((ecss_dict['data'][2] * 9.20312) - 1178) + "mA "
+                report += "3V3:" + str(ecss_dict['data'][3] * 25) + "mA "
+                report += "5V0:" + str(ecss_dict['data'][4] * 25) + "mA "
+                report += "TCPU:" + str((ecss_dict['data'][5] * 0.25) - 15) + "C "
+                report += "TBAT:" + str((ecss_dict['data'][6] * 0.25) - 15) + "C"
 
             elif ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.EPS_FLS_REP:
 
@@ -240,7 +240,64 @@ def ecss_logic(ecss_dict):
             text = "TIME: {0}".format(report)
 
         elif ecss_dict['ser_type'] == packet_settings.TC_SCHEDULING_SERVICE:
-            text = "APO, DO LET US KNOW WHAT TO DO HERE"
+
+            pointer = 0
+            content = [{}]
+
+            if ecss_dict['ser_subtype'] == packet_settings.TC_SC_SUMMARY_REPORT:
+
+                if len(ecss_dict['data']) % 13 == 0:
+                    for i in range(0, (len(ecss_dict['data']) / 13)):
+                        pre_content = [{}]
+                        pre_content[0]["Position"] = str(ecss_dict['data'][pointer])
+                        pointer += 1
+                        pre_content[0]["Enabled"] = str(ecss_dict['data'][pointer])
+                        pointer += 1
+                        pre_content[0]["App_ID"] = str(ecss_dict['data'][pointer])
+                        pointer += 1
+                        pre_content[0]["Seq_Cnt"] = str(ecss_dict['data'][pointer])
+                        pointer += 1
+                        pre_content[0]["Sch_Event"] = str(ecss_dict['data'][pointer])
+                        pointer += 1
+                        pre_content[0]["Release Time"] = str(cnv8_32(ecss_dict['data'][pointer:]))
+                        pointer += 4
+                        pre_content[0]["Timeout"] = str(cnv8_32(ecss_dict['data'][pointer:]))
+                        pointer += 4
+
+                        content[0][i] = pre_content
+
+                else:
+                    content[0] = "Simple schedule report was not of right data size."
+
+            elif ecss_dict['ser_subtype'] == packet_settings.TC_SC_DETAILED_REPORT:
+                content[0]['App_ID'] = str(ecss_dict['data'][pointer])
+                pointer += 1
+                content[0]['Type'] = str(ecss_dict['data'][pointer])
+                pointer += 1
+                content[0]['Seq_Flag'] = str(ecss_dict['data'][pointer])
+                pointer += 1
+                content[0]['Seq_Cnt'] = str(ecss_dict['data'][pointer])
+                pointer += 1
+                content[0]['Size'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                pointer += 2
+                content[0]['ACK'] = str(ecss_dict['data'][pointer])
+                pointer += 1
+                content[0]['Ser_Type'] = str(ecss_dict['data'][pointer])
+                pointer += 1
+                content[0]['Ser_SubType'] = str(ecss_dict['data'][pointer])
+                pointer += 1
+                content[0]['Dest_ID'] = str(ecss_dict['data'][pointer])
+                pointer += 1
+                for j in range(0, int(content[0]['Size'])):
+                    content[0]['Data' + str(j)] = str(ecss_dict['data'][pointer])
+                    pointer += 1
+                content[0]['Verif_State'] = str(ecss_dict['data'][pointer])
+
+            else:
+                content[0] = "No valid subtype for scheduling found!"
+
+            text = json.dumps(content, indent=2, sort_keys=True)
+
         elif ecss_dict['ser_type'] == packet_settings.TC_LARGE_DATA_SERVICE:
             text = "FM {0}, FROM: {1}".format(ecss_dict['app_id'])
         elif ecss_dict['ser_type'] == packet_settings.TC_MASS_STORAGE_SERVICE:
@@ -642,17 +699,17 @@ def adcs_hk(ecss_data):
     pointer += 2
     content[0]['Gyr Z'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
     pointer += 2
-    content[0]['XM X'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
+    content[0]['XM X'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 10)
     pointer += 2
-    content[0]['XM Y'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
+    content[0]['XM Y'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 10)
     pointer += 2
-    content[0]['XM Z'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 0.001)
+    content[0]['XM Z'] = str(cnv_signed_8_16(ecss_data[pointer:]) * 10)
     pointer += 2
-    content[0]['RM X'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 0.001)
+    content[0]['RM X'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 10)
     pointer += 4
-    content[0]['RM Y'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 0.001)
+    content[0]['RM Y'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 10)
     pointer += 4
-    content[0]['RM Z'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 0.001)
+    content[0]['RM Z'] = str(cnv_signed_8_32(ecss_data[pointer:]) * 10)
     pointer += 4
     content[0]['Sun V 0'] = str(cnv8_16(ecss_data[pointer:]) * 0.01)
     pointer += 2
