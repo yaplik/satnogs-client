@@ -1,3 +1,4 @@
+# coding=utf-8
 import datetime
 import logging
 import time
@@ -6,6 +7,7 @@ import math
 
 from satnogsclient import settings
 from satnogsclient.upsat import packet_settings
+from satnogsclient.upsat.wod import obc_wod_decode
 
 
 logger = logging.getLogger('satnogsclient')
@@ -32,174 +34,183 @@ def ecss_logic(ecss_dict):
 
         elif ecss_dict['ser_type'] == packet_settings.TC_HOUSEKEEPING_SERVICE and ecss_dict['ser_subtype'] == packet_settings.TM_HK_PARAMETERS_REPORT:
 
-            struct_id = ecss_dict['data'][0]
+            if not len(ecss_dict['data']) == 0:
 
-            report = "No HK handler found"
+                struct_id = ecss_dict['data'][0]
 
-            if ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.HEALTH_REP:
+                report = "No HK handler found"
 
-                report = "VBAT:" + str((ecss_dict['data'][1] * 0.05) + 3) + "V "
-                report += "IBAT:" + str((ecss_dict['data'][2] * 9.20312) - 1178) + "mA "
-                report += "3V3:" + str(ecss_dict['data'][3] * 25) + "mA "
-                report += "5V0:" + str(ecss_dict['data'][4] * 25) + "mA "
-                report += "TCPU:" + str((ecss_dict['data'][5] * 0.25) - 15) + "C "
-                report += "TBAT:" + str((ecss_dict['data'][6] * 0.25) - 15) + "C"
+                if ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.HEALTH_REP:
 
-            elif ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.EPS_FLS_REP:
+                    report = "VBAT:" + str((ecss_dict['data'][1] * 0.05) + 3) + "V "
+                    report += "IBAT:" + str((ecss_dict['data'][2] * 9.20312) - 1178) + "mA "
+                    report += "3V3:" + str(ecss_dict['data'][3] * 25) + "mA "
+                    report += "5V0:" + str(ecss_dict['data'][4] * 25) + "mA "
+                    report += "TCPU:" + str((ecss_dict['data'][5] * 0.25) - 15) + "°C "
+                    report += "TBAT:" + str((ecss_dict['data'][6] * 0.25) - 15) + "°C"
 
-                pointer = 1
-                report = "Safety Limit memory values:"
-
-                report += "1: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
-                pointer += 4
-                report += "2: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
-                pointer += 4
-                report += "3: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
-                pointer += 4
-                report += "4: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
-                pointer += 4
-                report += "5: " + str(cnv8_32(ecss_dict['data'][pointer:]))
-
-            elif ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
-
-                pointer = 1
-                report = eps_hk(ecss_dict['data'][pointer:])
-
-            elif ecss_dict['app_id'] == packet_settings.COMMS_APP_ID and struct_id == packet_settings.HEALTH_REP:
-
-                report = "data "
-
-            elif ecss_dict['app_id'] == packet_settings.COMMS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
-
-                pointer = 1
-                report = comms_hk(ecss_dict['data'][pointer:])
-
-            elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
-
-                pointer = 1
-                report = adcs_hk(ecss_dict['data'][pointer:])
-
-            elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.ADCS_TLE_REP:
-
-                pointer = 1
-                report = "TLE > "
-
-                report += "Argument of Periapsis: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
-                pointer += 4
-                report += "Ascending node: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
-                pointer += 4
-                report += "BSTAR drag term: " + str(cnv_signed_8_32(ecss_dict['data'][pointer:]) * (10 ** -12)) + ", "
-                pointer += 4
-                report += "Eccentricity: " + str(cnv_signed_8_32(ecss_dict['data'][pointer:]) * (10 ** -6)) + ", "
-                pointer += 4
-                report += "Epoch day: " + str(cnv8_32(ecss_dict['data'][pointer:]) * (10 ** -4)) + ", "
-                pointer += 4
-                report += "Inclination: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
-                pointer += 4
-                report += "Mean anomaly: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
-                pointer += 4
-                report += "Mean motion: " + str(cnv8_32(ecss_dict['data'][pointer:]) * 0.1) + ", "
-                pointer += 4
-                report += "Sat No: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
-                pointer += 2
-                report += "Epoch year: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
-                pointer += 2
-                report += "Revolution No: " + str(cnv8_32(ecss_dict['data'][pointer:]))
-
-            elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.SU_SCI_HDR_REP:
-
-                pointer = 1
-                report = "SU_SCI_HDR_REP "
-
-                roll = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
-                pointer += 2
-                report += "roll " + str(roll) + " "
-
-                pitch = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
-                pointer += 2
-                report += "pitch " + str(pitch) + " "
-
-                yaw = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
-                pointer += 2
-                report += "yaw " + str(yaw) + " "
-
-                roll_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
-                pointer += 2
-                report += "roll_dot " + str(roll_dot) + " "
-
-                pitch_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
-                pointer += 2
-                report += "pitch_dot " + str(pitch_dot) + " "
-
-                yaw_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
-                pointer += 2
-                report += "yaw_dot " + str(yaw_dot) + " "
-
-                x = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
-                pointer += 2
-                report += "x " + str(x) + " "
-
-                y = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
-                pointer += 2
-                report += "y " + str(y) + " "
-
-                z = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
-                pointer += 2
-                report += "z " + str(z) + " "
-
-            elif ecss_dict['app_id'] == packet_settings.OBC_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
-
-                pointer = 1
-                report = obc_hk(ecss_dict['data'][pointer:])
-
-            elif struct_id == packet_settings.ECSS_STATS_REP:
-
-                if len(ecss_dict['data']) == packet_settings.ECSS_STATS_REP_SIZE:
+                elif ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.EPS_FLS_REP:
 
                     pointer = 1
-                    content = [{}]
+                    report = "Safety Limit memory values:"
 
-                    content[0]['Dropped HLDLC'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                    report += "1: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+                    pointer += 4
+                    report += "2: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+                    pointer += 4
+                    report += "3: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+                    pointer += 4
+                    report += "4: " + str(cnv8_32(ecss_dict['data'][pointer:])) + ", "
+                    pointer += 4
+                    report += "5: " + str(cnv8_32(ecss_dict['data'][pointer:]))
+
+                elif ecss_dict['app_id'] == packet_settings.EPS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
+
+                    pointer = 1
+                    report = eps_hk(ecss_dict['data'][pointer:])
+
+                elif ecss_dict['app_id'] == packet_settings.COMMS_APP_ID and struct_id == packet_settings.HEALTH_REP:
+
+                    report = "TCOMMS:" + str((ecss_dict['data'][1] * 0.25) - 15) + "°C"
+
+                elif ecss_dict['app_id'] == packet_settings.COMMS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
+
+                    pointer = 1
+                    report = comms_hk(ecss_dict['data'][pointer:])
+
+                elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
+
+                    pointer = 1
+                    report = adcs_hk(ecss_dict['data'][pointer:])
+
+                elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.ADCS_TLE_REP:
+
+                    pointer = 1
+                    report = "TLE > "
+
+                    report += "Argument of Periapsis: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
+                    pointer += 4
+                    report += "Ascending node: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
+                    pointer += 4
+                    report += "BSTAR drag term: " + str(cnv_signed_8_32(ecss_dict['data'][pointer:]) * (10 ** -12)) + ", "
+                    pointer += 4
+                    report += "Eccentricity: " + str(cnv_signed_8_32(ecss_dict['data'][pointer:]) * (10 ** -6)) + ", "
+                    pointer += 4
+                    report += "Epoch day: " + str(cnv8_32(ecss_dict['data'][pointer:]) * (10 ** -4)) + ", "
+                    pointer += 4
+                    report += "Inclination: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
+                    pointer += 4
+                    report += "Mean anomaly: " + str(math.degrees(cnv_signed_8_32(ecss_dict['data'][pointer:]) * 0.01)) + ", "
+                    pointer += 4
+                    report += "Mean motion: " + str(cnv8_32(ecss_dict['data'][pointer:]) * 0.1) + ", "
+                    pointer += 4
+                    report += "Sat No: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
                     pointer += 2
-                    content[0]['Dropped Unpacked'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                    report += "Epoch year: " + str(cnv8_16(ecss_dict['data'][pointer:])) + ", "
                     pointer += 2
+                    report += "Revolution No: " + str(cnv8_32(ecss_dict['data'][pointer:]))
 
-                    content_in = [{}]
-                    for i in range(1, packet_settings.LAST_APP_ID):
-                        sub_content = [{}]
-                        for j in range(1, packet_settings.LAST_APP_ID):
-                            sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
-                            pointer += 2
-                        content_in[0][i] = sub_content
-                    content[0]['In'] = json.loads(json.dumps(content_in, indent=2, sort_keys=True))
+                elif ecss_dict['app_id'] == packet_settings.ADCS_APP_ID and struct_id == packet_settings.SU_SCI_HDR_REP:
 
-                    content_out = [{}]
-                    for i in range(1, packet_settings.LAST_APP_ID):
-                        sub_content = [{}]
-                        for j in range(1, packet_settings.LAST_APP_ID):
-                            sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
-                            pointer += 2
-                        content_out[0][i] = sub_content
-                    content[0]['Out'] = json.loads(json.dumps(content_out, indent=2, sort_keys=True))
+                    pointer = 1
+                    report = "SU_SCI_HDR_REP "
 
+                    roll = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
+                    pointer += 2
+                    report += "roll " + str(roll) + " "
+
+                    pitch = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
+                    pointer += 2
+                    report += "pitch " + str(pitch) + " "
+
+                    yaw = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.01
+                    pointer += 2
+                    report += "yaw " + str(yaw) + " "
+
+                    roll_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
+                    pointer += 2
+                    report += "roll_dot " + str(roll_dot) + " "
+
+                    pitch_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
+                    pointer += 2
+                    report += "pitch_dot " + str(pitch_dot) + " "
+
+                    yaw_dot = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.001
+                    pointer += 2
+                    report += "yaw_dot " + str(yaw_dot) + " "
+
+                    x = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
+                    pointer += 2
+                    report += "x " + str(x) + " "
+
+                    y = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
+                    pointer += 2
+                    report += "y " + str(y) + " "
+
+                    z = cnv_signed_8_16(ecss_dict['data'][pointer:]) * 0.5
+                    pointer += 2
+                    report += "z " + str(z) + " "
+
+                elif ecss_dict['app_id'] == packet_settings.OBC_APP_ID and struct_id == packet_settings.EX_HEALTH_REP:
+
+                    pointer = 1
+                    report = obc_hk(ecss_dict['data'][pointer:])
+
+                elif struct_id == packet_settings.ECSS_STATS_REP:
+
+                    if len(ecss_dict['data']) == packet_settings.ECSS_STATS_REP_SIZE:
+
+                        pointer = 1
+                        content = [{}]
+
+                        content[0]['Dropped HLDLC'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                        pointer += 2
+                        content[0]['Dropped Unpacked'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                        pointer += 2
+
+                        content_in = [{}]
+                        for i in range(1, packet_settings.LAST_APP_ID):
+                            sub_content = [{}]
+                            for j in range(1, packet_settings.LAST_APP_ID):
+                                sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                                pointer += 2
+                            content_in[0][i] = sub_content
+                        content[0]['In'] = json.loads(json.dumps(content_in, indent=2, sort_keys=True))
+
+                        content_out = [{}]
+                        for i in range(1, packet_settings.LAST_APP_ID):
+                            sub_content = [{}]
+                            for j in range(1, packet_settings.LAST_APP_ID):
+                                sub_content[0][j] = str(cnv8_16(ecss_dict['data'][pointer:]))
+                                pointer += 2
+                            content_out[0][i] = sub_content
+                        content[0]['Out'] = json.loads(json.dumps(content_out, indent=2, sort_keys=True))
+
+                        report = json.dumps(content, indent=2, sort_keys=True)
+                    else:
+                        report = "ECSS Stats package has invalid length"
+
+                elif struct_id == packet_settings.EXT_WOD_REP:
+                    content = ext_wod_decode(ecss_dict['data'])
+
+                    report_pre = [{
+                        "type": "EXT_WOD",
+                        "content": content
+                    }]
+                    report = json.dumps(report_pre, indent=2, sort_keys=True)
+
+                    timestr = time.strftime("%Y%m%d-%H%M%S")
+                    fwname = log_path + "EXT_WOD_RX/ext_wod_" + timestr + ".json"
+                    myfile = open(fwname, 'w')
+                    myfile.write(report)
+                    myfile.close()
+
+                elif struct_id == packet_settings.WOD_REP:
+                    content = obc_wod_decode(ecss_dict['data'][1:])
                     report = json.dumps(content, indent=2, sort_keys=True)
-                else:
-                    report = "ECSS Stats package has invalid length"
 
-            elif struct_id == packet_settings.EXT_WOD_REP:
-                content = ext_wod_decode(ecss_dict['data'])
-
-                report_pre = [{
-                    "type": "EXT_WOD",
-                    "content": content
-                }]
-                report = json.dumps(report_pre, indent=2, sort_keys=True)
-
-                timestr = time.strftime("%Y%m%d-%H%M%S")
-                fwname = log_path + "EXT_WOD_RX/ext_wod_" + timestr + ".json"
-                myfile = open(fwname, 'w')
-                myfile.write(report)
-                myfile.close()
+            else:
+                report = "Empty Data packet"
 
             text = report
 
@@ -570,29 +581,29 @@ def eps_hk(ecss_data):
     pointer += 1
     content[0]['Heater status'] = str(ecss_data[pointer])
     pointer += 1
-    content[0]['TOP Voltage'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Y+ Voltage'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['TOP Current'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Y+ Current'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['TOP Duty'] = str(ecss_data[pointer])
+    content[0]['Y+ Duty'] = str(ecss_data[pointer])
     pointer += 1
-    content[0]['BOTTOM Voltage'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Y- Voltage'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['BOTTOM Current'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['Y- Current'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['BOTTOM Duty'] = str(ecss_data[pointer])
+    content[0]['Y- Duty'] = str(ecss_data[pointer])
     pointer += 1
-    content[0]['LEFT Voltage'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['X+ Voltage'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['LEFT Current'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['X+ Current'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['LEFT Duty'] = str(ecss_data[pointer])
+    content[0]['X+ Duty'] = str(ecss_data[pointer])
     pointer += 1
-    content[0]['RIGHT Voltage'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['X- Voltage'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['RIGHT Current'] = str(cnv8_16(ecss_data[pointer:]))
+    content[0]['X- Current'] = str(cnv8_16(ecss_data[pointer:]))
     pointer += 2
-    content[0]['RIGHT Duty'] = str(ecss_data[pointer])
+    content[0]['X- Duty'] = str(ecss_data[pointer])
     pointer += 1
     content[0]['Deployment Status'] = str(int('{0:08b}'.format(ecss_data[pointer])[:2], 2))
     content[0]['Safety Battery Mode'] = str(int('{0:08b}'.format(ecss_data[pointer])[2:5], 2))

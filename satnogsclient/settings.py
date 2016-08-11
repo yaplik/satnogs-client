@@ -16,14 +16,10 @@ GROUND_STATION_ID = _cast_or_none(int, environ.get('SATNOGS_STATION_ID', None))
 GROUND_STATION_LAT = _cast_or_none(float, environ.get('SATNOGS_STATION_LAT', None))
 GROUND_STATION_LON = _cast_or_none(float, environ.get('SATNOGS_STATION_LON', None))
 GROUND_STATION_ELEV = _cast_or_none(float, environ.get('SATNOGS_STATION_ELEV', None))
-RF_SW_CMD_OFF_1 = _cast_or_none(int, environ.get('RF_SW_CMD_OFF_1', None))
-RF_SW_CMD_OFF_2 = _cast_or_none(int, environ.get('RF_SW_CMD_OFF_2', None))
-RF_SW_CMD_OFF_3 = _cast_or_none(int, environ.get('RF_SW_CMD_OFF_3', None))
-RF_SW_CMD_OFF_4 = _cast_or_none(int, environ.get('RF_SW_CMD_OFF_4', None))
-RF_SW_CMD_ON_1 = _cast_or_none(int, environ.get('RF_SW_CMD_ON_1', None))
-RF_SW_CMD_ON_2 = _cast_or_none(int, environ.get('RF_SW_CMD_ON_2', None))
-RF_SW_CMD_ON_3 = _cast_or_none(int, environ.get('RF_SW_CMD_ON_3', None))
-RF_SW_CMD_ON_4 = _cast_or_none(int, environ.get('RF_SW_CMD_ON_4', None))
+RF_SW_CMD_OFF_INT = _cast_or_none(int, environ.get('RF_SW_CMD_OFF_INT', None))
+RF_SW_CMD_OFF_CHAR_SEQ = environ.get('RF_SW_CMD_OFF_CHAR_SEQ', None)
+RF_SW_CMD_ON_INT = _cast_or_none(int, environ.get('RF_SW_CMD_ON_INT', None))
+RF_SW_CMD_ON_CHAR_SEQ = environ.get('RF_SW_CMD_ON_CHAR_SEQ', None)
 
 
 # Output paths

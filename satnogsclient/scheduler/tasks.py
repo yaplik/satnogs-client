@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 import os
 import signal
@@ -13,6 +12,7 @@ import json
 from satnogsclient.scheduler import scheduler
 from flask_socketio import SocketIO
 from satnogsclient.upsat.large_data_service import downlink
+from satnogsclient.upsat.wod import wod_decode
 import subprocess
 
 import pytz
@@ -29,6 +29,7 @@ from time import sleep
 
 logger = logging.getLogger('satnogsclient')
 socketio = SocketIO(message_queue='redis://')
+log_path = settings.OUTPUT_PATH + "/files/"
 
 
 def signal_term_handler(a, b):
@@ -318,14 +319,28 @@ def wod_listener():
     sock = Udpsocket(('127.0.0.1', settings.WOD_UDP_PORT))
     while 1:
         try:
-            conn = sock.recv()
+            conn, addr = sock.recv()
         except IOError:
             logger.info('WOD listerner is terminated or something bad happened to accept')
             return
         logger.debug("WOD received %s", conn)
-        data = {}
-        data["type"] = "WOD"
-        data["content"] = str(conn)
+
+        # Write to disk the binary packet
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        fwname = log_path + "WOD_RX/wod_" + timestr + ".hex"
+        myfile = open(fwname, 'w')
+        myfile.write(conn)
+        myfile.close()
+
+        data = wod_decode(conn)
+
+        # Write to disk the decoded packet
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        fwname = log_path + "WOD_RX_DEC/wod_" + timestr + ".json"
+        myfile = open(fwname, 'w')
+        myfile.write(str(data['content']))
+        myfile.close()
+
         # Data must be sent to socket.io here
         socketio.emit('backend_msg', data, namespace='/control_rx', callback=success_message_to_frontend())
 

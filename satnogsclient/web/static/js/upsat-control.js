@@ -150,8 +150,8 @@ $(document).ready(function() {
             $('[id ^=sch][id $=row]').hide();
             $('#sch-app_id-row').show();
         }
-        
-        
+
+
     });
 
     $('#service-param-ms-action').on('change', function() {
@@ -510,7 +510,7 @@ $(document).ready(function() {
                 data.splice(2, 0, 0);
                 data.splice(3, 0, sch_app_id);
             }
-            
+
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
             ecss_cmd_socket.emit('ecss_command', request);
 
@@ -548,7 +548,7 @@ $(document).ready(function() {
             } else if (selected_action == 'auto') {
 
                 service_subtype = 1;
-                dateutc = moment();
+                dateutc = moment.utc();
 
                 if (dateutc.day() === 0) {
                     weekday = 7;
@@ -979,15 +979,17 @@ function print_command_response(data) {
     if (data.type == "WOD") {
         console.log('Received WOD');
         var wod_panel = $('#response-panel-body-wod ul');
+        console.log(data.content);
+        json_reponse = JSON.parse(data.content);
+        str_response = JSON.stringify(json_reponse);
+        log_data = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true" data-toggle="modal" data-target="#json-prettify"></span> <span>' + str_response + '</span>';
         wod_panel.append('<li><span class="label label-default" title="' + moment().format('YYYY/MM/DD').toString() + '">' + moment().format('HH:mm:ss').toString() +
-            '</span>' + data.content + '</li>');
+            '</span>' + log_data + '</li>');
 
         $('#response-panel-body-wod').scrollTop(wod_panel.height());
     } else {
         var response_panel = $('#response-panel-body ul');
         var data_type;
-        console.log(JSON.stringify(data));
-
         var resp = data;
 
         if (resp.id == 1) {
