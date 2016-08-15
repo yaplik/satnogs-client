@@ -20,7 +20,7 @@ def wod_decode(hex_payload):
         datasets = datasets[57:]
 
         dataset_datetime = EPOCH_DATE + timedelta(seconds=seconds)
-        seconds += 60
+        seconds -= 60
         satellite_datetime = datetime.strftime(dataset_datetime, '%Y%m%dT%H%M%SZ')
 
         # mode

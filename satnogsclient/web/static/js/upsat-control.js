@@ -38,7 +38,6 @@ $(document).ready(function() {
         console.log('Resend backend mode confirmation!');
     });
 
-
     config_socket.on('connect_error', function() {
         $('#backend-status').removeClass('online-circle').addClass('offline-circle').attr('title', 'Backend Offline');
         console.log('Frontend cannot connect to backend!');
@@ -150,8 +149,15 @@ $(document).ready(function() {
             $('[id ^=sch][id $=row]').hide();
             $('#sch-app_id-row').show();
         }
-        
-        
+    });
+
+    $('#service-param-mnlp-action').on('change', function() {
+        if ($('#service-param-mnlp-action').find("option:selected").val() == "su_manset_scr") {
+            $('[id ^=mnlp][id $=row]').hide();
+            $('#mnlp-suscr-row').show();
+        } else {
+            $('[id ^=mnlp][id $=row]').hide();
+        }
     });
 
     $('#service-param-ms-action').on('change', function() {
@@ -672,22 +678,34 @@ $(document).ready(function() {
         } else if (selected_value == "mnlp") {
             app_id = 1;
             type = 1;
+            data = [];
             ack = $('#service-param-mnlp-ack').val();
             dest_id = $('#service-param-mnlp-dest_id').val();
             service_type = 18;
             su_func = $('#service-param-mnlp-action').val();
-            if (su_func == 'su-reset-active') {
-                service_subtype = 13;
-                data = [];
-            } else if (su_func == 'su-service-scheduler-on') {
-                service_subtype = 24;
-                data = [1];
-            } else if (su_func == 'su-service-scheduler-off') {
-                service_subtype = 24;
-                data = [0];
-            } else if (su_func == 'su-notify-task') {
-                service_subtype = 22;
-                data = [1];
+
+            if (su_func == 'su_reset') {
+                service_subtype = 18;
+                data.splice(0, 0, 2);
+            } else if (su_func == 'su_service_scheduler_on') {
+                service_subtype = 18;
+                data.splice(0, 0, 0);
+                data.splice(1, 0, 1);
+            } else if (su_func == 'su_service_scheduler_off') {
+                service_subtype = 18;
+                data.splice(0, 0, 0);
+                data.splice(1, 0, 0);
+            } else if (su_func == 'su_notify_task') {
+                service_subtype = 15;
+            } else if (su_func == 'su_manset_scr') {
+                scr_no = $('#service-param-mnlp-suscr').val();
+                service_subtype = 18;
+                data.splice(0, 0, 1);
+                data.splice(1, 0, scr_no);
+            } else if (su_func == 'su_status_report') {
+                service_subtype = 16;
+            } else if (su_func == 'su_manual_ctrl') {
+                console.log("to be implemented");
             }
             request = encode_service(type, app_id, service_type, service_subtype, dest_id, ack, data);
             ecss_cmd_socket.emit('ecss_command', request);
@@ -1160,6 +1178,7 @@ function init(config_socket) {
     $('[id ^=adcs][id $=row]').hide();
     $('[id ^=sch][id $=row]').hide();
     $('#eps-safety-limits-row').hide();
+    $('[id ^=mnlp][id $=row]').hide();
 }
 
 function encode_mode_switch(mode) {

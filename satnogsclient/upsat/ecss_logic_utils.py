@@ -250,6 +250,40 @@ def ecss_logic(ecss_dict):
 
             text = "TIME: {0}".format(report)
 
+        elif ecss_dict['ser_type'] == packet_settings.TC_SU_MNLP_SERVICE:
+
+            content = [{}]
+            pointer = 0
+            content[0]['QB50_rep_time'] = str(cnv8_32(ecss_dict['data'][pointer:]))
+            pointer += 4
+            content[0]['QB50_last_su_resp_time'] = str(cnv8_32(ecss_dict['data'][pointer:]))
+            pointer += 4
+            content[0]['MNLP service scheduler active'] = str(ecss_dict['data'][pointer])
+            pointer += 1
+            content[0]['MNLP script scheduler active'] = str(ecss_dict['data'][pointer])
+            pointer += 1
+            content[0]['Last Active Script'] = str(ecss_dict['data'][pointer])
+            pointer += 1
+            content[0]['MNLP State'] = str(ecss_dict['data'][pointer])
+            pointer += 1
+            content[0]['MNLP Current TimeTable'] = str(ecss_dict['data'][pointer])
+            pointer += 1
+            content[0]['MNLP Current Script index'] = str(ecss_dict['data'][pointer])
+            pointer += 1
+            content[0]['MNLP Timed Out'] = str(ecss_dict['data'][pointer])
+            pointer += 1
+            content[0]['MNLP perm norm exec count'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+            pointer += 2
+            content[0]['MNLP perm on span exec count'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+            pointer += 2
+            content[0]['MNLP normal exec count'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+            pointer += 2
+            content[0]['MNLP span exec count'] = str(cnv8_16(ecss_dict['data'][pointer:]))
+            pointer += 2
+            content[0]['MNLP tt lost count '] = str(cnv8_16(ecss_dict['data'][pointer:]))
+
+            text = json.dumps(content, indent=2, sort_keys=True)
+
         elif ecss_dict['ser_type'] == packet_settings.TC_SCHEDULING_SERVICE:
 
             pointer = 0
