@@ -6,6 +6,7 @@ from satnogsclient import settings as client_settings
 from satnogsclient.upsat import packet, tx_handler, packet_settings, large_data_service
 
 from satnogsclient.observer.commsocket import Commsocket
+from satnogsclient.scheduler import tasks
 import logging
 import os
 
@@ -112,6 +113,23 @@ def handle_backend_change(data):
                 dict_out = {'backend': backend}
                 packet.custom_cmd_to_backend(dict_out)
                 emit('backend_msg', dict_out)
+
+
+@socketio.on('schedule_observation', namespace='/manual_observation')
+def handle_observation(data):
+    logger.info('Received manual observation: ' + str(data))
+    requested_command = json.loads(data)
+    # handle received observation
+    if json is not None:
+        dict_out = {'tle0': requested_command['tle0'],
+                    'tle1': requested_command['tle1'],
+                    'tle2': requested_command['tle2'],
+                    'start': requested_command['start_time'],
+                    'end': requested_command['end_time'],
+                    'frequency': requested_command['freq'],
+                    'id': requested_command['obs_id'],
+                    'mode': requested_command['mode']}
+        tasks.add_observation(dict_out)
 
 
 @socketio.on('ecss_command', namespace='/cmd')

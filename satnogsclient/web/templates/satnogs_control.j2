@@ -8,80 +8,82 @@
     <div class="page-header">
       <h1>Ground Station <small>Command&amp;Control</small></h1>
     </div>
-    <div class="gs-cnc-panel-minimal">
-      <div class="gs-cnc-panel-heading">
-        <h2 class="panel-title">New Observation</h2>
-        <div class="panel-subtitle">
-          <span class="glyphicon glyphicon-time glyphicon-weight" aria-hidden="true"></span>
-          Timeframes are in <a href="#" data-toggle="modal" data-target="#UTCModal">UTC</a>
-        </div>
-      </div>
-      <div class="gs-cnc panel-body">
-        <div class="row">
-          <div class="col-xs-12 col-md-4">
-            <div class="input-group">
-              <span class="input-group-addon" id="gs_cnc_id">ID</span>
-              <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1">
-            </div>
+    <div id="gs-cnc">
+      <div class="gs-cnc-panel-minimal">
+        <div class="gs-cnc-panel-heading">
+          <h2 class="panel-title">New Observation</h2>
+          <div class="panel-subtitle">
+            <span class="glyphicon glyphicon-time glyphicon-weight" aria-hidden="true"></span>
+            Timeframes are in <a href="#" data-toggle="modal" data-target="#UTCModal">UTC</a>
           </div>
         </div>
-        <div class="row">
-          <div class="col-xs-12 col-md-4">
-            <div class="input-group">
-              <span class="input-group-addon" id="gs_cnc_tle0">TLE 0</span>
-              <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1">
+        <div class="gs-cnc panel-body">
+          <div class="row">
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group">
+                <span class="input-group-addon">ID</span>
+                <input type="text" id="gs-cnc-id" class="form-control" placeholder="">
+              </div>
             </div>
           </div>
-          <div class="col-xs-12 col-md-4">
-            <div class="input-group">
-              <span class="input-group-addon" id="gs_cnc_tle1">TLE 1</span>
-              <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1">
+          <div class="row">
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group">
+                <span class="input-group-addon">TLE 0</span>
+                <input type="text" id="gs-cnc-tle0" class="form-control" placeholder="">
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group">
+                <span class="input-group-addon">TLE 1</span>
+                <input type="text" id="gs-cnc-tle1" class="form-control" placeholder="">
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group">
+                <span class="input-group-addon">TLE 2</span>
+                <input type="text" id="gs-cnc-tle2" class="form-control" placeholder="">
+              </div>
             </div>
           </div>
-          <div class="col-xs-12 col-md-4">
-            <div class="input-group">
-              <span class="input-group-addon" id="gs_cnc_tle2">TLE 2</span>
-              <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1">
+          <div class="row">
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group">
+                <span class="input-group-addon">Frequency</span>
+                <input type="text" id="gs-cnc-freq" class="form-control" placeholder="">
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group">
+                <span class="input-group-addon">Mode</span>
+                <input type="text" id="gs-cnc-mode" class="form-control" placeholder="">
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-xs-12 col-md-4">
-            <div class="input-group">
-              <span class="input-group-addon" id="gs_cnc_freq">Frequency</span>
-              <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1">
+          <div class="row">
+            <div class="col-xs-12 col-md-4">
+              <div class='input-group date' id="gs-cnc-start" style="display:table;">
+                <span class="input-group-addon">Start Time</span>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar glyphicon-weight"></span>
+                </span>
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class='input-group date' id="gs-cnc-end" style="display:table;">
+                <span class="input-group-addon">End Time</span>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar glyphicon-weight"></span>
+                </span>
+              </div>
             </div>
           </div>
-          <div class="col-xs-12 col-md-4">
-            <div class="input-group">
-              <span class="input-group-addon" id="gs_cnc_mode">Mode</span>
-              <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1">
+          <div class="row">
+            <div class="col-xs-12 col-md-12">
+              <button type="button" id="gs-cnc-set-observation" class="btn btn-primary">Schedule Observation</button>
             </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-xs-12 col-md-4">
-            <div class='input-group date' id='gs_cnc_start' style="display:table;">
-              <span class="input-group-addon">Start Time</span>
-              <input type='text' class="form-control" />
-              <span class="input-group-addon">
-                  <span class="glyphicon glyphicon-calendar glyphicon-weight"></span>
-              </span>
-            </div>
-          </div>
-          <div class="col-xs-12 col-md-4">
-            <div class='input-group date' id='gs_cnc_end' style="display:table;">
-              <span class="input-group-addon">End Time</span>
-              <input type='text' class="form-control" />
-              <span class="input-group-addon">
-                  <span class="glyphicon glyphicon-calendar glyphicon-weight"></span>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-xs-12 col-md-12">
-            <button type="button" id="gs-cnc-set-observation" class="btn btn-primary">Schedule Observation</button>
           </div>
         </div>
       </div>
