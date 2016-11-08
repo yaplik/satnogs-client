@@ -25,6 +25,7 @@ from satnogsclient.upsat.gnuradio_handler import read_from_gnuradio
 from time import sleep
 
 logger = logging.getLogger('satnogsclient')
+logging.basicConfig()
 socketio = SocketIO(message_queue='redis://')
 log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
 
@@ -265,8 +266,15 @@ def status_listener():
                 if int(os.environ['ECSS_FEEDER_PID']) != 0:
                     os.kill(int(os.environ['ECSS_FEEDER_PID']), signal.SIGTERM)
                     os.environ['ECSS_FEEDER_PID'] = '0'
-                os.environ['SCHEDULER'] = 'ON'
-                scheduler.start()
+                scheduler.remove_all_jobs()
+                interval = settings.NETWORK_API_QUERY_INTERVAL
+                scheduler.add_job(get_jobs, 'interval', minutes=interval)
+                msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
+                logger.info(msg)
+                interval = settings.NETWORK_API_POST_INTERVAL
+                msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
+                logger.info(msg)
+                scheduler.add_job(post_data, 'interval', minutes=interval)
                 tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT,))
                 tf.start()
                 os.environ['TASK_FEEDER_PID'] = str(tf.pid)
@@ -284,7 +292,7 @@ def kill_netw_proc():
         logger.info('Killing feeder %d', int(os.environ['TASK_FEEDER_PID']))
         os.kill(int(os.environ['TASK_FEEDER_PID']), signal.SIGTERM)
         os.environ['TASK_FEEDER_PID'] = '0'
-    scheduler.shutdown()
+    scheduler.remove_all_jobs()
     logger.info('Scheduler shutting down')
 
 
