@@ -1,5 +1,6 @@
 import logging
 import cPickle
+import subprocess
 
 from satnogsclient.upsat import packet_settings
 from satnogsclient import settings as client_settings
@@ -44,3 +45,16 @@ def read_from_gnuradio():
                 ecss_feeder_sock.sendto(pickled, ('127.0.0.1', client_settings.ECSS_FEEDER_UDP_PORT))
         except KeyError:
             logger.error('Ecss Dictionary not properly constructed. Error occured. Key \'ser_type\' not in dictionary')
+
+
+def exec_gnuradio(observation_id, freq):
+    arguments = {'filename': client_settings.OUTPUT_PATH + '/' + str(observation_id),
+                                                    'rx_device': client_settings.RX_DEVICE,
+                                                    'center_freq': str(freq)}
+    arg_string = ' '
+    arg_string += '--rx-sdr-device=' + arguments['rx_device'] + ' '
+    arg_string += '--file-path=' + arguments['filename'] + ' '
+    arg_string += '--rx-freq=' + arguments['center_freq'] + ' '
+    logger.info('Starting GNUradio python script')
+    proc = subprocess.Popen([client_settings.GNURADIO_SCRIPT_FILENAME + " " + arg_string], shell=True)
+    return proc

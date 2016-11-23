@@ -34,11 +34,12 @@ class Worker:
 
     _azimuth = None
     _altitude = None
+    _gnu_proc = None
 
     observer_dict = {}
     satellite_dict = {}
 
-    def __init__(self, ip, port, time_to_stop=None, frequency=None):
+    def __init__(self, ip, port, time_to_stop=None, frequency=None, proc=None):
         """Initialize worker class."""
         self._IP = ip
         self._PORT = port
@@ -46,6 +47,8 @@ class Worker:
             self._frequency = frequency
         if time_to_stop:
             self._observation_end = time_to_stop
+        if proc:
+            self._gnu_proc = proc
 
     @property
     def is_alive(self):
@@ -136,6 +139,8 @@ class Worker:
         """
         logger.info('Tracking stopped.')
         self.is_alive = False
+        if self._gnu_proc:
+            self._gnu_proc.terminate()
 
     def check_observation_end_reached(self):
         if datetime.now(pytz.utc) > self._observation_end:
@@ -158,7 +163,7 @@ class WorkerTrack(Worker):
 class WorkerFreq(Worker):
     def send_to_socket(self, p, sock):
         doppler_calc_freq = self._frequency * (1 - (p['rng_vlct'] / ephem.c))
-        msg = 'F {0}\n'.format(doppler_calc_freq)
+        msg = 'F {0}\n'.format(int(doppler_calc_freq))
         logger.debug('Initial frequency: {0}'.format(self._frequency))
         logger.debug('Rigctld msg: {0}'.format(msg))
         sock.send(msg)

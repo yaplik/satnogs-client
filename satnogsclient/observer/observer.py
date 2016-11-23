@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-
-
 from satnogsclient import settings
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
+from satnogsclient.upsat import gnuradio_handler
 logger = logging.getLogger('satnogsclient')
 
 
@@ -15,6 +14,7 @@ class Observer:
     _frequency = None
 
     _location = None
+    _gnu_proc = None
 
     _rot_ip = settings.ROT_IP
     _rot_port = settings.ROT_PORT
@@ -116,6 +116,8 @@ class Observer:
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
         # start thread for rotctl
+        logger.info('Start gnuradio thread.')
+        self._gnu_proc = gnuradio_handler.exec_gnuradio(self.observation_id, self.frequency)
         logger.info('Start rotctrl thread.')
         self.run_rot()
 
@@ -127,7 +129,8 @@ class Observer:
         self.tracker_rot = WorkerTrack(ip=self.rot_ip,
                                        port=self.rot_port,
                                        frequency=self.frequency,
-                                       time_to_stop=self.observation_end)
+                                       time_to_stop=self.observation_end,
+                                       proc=self._gnu_proc)
         logger.debug('TLE: {0}'.format(self.tle))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_rot.trackobject(self.location, self.tle)
@@ -137,7 +140,8 @@ class Observer:
         self.tracker_freq = WorkerFreq(ip=self.rig_ip,
                                        port=self.rig_port,
                                        frequency=self.frequency,
-                                       time_to_stop=self.observation_end)
+                                       time_to_stop=self.observation_end,
+                                       proc=self._gnu_proc)
         logger.debug('Frequency {0}'.format(self.frequency))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_freq.trackobject(self.location, self.tle)
