@@ -1,0 +1,23 @@
+# Sphinx
+sphinx
+Pygments
+setuptools
+docutils
+mkdocs
+mock
+pillow
+sphinx-rtd-theme
+alabaster
+commonmark
+recommonmark
+
+# satnogs-client
+APScheduler
+SQLAlchemy
+requests
+validators
+python-dateutil
+ephem
+pytz
+flask
+pyopenssl
