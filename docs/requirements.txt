@@ -21,3 +21,6 @@ ephem
 pytz
 flask
 pyopenssl
+pyserial
+flask-socketio
+redis
