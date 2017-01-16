@@ -47,10 +47,10 @@ def read_from_gnuradio():
             logger.error('Ecss Dictionary not properly constructed. Error occured. Key \'ser_type\' not in dictionary')
 
 
-def exec_gnuradio(observation_id, freq):
-    arguments = {'filename': client_settings.OUTPUT_PATH + '/' + str(observation_id),
-                                                    'rx_device': client_settings.RX_DEVICE,
-                                                    'center_freq': str(freq)}
+def exec_gnuradio(observation_file, freq):
+    arguments = {'filename': observation_file,
+                 'rx_device': client_settings.RX_DEVICE,
+                 'center_freq': str(freq)}
     arg_string = ' '
     arg_string += '--rx-sdr-device=' + arguments['rx_device'] + ' '
     arg_string += '--file-path=' + arguments['filename'] + ' '
