@@ -317,3 +317,9 @@ body {
 #gs-cnc-set-observation {
     float: right;
 }
+
+#timezone-utc,
+#timezone-local {
+    font-weight: bold;
+    font-size: 1.3em;
+}

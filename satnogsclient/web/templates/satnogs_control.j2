@@ -16,16 +16,38 @@
             <span class="glyphicon glyphicon-time glyphicon-weight" aria-hidden="true"></span>
             Timeframes are in <a href="#" data-toggle="modal" data-target="#UTCModal">UTC</a>
           </div>
+          <div class="modal fade" id="UTCModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                  </button>
+                  <h4 class="modal-title" id="UTCModalTitle"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></h4>
+                </div>
+                <div class="modal-body">
+                  <div class="panel panel-default">
+                    <div class="panel-heading">UTC</div>
+                    <div class="panel-body">
+                      <span id="timezone-utc"></span>
+                    </div>
+                  </div>
+                  <div class="panel panel-default">
+                    <div class="panel-heading">your local time</div>
+                    <div class="panel-body">
+                      <span id="timezone-local"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
         </div>
         <div class="gs-cnc panel-body">
-          <div class="row">
-            <div class="col-xs-12 col-md-4">
-              <div class="input-group">
-                <span class="input-group-addon">ID</span>
-                <input type="text" id="gs-cnc-id" class="form-control" placeholder="">
-              </div>
-            </div>
-          </div>
           <div class="row">
             <div class="col-xs-12 col-md-4">
               <div class="input-group">
@@ -86,6 +108,25 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="gs-cnc-panel-minimal">
+        <div class="gs-cnc-panel-heading">
+          <h2 class="panel-title">Scheduled Observations</h2>
+        </div>
+      </div>
+      <div>
+        <table class="table table-hover" id="scheduled_obs_table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Frequency</th>
+              <th>Encoding</th>
+              <th>Timeframe</th>
+            </tr>
+          </thead>
+            <tbody>
+            </tbody>
+        </table>
       </div>
     </div>
   </div>
