@@ -231,7 +231,7 @@ class Observer:
         if os.path.isfile(self.observation_raw_file):
             encoded = call(["oggenc", "-r",
                             "--raw-endianness", "0",
-                            "-R", "44100", "-B", "16", "-C", "1",
+                            "-R", "48000", "-B", "16", "-C", "1",
                             "-q", "10", "-o",
                             self.observation_temp_ogg_file,
                             self.observation_raw_file])
