@@ -25,6 +25,8 @@ class Observer:
     _observation_raw_file = None
     _observation_temp_ogg_file = None
     _observation_ogg_file = None
+    _observation_waterfall_file = None
+    _observation_waterfall_png = None
 
     _rot_ip = settings.ROT_IP
     _rot_port = settings.ROT_PORT
@@ -133,6 +135,22 @@ class Observer:
     def observation_ogg_file(self, observation_ogg_file):
         self._observation_ogg_file = observation_ogg_file
 
+    @property
+    def observation_waterfall_file(self):
+        return self._observation_waterfall_file
+
+    @observation_waterfall_file.setter
+    def observation_waterfall_file(self, observation_waterfall_file):
+        self._observation_waterfall_file = observation_waterfall_file
+
+    @property
+    def observation_waterfall_png(self):
+        return self._observation_waterfall_png
+
+    @observation_waterfall_png.setter
+    def observation_waterfall_png(self, observation_waterfall_png):
+        self._observation_waterfall_png = observation_waterfall_png
+
     def setup(self, observation_id, tle, observation_end, frequency):
         """
         Sets up required internal variables.
@@ -148,9 +166,12 @@ class Observer:
 
         not_completed_prefix = 'receiving_satnogs'
         completed_prefix = 'satnogs'
+        receiving_waterfall_prefix = 'receiving_waterfall'
+        waterfall_prefix = 'waterfall'
         timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S%z')
         raw_file_extension = 'out'
         encoded_file_extension = 'ogg'
+        waterfall_file_extension = 'dat'
         self.observation_raw_file = '{0}/{1}_{2}_{3}.{4}'.format(
             settings.OUTPUT_PATH,
             not_completed_prefix,
@@ -168,12 +189,26 @@ class Observer:
             self.observation_id,
             timestamp,
             encoded_file_extension)
+        self.observation_waterfall_file = '{0}/{1}_{2}_{3}.{4}'.format(
+            settings.OUTPUT_PATH,
+            receiving_waterfall_prefix,
+            self.observation_id,
+            timestamp,
+            waterfall_file_extension)
+        self.observation_waterfall_png = '{0}/{1}_{2}_{3}.{4}'.format(
+            settings.OUTPUT_PATH,
+            waterfall_prefix,
+            self.observation_id,
+            timestamp,
+            'png')
 
         return all([self.observation_id, self.tle,
                     self.observation_end, self.frequency,
                     self.observation_raw_file,
                     self.observation_temp_ogg_file,
-                    self.observation_ogg_file])
+                    self.observation_ogg_file,
+                    self.observation_waterfall_file,
+                    self.observation_waterfall_png])
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
@@ -181,6 +216,7 @@ class Observer:
         logger.info('Start gnuradio thread.')
         self._gnu_proc = gnuradio_handler.exec_gnuradio(
             self.observation_raw_file,
+            self.observation_waterfall_file,
             self.frequency)
         logger.info('Start rotctrl thread.')
         self.run_rot()
@@ -195,6 +231,8 @@ class Observer:
             self.ogg_enc()
             logger.info('Rename encoded file for uploading.')
             self.rename_ogg_file()
+            logger.info('Creating waterfall plot.')
+            self.plot_waterfall()
 
     def run_rot(self):
         self.tracker_rot = WorkerTrack(ip=self.rot_ip,
@@ -238,9 +276,28 @@ class Observer:
             logger.info('Encoding Finished')
             if encoded == 0 and settings.REMOVE_RAW_FILES:
                 self.remove_raw_file()
+        else:
+            logger.info('No observation raw file found')
 
     def rename_ogg_file(self):
         if os.path.isfile(self.observation_temp_ogg_file):
             os.rename(self.observation_temp_ogg_file,
                       self.observation_ogg_file)
         logger.info('Rename encoded file for uploading finished')
+
+    def plot_waterfall(self):
+        if os.path.isfile(self.observation_waterfall_file):
+            plot = call("gnuplot -e \"inputfile='%s'\" -e \"outfile='%s'\" \
+                        /usr/share/satnogs/scripts/satnogs_waterfall.gp" %
+                        (self.observation_waterfall_file,
+                        self.observation_waterfall_png),
+                        shell=True)
+            logger.info('Waterfall plot finished')
+            if plot == 0 and settings.REMOVE_RAW_FILES:
+                self.remove_waterfall_file()
+        else:
+            logger.info('No waterfall data file found')
+
+    def remove_waterfall_file(self):
+        if os.path.isfile(self.observation_waterfall_file):
+            os.remove(self.observation_waterfall_file)

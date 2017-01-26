@@ -84,6 +84,12 @@ def post_data():
         # Ignore files in receiving state
         if f.startswith('receiving'):
             continue
+
+        # temporary skip of waterfall until we integrate with Network
+        # TODO replace with network API code for waterfall
+        if f.startswith('waterfall'):
+            continue
+
         observation_id = f.split('_')[1]
         logger.info('Trying to PUT observation data for id: {0}'.format(observation_id))
         file_path = os.path.join(*[settings.OUTPUT_PATH, f])
