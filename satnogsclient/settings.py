@@ -29,7 +29,7 @@ for p in [SATNOGS_APP_PATH, SATNOGS_OUTPUT_PATH, SATNOGS_COMPLETE_OUTPUT_PATH, S
     if not os.path.exists(p):
         os.mkdir(p)
 
-SATNOGS_REMOVE_RAW_FILES = environ.get("SATNOGS_REMOVE_RAW_FILES, 'True'")
+SATNOGS_REMOVE_RAW_FILES = bool(strtobool(environ.get('SATNOGS_REMOVE_RAW_FILES', 'True')))
 
 SATNOGS_VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
 DEFAULT_SQLITE_PATH = path.join(SATNOGS_APP_PATH, 'jobs.sqlite')
