@@ -47,16 +47,27 @@ def read_from_gnuradio():
             logger.error('Ecss Dictionary not properly constructed. Error occured. Key \'ser_type\' not in dictionary')
 
 
-def exec_gnuradio(observation_file, waterfall_file, freq):
+def exec_gnuradio(observation_file, waterfall_file, freq, user_args, script_name):
     arguments = {'filename': observation_file,
                  'waterfall': waterfall_file,
                  'rx_device': client_settings.SATNOGS_RX_DEVICE,
-                 'center_freq': str(freq)}
+                 'center_freq': str(freq),
+                 'user_args': user_args,
+                 'script_name': script_name}
+    if user_args != '':
+        if '--rx-freq=' in user_args:
+            rx_freq = user_args.split('--rx-freq=')[1].split(' ')[0] 
+        else:
+            rx_freq = arguments['center_freq'];
+        if '--rx-sdr-device=' in user_args:
+            device = user_args.split('--rx-sdr-device=')[1].split(' ')[0]
+        else:
+            device = arguments['rx_device']
     arg_string = ' '
-    arg_string += '--rx-sdr-device=' + arguments['rx_device'] + ' '
+    arg_string += '--rx-sdr-device=' + device + ' '
     arg_string += '--file-path=' + arguments['filename'] + ' '
     arg_string += '--waterfall-file-path=' + arguments['waterfall'] + ' '
-    arg_string += '--rx-freq=' + arguments['center_freq'] + ' '
+    arg_string += '--rx-freq=' + rx_freq + ' '
     logger.info('Starting GNUradio python script')
-    proc = subprocess.Popen([client_settings.GNURADIO_SCRIPT_FILENAME + " " + arg_string], shell=True)
+    proc = subprocess.Popen([arguments['script_name'] + " " + arg_string], shell=True)
     return proc

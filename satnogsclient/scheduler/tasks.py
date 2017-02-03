@@ -57,13 +57,20 @@ def spawn_observer(*args, **kwargs):
         'lat': settings.SATNOGS_STATION_LAT,
         'elev': settings.SATNOGS_STATION_ELEV
     }
-
+    frequency = ""
+    if 'user_args' in obj:
+        user_args = obj['user_args']
+    else:
+        user_args = ""
+        frequency = obj['frequency']
     setup_kwargs = {
         'observation_id': obj['id'],
         'tle': tle,
         'observation_end': end,
-        'frequency': obj['frequency']
-    }
+        'frequency': frequency,
+        'gnuradio-args' : user_args,
+        'gnuradio-flowgraph': script_name
+        }
 
     logger.debug('Observer args: {0}'.format(setup_kwargs))
     setup = observer.setup(**setup_kwargs)
