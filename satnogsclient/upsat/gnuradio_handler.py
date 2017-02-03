@@ -50,7 +50,7 @@ def read_from_gnuradio():
 def exec_gnuradio(observation_file, waterfall_file, freq):
     arguments = {'filename': observation_file,
                  'waterfall': waterfall_file,
-                 'rx_device': client_settings.RX_DEVICE,
+                 'rx_device': client_settings.SATNOGS_RX_DEVICE,
                  'center_freq': str(freq)}
     arg_string = ' '
     arg_string += '--rx-sdr-device=' + arguments['rx_device'] + ' '

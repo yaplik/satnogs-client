@@ -102,7 +102,7 @@ Now, for the SatNOGS supervisord config file. This is also where you will config
    autostart=true
    autorestart=true
    user=debian
-   environment=SATNOGS_SQLITE_URL="sqlite:////tmp/jobs.sqlite",SATNOGS_API_URL="https://network.satnogs.org/api/",SATNOGS_API_TOKEN="<TOKEN>",SATNOGS_VERIFY_SSL="TRUE",SATNOGS_STATION_ID="<ID>",SATNOGS_STATION_LAT="<LATITUDE>",SATNOGS_STATION_LON="<LONGITUDE>",SATNOGS_STATION_ELEV="<ELEVATION>",SATNOGS_PPM_ERROR="<PPM>"
+   environment=SATNOGS_SQLITE_URL="sqlite:////tmp/jobs.sqlite",SATNOGS_NETWORK_API_URL="https://network.satnogs.org/api/",SATNOGS_API_TOKEN="<TOKEN>",SATNOGS_VERIFY_SSL="TRUE",SATNOGS_STATION_ID="<ID>",SATNOGS_STATION_LAT="<LATITUDE>",SATNOGS_STATION_LON="<LONGITUDE>",SATNOGS_STATION_ELEV="<ELEVATION>",SATNOGS_PPM_ERROR="<PPM>"
 
 Obviously there are fields above that will need to be configured appropriately, your latitude/longitude/elevation (example: 43.210 -86.123, elevation is in meters), API token, station ID, and PPM. Log in to the SatNOGS Network console and click on your user icon in the upper-right, then "My Profile". If you have not already added your ground station to the web site please do so now with the "Add Ground Station" button. Once that is done your ground station ID will be shown. In this screen as well you can click the "API Key" button for the token needed in the configuration above. All settings that can be changed in the environment can be found in the [settings.py file](https://github.com/satnogs/satnogs-client/blob/master/satnogsclient/settings.py)
 

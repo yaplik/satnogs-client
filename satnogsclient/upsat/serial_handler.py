@@ -20,7 +20,7 @@ def init():
     global ui_listener_sock
     global ld_socket
     try:
-        port = serial.Serial(client_settings.SERIAL_PORT, baudrate=9600, timeout=1.0)
+        port = serial.Serial(client_settings.SATNOGS_SERIAL_PORT, baudrate=9600, timeout=1.0)
     except serial.SerialException as e:
         logger.error('Could not open serial port. Error occured')
         logger.error(e)

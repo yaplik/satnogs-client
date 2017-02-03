@@ -11,7 +11,7 @@ from satnogsclient.upsat.wod import obc_wod_decode
 
 
 logger = logging.getLogger('satnogsclient')
-log_path = settings.OUTPUT_PATH + "/files/"
+log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
 
 
 def ecss_logic(ecss_dict):

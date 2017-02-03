@@ -26,7 +26,7 @@ from time import sleep
 
 logger = logging.getLogger('satnogsclient')
 socketio = SocketIO(message_queue='redis://')
-log_path = settings.OUTPUT_PATH + "/files/"
+log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
 
 
 def signal_term_handler(a, b):
@@ -52,9 +52,9 @@ def spawn_observer(*args, **kwargs):
 
     observer = Observer()
     observer.location = {
-        'lon': settings.GROUND_STATION_LON,
-        'lat': settings.GROUND_STATION_LAT,
-        'elev': settings.GROUND_STATION_ELEV
+        'lon': settings.SATNOGS_STATION_LON,
+        'lat': settings.SATNOGS_STATION_LAT,
+        'elev': settings.SATNOGS_STATION_ELEV
     }
 
     setup_kwargs = {
@@ -77,16 +77,16 @@ def spawn_observer(*args, **kwargs):
 def post_data():
     logger.info('Post data started')
     """PUT observation data back to Network API."""
-    base_url = urljoin(settings.NETWORK_API_URL, 'data/')
-    headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
+    base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'data/')
+    headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
 
-    for f in os.walk(settings.OUTPUT_PATH).next()[2]:
+    for f in os.walk(settings.SATNOGS_OUTPUT_PATH).next()[2]:
         # Ignore files in receiving state
         if f.startswith('receiving'):
             continue
         observation_id = f.split('_')[1]
         logger.info('Trying to PUT observation data for id: {0}'.format(observation_id))
-        file_path = os.path.join(*[settings.OUTPUT_PATH, f])
+        file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, f])
         if f.startswith('satnogs'):
             observation = {'payload': open(file_path, 'rb')}
         elif f.startswith('waterfall'):
@@ -100,27 +100,27 @@ def post_data():
         logger.debug('Observation file: {0}'.format(observation))
         response = requests.put(url, headers=headers,
                                 files=observation,
-                                verify=settings.VERIFY_SSL)
+                                verify=settings.SATNOGS_VERIFY_SSL)
         if response.status_code == 200:
             logger.info('Success: status code 200')
-            dst = os.path.join(settings.COMPLETE_OUTPUT_PATH, f)
+            dst = os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, f)
         else:
             logger.error('Bad status code: {0}'.format(response.status_code))
-            dst = os.path.join(settings.INCOMPLETE_OUTPUT_PATH, f)
-        os.rename(os.path.join(settings.OUTPUT_PATH, f), dst)
+            dst = os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, f)
+        os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, f), dst)
 
 
 def get_jobs():
     logger.info('Get jobs started')
     """Query SatNOGS Network API to GET jobs."""
-    url = urljoin(settings.NETWORK_API_URL, 'jobs/')
-    params = {'ground_station': settings.GROUND_STATION_ID}
-    headers = {'Authorization': 'Token {0}'.format(settings.API_TOKEN)}
+    url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'jobs/')
+    params = {'ground_station': settings.SATNOGS_STATION_ID}
+    headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
     logger.debug('URL: {0}'.format(url))
     logger.debug('Params: {0}'.format(params))
     logger.debug('Headers: {0}'.format(headers))
     logger.info('Trying to GET observation jobs from the network')
-    response = requests.get(url, params=params, headers=headers, verify=settings.VERIFY_SSL)
+    response = requests.get(url, params=params, headers=headers, verify=settings.SATNOGS_VERIFY_SSL)
 
     if not response.status_code == 200:
         raise Exception('Status code: {0} on request: {1}'.format(response.status_code, url))
@@ -198,11 +198,11 @@ def status_listener():
     logger.info('Starting scheduler...')
     scheduler.start()
     scheduler.remove_all_jobs()
-    interval = settings.NETWORK_API_QUERY_INTERVAL
+    interval = settings.SATNOGS_NETWORK_API_QUERY_INTERVAL
     scheduler.add_job(get_jobs, 'interval', minutes=interval)
     msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
     logger.info(msg)
-    interval = settings.NETWORK_API_POST_INTERVAL
+    interval = settings.SATNOGS_NETWORK_API_POST_INTERVAL
     msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
     logger.info(msg)
     scheduler.add_job(post_data, 'interval', minutes=interval)
@@ -362,6 +362,6 @@ def rigctld_subprocess():
         rig_args += "-P " + settings.RIG_PTT_TYPE + " "
     if settings.RIG_SERIAL_SPEED != "":
         rig_args += "-s " + settings.RIG_SERIAL_SPEED + " "
-    rig_args += "-t " + str(settings.RIG_PORT)
+    rig_args += "-t " + str(settings.SATNOGS_RIG_PORT)
     logger.info('Starting rigctl daemon')
     os.system("rigctld" + rig_args)

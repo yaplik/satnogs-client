@@ -28,11 +28,11 @@ class Observer:
     _observation_waterfall_file = None
     _observation_waterfall_png = None
 
-    _rot_ip = settings.ROT_IP
-    _rot_port = settings.ROT_PORT
+    _rot_ip = settings.SATNOGS_ROT_IP
+    _rot_port = settings.SATNOGS_ROT_PORT
 
-    _rig_ip = settings.RIG_IP
-    _rig_port = settings.RIG_PORT
+    _rig_ip = settings.SATNOGS_RIG_IP
+    _rig_port = settings.SATNOGS_RIG_PORT
 
     # Variables from settings
     # Mainly present so we can support multiple ground stations from the client
@@ -173,30 +173,30 @@ class Observer:
         encoded_file_extension = 'ogg'
         waterfall_file_extension = 'dat'
         self.observation_raw_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.OUTPUT_PATH,
+            settings.SATNOGS_OUTPUT_PATH,
             not_completed_prefix,
             self.observation_id,
             timestamp, raw_file_extension)
         self.observation_temp_ogg_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.OUTPUT_PATH,
+            settings.SATNOGS_OUTPUT_PATH,
             not_completed_prefix,
             self.observation_id,
             timestamp,
             encoded_file_extension)
         self.observation_ogg_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.OUTPUT_PATH,
+            settings.SATNOGS_OUTPUT_PATH,
             completed_prefix,
             self.observation_id,
             timestamp,
             encoded_file_extension)
         self.observation_waterfall_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.OUTPUT_PATH,
+            settings.SATNOGS_OUTPUT_PATH,
             receiving_waterfall_prefix,
             self.observation_id,
             timestamp,
             waterfall_file_extension)
         self.observation_waterfall_png = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.OUTPUT_PATH,
+            settings.SATNOGS_OUTPUT_PATH,
             waterfall_prefix,
             self.observation_id,
             timestamp,
@@ -274,7 +274,7 @@ class Observer:
                             self.observation_temp_ogg_file,
                             self.observation_raw_file])
             logger.info('Encoding Finished')
-            if encoded == 0 and settings.REMOVE_RAW_FILES:
+            if encoded == 0 and settings.SATNOGS_REMOVE_RAW_FILES:
                 self.remove_raw_file()
         else:
             logger.info('No observation raw file found')
@@ -293,7 +293,7 @@ class Observer:
                         self.observation_waterfall_png),
                         shell=True)
             logger.info('Waterfall plot finished')
-            if plot == 0 and settings.REMOVE_RAW_FILES:
+            if plot == 0 and settings.SATNOGS_REMOVE_RAW_FILES:
                 self.remove_waterfall_file()
         else:
             logger.info('No waterfall data file found')

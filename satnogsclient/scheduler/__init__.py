@@ -9,7 +9,7 @@ from satnogsclient import settings
 
 
 jobstores = {
-    'default': SQLAlchemyJobStore(url=settings.SQLITE_URL)
+    'default': SQLAlchemyJobStore(url=settings.SATNOGS_SQLITE_URL)
 }
 
 executors = {

@@ -17,7 +17,7 @@ log_path = ""
 
 def folder_init():
     global log_path
-    log_path = settings.OUTPUT_PATH + "/files/"
+    log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
     logger.info("Dir %s", log_path)
     if not os.path.exists(log_path):
         logger.info("Made dir %s", log_path)
