@@ -16,7 +16,6 @@ $(document).ready(function() {
   });
 
   manual_observation_socket.on('backend_msg', function(data) {
-      console.log(data);
       if (data.response_type == 'init' || data.response_type == 'obs_success') {
         append_manual_obs_list(data.scheduled_observation_list);
       } else if (data.response_type == 'obs_end') {
@@ -49,15 +48,20 @@ function init() {
   }
 
   display_control_view(current_mode);
-
-  datetimepicker_start = $('#gs-cnc-start').datetimepicker({
-      format: 'YYYY-MM-DD HH:mm',
-      timeZone: 'UTC',
+  var minstart = $('#gs-cnc-start').data('date-minstart');
+  var minend = $('#gs-cnc-end').data('date-minend');
+  var maxrange = $('#gs-cnc-end').data('date-maxrange');
+  $('#gs-cnc-start').datetimepicker({
+      format: 'YYYY-MM-DD HH:mm'
   });
-
-  datetimepicker_end = $('#gs-cnc-end').datetimepicker({
-      format: 'YYYY-MM-DD HH:mm',
-      timeZone: 'U',
+  $('#gs-cnc-start').data('DateTimePicker').minDate(moment.utc().add(minstart, 'm'));
+  $('#gs-cnc-end').datetimepicker({
+      format: 'YYYY-MM-DD HH:mm'
+  });
+  $('#gs-cnc-end').data('DateTimePicker').minDate(moment.utc().add(minend, 'm'));
+  $("#gs-cnc-start").on('dp.change',function (e) {
+      // Setting default, minimum and maximum for end
+      $('#gs-cnc-end').data('DateTimePicker').defaultDate($('#gs-cnc-start').data("DateTimePicker").date().add(1, 'm'));
   });
 
 }
@@ -78,17 +82,17 @@ function encode_backend_message() {
   var tle0 = $("#gs-cnc-tle0").val();
   var tle1 = $("#gs-cnc-tle1").val();
   var tle2 = $("#gs-cnc-tle2").val();
-  var freq = $("#gs-cnc-freq").val();
-  var mode = $("#gs-cnc-mode").val();
-  var start_time = datetimepicker_start.data("DateTimePicker").date().utc().add(datetimepicker_start.data("DateTimePicker").date().utcOffset(), 'm').format();
-  var end_time = datetimepicker_end.data("DateTimePicker").date().utc().add(datetimepicker_end.data("DateTimePicker").date().utcOffset(), 'm').format();
+  var flowgraph = $('#gs-cnc-gnuradio-flowgraph').find("option:selected").text();
+  var args = $('#gs-cnc-gnuradio-args').val();
+  var start_time = $('#gs-cnc-start').data("DateTimePicker").date();
+  var end_time = $('#gs-cnc-end').data("DateTimePicker").date();
 
   var msg = {};
   msg.tle0 = tle0;
   msg.tle1 = tle1;
   msg.tle2 = tle2;
-  msg.freq = freq;
-  msg.mode = mode;
+  msg.script_name = flowgraph;
+  msg.user_args = args;
   msg.start_time = start_time;
   msg.end_time = end_time;
 
@@ -101,15 +105,13 @@ function encode_backend_message() {
 function append_manual_obs_list(obs_list) {
     for (var i = 0; i < obs_list.length; i++) {
         var obs_id = obs_list[i].id;
-        var mode = obs_list[i].mode;
-        var freq = obs_list[i].frequency;
-        var start_time = moment(obs_list[i].start).format("YYYY-MM-DD HH:mm");
-        var end_time = moment(obs_list[i].end).format("YYYY-MM-DD HH:mm");
+        var script_name = obs_list[i].script_name;
+        var start_time = moment(obs_list[i].start).utc().format("YYYY-MM-DD HH:mm");
+        var end_time = moment(obs_list[i].end).utc().format("YYYY-MM-DD HH:mm");
         $("#scheduled_obs_table").find('tbody')
             .append($('<tr>')
                 .append($('<td>' + obs_id + '</td>' +
-                      '<td>' + freq + '</td>'  +
-                      '<td>' + mode + '</td>'  +
+                      '<td>' + script_name + '</td>'  +
                       '<td>' + start_time + ' - ' + end_time +'</td>'))
             );
     }

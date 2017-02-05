@@ -60,6 +60,8 @@ def spawn_observer(*args, **kwargs):
     frequency = ""
     if 'user_args' in obj:
         user_args = obj['user_args']
+        script_name = obj['script_name']
+        frequency = 1e6
     else:
         user_args = ""
         frequency = obj['frequency']
@@ -68,9 +70,9 @@ def spawn_observer(*args, **kwargs):
         'tle': tle,
         'observation_end': end,
         'frequency': frequency,
-        'gnuradio-args' : user_args,
-        'gnuradio-flowgraph': script_name
-        }
+        'user_args': user_args,
+        'script_name': script_name
+    }
 
     logger.debug('Observer args: {0}'.format(setup_kwargs))
     setup = observer.setup(**setup_kwargs)
