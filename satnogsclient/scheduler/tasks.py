@@ -81,12 +81,13 @@ def post_data():
     headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
 
     for f in os.walk(settings.SATNOGS_OUTPUT_PATH).next()[2]:
-        # Ignore files in receiving state
-        if f.startswith('receiving'):
+        file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, f])
+        # Ignore files in receiving state or without data
+        if (f.startswith('receiving') or
+                os.stat(file_path).st_size == 0):
             continue
         observation_id = f.split('_')[1]
         logger.info('Trying to PUT observation data for id: {0}'.format(observation_id))
-        file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, f])
         if f.startswith('satnogs'):
             observation = {'payload': open(file_path, 'rb')}
         elif f.startswith('waterfall'):
