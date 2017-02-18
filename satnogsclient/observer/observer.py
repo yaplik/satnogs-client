@@ -23,7 +23,6 @@ class Observer:
     _gnu_proc = None
 
     _observation_raw_file = None
-    _observation_temp_ogg_file = None
     _observation_ogg_file = None
     _observation_waterfall_file = None
     _observation_waterfall_png = None
@@ -120,14 +119,6 @@ class Observer:
         self._observation_raw_file = observation_raw_file
 
     @property
-    def observation_temp_ogg_file(self):
-        return self._observation_temp_ogg_file
-
-    @observation_temp_ogg_file.setter
-    def observation_temp_ogg_file(self, observation_temp_ogg_file):
-        self._observation_temp_ogg_file = observation_temp_ogg_file
-
-    @property
     def observation_ogg_file(self):
         return self._observation_ogg_file
 
@@ -177,12 +168,6 @@ class Observer:
             not_completed_prefix,
             self.observation_id,
             timestamp, raw_file_extension)
-        self.observation_temp_ogg_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH,
-            not_completed_prefix,
-            self.observation_id,
-            timestamp,
-            encoded_file_extension)
         self.observation_ogg_file = '{0}/{1}_{2}_{3}.{4}'.format(
             settings.SATNOGS_OUTPUT_PATH,
             completed_prefix,
@@ -205,7 +190,6 @@ class Observer:
         return all([self.observation_id, self.tle,
                     self.observation_end, self.frequency,
                     self.observation_raw_file,
-                    self.observation_temp_ogg_file,
                     self.observation_ogg_file,
                     self.observation_waterfall_file,
                     self.observation_waterfall_png])
@@ -227,8 +211,6 @@ class Observer:
         # Polling gnuradio process status
         self.poll_gnu_proc_status()
         if "satnogs_fm_demod.py" in settings.GNURADIO_SCRIPT_FILENAME:
-            logger.info('Start encoding to ogg.')
-            self.ogg_enc()
             logger.info('Rename encoded file for uploading.')
             self.rename_ogg_file()
             logger.info('Creating waterfall plot.')
@@ -261,27 +243,9 @@ class Observer:
             sleep(30)
         logger.info('Observation Finished')
 
-    def remove_raw_file(self):
-        if os.path.isfile(self.observation_raw_file):
-            os.remove(self.observation_raw_file)
-
-    def ogg_enc(self):
-        if os.path.isfile(self.observation_raw_file):
-            encoded = call(["oggenc", "-r",
-                            "--raw-endianness", "0",
-                            "-R", "48000", "-B", "16", "-C", "1",
-                            "-q", "10", "-o",
-                            self.observation_temp_ogg_file,
-                            self.observation_raw_file])
-            logger.info('Encoding Finished')
-            if encoded == 0 and settings.SATNOGS_REMOVE_RAW_FILES:
-                self.remove_raw_file()
-        else:
-            logger.info('No observation raw file found')
-
     def rename_ogg_file(self):
-        if os.path.isfile(self.observation_temp_ogg_file):
-            os.rename(self.observation_temp_ogg_file,
+        if os.path.isfile(self.observation_raw_file):
+            os.rename(self.observation_raw_file,
                       self.observation_ogg_file)
         logger.info('Rename encoded file for uploading finished')
 
