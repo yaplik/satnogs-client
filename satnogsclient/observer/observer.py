@@ -251,7 +251,8 @@ class Observer:
 
     def plot_waterfall(self):
         if os.path.isfile(self.observation_waterfall_file):
-            plot = call("gnuplot -e \"inputfile='%s'\" -e \"outfile='%s'\" \
+            plot = call("gnuplot -e \"inputfile='%s'\" \
+                         -e \"outfile='%s'\" -e \"height=1600\" \
                         /usr/share/satnogs/scripts/satnogs_waterfall.gp" %
                         (self.observation_waterfall_file,
                         self.observation_waterfall_png),
