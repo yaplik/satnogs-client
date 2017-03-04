@@ -101,7 +101,8 @@ def post_data():
         logger.debug('Observation file: {0}'.format(observation))
         response = requests.put(url, headers=headers,
                                 files=observation,
-                                verify=settings.SATNOGS_VERIFY_SSL)
+                                verify=settings.SATNOGS_VERIFY_SSL,
+                                stream=True)
         if response.status_code == 200:
             logger.info('Success: status code 200')
             dst = os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, f)
