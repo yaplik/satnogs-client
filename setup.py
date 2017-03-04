@@ -35,5 +35,4 @@ setup(name='satnogsclient',
       extras_require={
           "develop": develop_requires
       },
-      scripts=['satnogsclient/bin/satnogs-poller',
-               'satnogsclient/bin/satnogs-task'])
+      scripts=['satnogsclient/bin/satnogs-poller'])
