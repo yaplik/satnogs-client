@@ -145,10 +145,9 @@ def handle_observation(data):
                     'tle2': requested_command['tle2'],
                     'start': requested_command['start_time'],
                     'end': requested_command['end_time'],
+                    'frequency': requested_command['freq'],
                     'id': obs_id,
-                    'script_name': requested_command['script_name'],
-                    'user_args': requested_command['user_args']
-                    }
+                    'mode': requested_command['mode']}
         logger.info(dict_out)
         obs = tasks.add_observation(dict_out)
         if obs is not None:

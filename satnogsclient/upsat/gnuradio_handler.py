@@ -56,9 +56,9 @@ def exec_gnuradio(observation_file, waterfall_file, freq, user_args, script_name
                  'script_name': script_name}
     if user_args != '':
         if '--rx-freq=' in user_args:
-            rx_freq = user_args.split('--rx-freq=')[1].split(' ')[0]
+            rx_freq = user_args.split('--rx-freq=')[1].split(' ')[0] 
         else:
-            rx_freq = arguments['center_freq']
+            rx_freq = arguments['center_freq'];
         if '--rx-sdr-device=' in user_args:
             device = user_args.split('--rx-sdr-device=')[1].split(' ')[0]
         else:

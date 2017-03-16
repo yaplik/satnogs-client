@@ -189,8 +189,7 @@ class Observer:
             timestamp,
             'png')
 
-        return all([self.observation_id, self.user_args,
-                    self.script_name, self.tle,
+        return all([self.observation_id, self.tle,
                     self.observation_end, self.frequency,
                     self.observation_raw_file,
                     self.observation_ogg_file,
