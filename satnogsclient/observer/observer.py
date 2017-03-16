@@ -142,7 +142,7 @@ class Observer:
     def observation_waterfall_png(self, observation_waterfall_png):
         self._observation_waterfall_png = observation_waterfall_png
 
-    def setup(self, observation_id, tle, observation_end, frequency, user_args, script_name):
+    def setup(self, observation_id, tle, observation_end, frequency):
         """
         Sets up required internal variables.
         * returns True if setup is ok
@@ -151,8 +151,6 @@ class Observer:
 
         # Set attributes
         self.observation_id = observation_id
-        self.user_args = user_args
-        self.script_name = script_name
         self.tle = tle
         self.observation_end = observation_end
         self.frequency = frequency
@@ -203,9 +201,7 @@ class Observer:
         self._gnu_proc = gnuradio_handler.exec_gnuradio(
             self.observation_raw_file,
             self.observation_waterfall_file,
-            self.frequency,
-            self.user_args,
-            self.script_name)
+            self.frequency)
         logger.info('Start rotctrl thread.')
         self.run_rot()
 
