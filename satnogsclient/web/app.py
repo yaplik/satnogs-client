@@ -4,6 +4,7 @@ from multiprocessing import Process
 
 from satnogsclient import settings as client_settings
 from satnogsclient.upsat import packet, tx_handler, packet_settings, large_data_service
+
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.scheduler import tasks
 import logging
@@ -114,31 +115,11 @@ def handle_backend_change(data):
                 emit('backend_msg', dict_out)
 
 
-@socketio.on('connect', namespace='/manual_observation')
-def init_observation_table():
-    response = {}
-    response['response_type'] = 'init'
-    scheduled_jobs = tasks.get_observation_list()
-    obs_list = []
-    for job in scheduled_jobs:
-        if 'obj' in job.kwargs:
-            obs_list.append(job.kwargs['obj'])
-    response['scheduled_observation_list'] = obs_list
-    emit('backend_msg', response)
-
-
 @socketio.on('schedule_observation', namespace='/manual_observation')
 def handle_observation(data):
     logger.info('Received manual observation: ' + str(data))
     requested_command = json.loads(data)
     # handle received observation
-    scheduled_jobs = tasks.get_observation_list()
-    # Assign next biggest available observation id
-    if not scheduled_jobs:
-        obs_id = 1
-    else:
-        obs_id = int(scheduled_jobs[len(scheduled_jobs) - 1].id) + 1
-
     if json is not None:
         dict_out = {'tle0': requested_command['tle0'],
                     'tle1': requested_command['tle1'],
@@ -146,19 +127,9 @@ def handle_observation(data):
                     'start': requested_command['start_time'],
                     'end': requested_command['end_time'],
                     'frequency': requested_command['freq'],
-                    'id': obs_id,
+                    'id': requested_command['obs_id'],
                     'mode': requested_command['mode']}
-        logger.info(dict_out)
-        obs = tasks.add_observation(dict_out)
-        if obs is not None:
-            response = {}
-            response['response_type'] = 'obs_success'
-            obs_list = []
-            obs_list.append(obs.kwargs['obj'])
-            response['scheduled_observation_list'] = obs_list
-            emit('backend_msg', response)
-        else:
-            logger.info('Error adding observation')
+        tasks.add_observation(dict_out)
 
 
 @socketio.on('ecss_command', namespace='/cmd')

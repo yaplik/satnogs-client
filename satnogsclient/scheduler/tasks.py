@@ -83,7 +83,8 @@ def post_data():
 
     for f in os.walk(settings.SATNOGS_OUTPUT_PATH).next()[2]:
         file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, f])
-        if (f.startswith('receiving_satnogs') or
+        # Ignore files in receiving state or without data
+        if (f.startswith('receiving') or
                 os.stat(file_path).st_size == 0):
             continue
         observation_id = f.split('_')[1]
@@ -251,9 +252,8 @@ def status_listener():
             logger.info('Changing mode')
             if dictionary['mode'] == 'cmd_ctrl':
                 logger.info('Starting ecss feeder thread...')
-                logger.info('Clearing scheduled observations')
-                kill_netw_proc()
                 os.environ['MODE'] = 'cmd_ctrl'
+                kill_netw_proc()
                 ef = Process(target=ecss_feeder, args=(settings.ECSS_FEEDER_UDP_PORT,))
                 start_wod_thread()
                 ef.start()
@@ -346,22 +346,11 @@ def add_observation(obj):
     kwargs = {'obj': obj}
     logger.info('Adding new job: {0}'.format(job_id))
     logger.debug('Observation obj: {0}'.format(obj))
-    obs = scheduler.add_job(spawn_observer,
+    scheduler.add_job(spawn_observer,
                         'date',
                         run_date=start,
-                        id=format(job_id),
+                        id='observer_{0}'.format(job_id),
                         kwargs=kwargs)
-    return obs
-
-
-def get_observation_list():
-    obs_list = scheduler.get_jobs()
-    return obs_list
-
-
-def get_observation(id):
-    obs = scheduler.get_job(id)
-    return obs
 
 
 def exec_rigctld():
