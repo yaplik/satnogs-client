@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from satnogsclient.web.weblogger import WebLogger
 import logging
 import math
 import threading
@@ -10,14 +11,19 @@ from datetime import datetime
 import ephem
 import pytz
 
+from flask_socketio import SocketIO
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 
 
-logger = logging.getLogger('satnogsclient')
+logging.setLoggerClass(WebLogger)
+logger = logging.getLogger('default')
+assert isinstance(logger, WebLogger)
+socketio = SocketIO(message_queue='redis://')
 
 
 class Worker:
+
     """Class to facilitate as a worker for rotctl/rigctl."""
 
     # sleep time of loop (in seconds)
@@ -83,7 +89,8 @@ class Worker:
         self.t.start()
 
         if start_thread:
-            self.r = threading.Thread(target=self._status_interface, args=(port,))
+            self.r = threading.Thread(
+                target=self._status_interface, args=(port,))
             self.r.daemon = True
             self.r.start()
 
@@ -110,6 +117,13 @@ class Worker:
 
             p = pinpoint(self.observer_dict, self.satellite_dict)
             if p['ok']:
+                dict = {'azimuth': p['az'].conjugate() * 180 / math.pi,
+                        'altitude': p['alt'].conjugate() * 180 / math.pi,
+                        'frequency': self._frequency * (1 - (p['rng_vlct'] / ephem.c)),
+                        'tle0': self.satellite_dict['tle0'],
+                        'tle1': self.satellite_dict['tle1'],
+                        'tle2': self.satellite_dict['tle2']}
+                socketio.emit('update_rotator', dict, namespace='/update_status')
                 self.send_to_socket(p, sock)
                 time.sleep(self.SLEEP_TIME)
 
@@ -148,19 +162,20 @@ class Worker:
 
 
 class WorkerTrack(Worker):
+
     def send_to_socket(self, p, sock):
         # Read az/alt and convert to radians
         az = p['az'].conjugate() * 180 / math.pi
         alt = p['alt'].conjugate() * 180 / math.pi
         self._azimuth = az
         self._altitude = alt
-
         msg = 'P {0} {1}\n'.format(az, alt)
         logger.debug('Rotctld msg: {0}'.format(msg))
         sock.send(msg)
 
 
 class WorkerFreq(Worker):
+
     def send_to_socket(self, p, sock):
         doppler_calc_freq = self._frequency * (1 - (p['rng_vlct'] / ephem.c))
         msg = 'F {0}\n'.format(int(doppler_calc_freq))

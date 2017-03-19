@@ -142,10 +142,10 @@ $(document).ready(function() {
             $('[id ^=sch][id $=row]').hide();
             $('#sch-seq-row').show();
             $('#sch-app_id-row').show();
-        } else if ($('#service-param-sch-action').find("option:selected").val() == "enable_apid"){
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "enable_apid") {
             $('[id ^=sch][id $=row]').hide();
             $('#sch-app_id-row').show();
-        } else if ($('#service-param-sch-action').find("option:selected").val() == "disable_apid"){
+        } else if ($('#service-param-sch-action').find("option:selected").val() == "disable_apid") {
             $('[id ^=sch][id $=row]').hide();
             $('#sch-app_id-row').show();
         }

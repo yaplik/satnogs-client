@@ -8,7 +8,7 @@ $(document).ready(function() {
     });
 
     config_socket.on('connect', function() {
-        $('#backend-status').addClass('online-circle').removeClass('offline-circle').attr('title','Backend Online');
+        $('#backend-status').addClass('online-circle').removeClass('offline-circle').attr('title', 'Backend Online');
         console.log('Frontend connected to backend!');
         current_mode = Cookies.get('mode');
         request = encode_mode_switch(current_mode);
@@ -16,7 +16,7 @@ $(document).ready(function() {
     });
 
     config_socket.on('connect_error', function() {
-        $('#backend-status').removeClass('online-circle').addClass('offline-circle').attr('title','Backend Offline');
+        $('#backend-status').removeClass('online-circle').addClass('offline-circle').attr('title', 'Backend Offline');
         console.log('Frontend cannot connect to backend!');
     });
 

@@ -1,55 +1,38 @@
-from flask import Flask, render_template, json, jsonify
-from flask.ext.socketio import SocketIO, emit
+from flask import Flask, render_template, json
+from flask_socketio import SocketIO, emit
 from multiprocessing import Process
 
 from satnogsclient import settings as client_settings
 from satnogsclient.upsat import packet, tx_handler, packet_settings, large_data_service
-
-from satnogsclient.observer.commsocket import Commsocket
+from satnogsclient.scheduler import tasks
+from satnogsclient.web.weblogger import WebLogger
 import logging
 import os
+import fnmatch
 
-
-logger = logging.getLogger('satnogsclient')
+logging.setLoggerClass(WebLogger)
+logger = logging.getLogger('default')
+assert isinstance(logger, WebLogger)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, message_queue='redis://')
 
 
-@app.route('/update_status', methods=['GET', 'POST'])
-def get_status_info():
-    current_pass_json = {}
-    scheduled_pass_json = {}
-    current_pass_json['azimuth'] = 'NA'
-    current_pass_json['altitude'] = 'NA'
-    current_pass_json['frequency'] = 'NA'
-    current_pass_json['tle0'] = 'NA'
-    current_pass_json['tle1'] = 'NA'
-    current_pass_json['tle2'] = 'NA'
-    # current_pass_json = jsonify(current_pass_json)
-    scheduled_pass_json['Info'] = 'There are no scheduled observations.'
-    # scheduled_pass_json = jsonify(scheduled_pass_json)
-
-    current_pass_sock = Commsocket('127.0.0.1', client_settings.CURRENT_PASS_TCP_PORT)
-    scheduled_pass_sock = Commsocket('127.0.0.1', client_settings.TASK_FEEDER_TCP_PORT)
-
-    current_pass_check = current_pass_sock.connect()
-    scheduled_pass_check = scheduled_pass_sock.connect()
-
-    if scheduled_pass_check:
-        scheduled_pass_json = scheduled_pass_sock.send("Requesting scheduled observations\n")
-        scheduled_pass_json = json.loads(scheduled_pass_json)
-    else:
-        logger.info('No observation currently')
-
-    if current_pass_check:
-        current_pass_json = current_pass_sock.send("Requesting current observations\n")
-        current_pass_json = json.loads(current_pass_json)
-    else:
-        logger.info('No observation currently')
-
-    # return current_pass_json
-    return jsonify(observation=dict(current=current_pass_json, scheduled=scheduled_pass_json))
+@socketio.on('connect', namespace='/update_status')
+def send_status():
+    dict_out = {'id': client_settings.SATNOGS_STATION_ID,
+                'coord': str(round(client_settings.SATNOGS_STATION_LAT, 1)) + '-' + str(round(client_settings.SATNOGS_STATION_LON, 1)),
+                'alt': str(client_settings.SATNOGS_STATION_ELEV)}
+    emit('init_status', dict_out)
+    logger.info("Status view initiated")
+    response = {}
+    scheduled_jobs = tasks.get_observation_list()
+    obs_list = []
+    for job in scheduled_jobs:
+        if 'obj' in job.kwargs:
+            obs_list.append(job.kwargs['obj'])
+    response['scheduled_observation_list'] = obs_list
+    emit('update_scheduled', response)
 
 
 @app.route('/')
@@ -114,6 +97,63 @@ def handle_backend_change(data):
                 emit('backend_msg', dict_out)
 
 
+@socketio.on('connect', namespace='/manual_observation')
+def init_observation_table():
+    logger.info("Satnogs control view initiated")
+    response = {}
+    response['response_type'] = 'init'
+    scheduled_jobs = tasks.get_observation_list()
+    obs_list = []
+    for job in scheduled_jobs:
+        if 'obj' in job.kwargs:
+            obs_list.append(job.kwargs['obj'])
+    response['scheduled_observation_list'] = obs_list
+    emit('backend_msg', response)
+    flowgraphs = []
+    for path in client_settings.GNURADIO_SCRIPT_PATH:
+        for root, dirs, files in os.walk(path):
+            for name in files:
+                if fnmatch.fnmatch(name, 'satnogs_*.py'):
+                    flowgraphs.append(name)
+    response['scripts'] = flowgraphs
+    emit('update_script_names', response)
+
+
+@socketio.on('schedule_observation', namespace='/manual_observation')
+def handle_observation(data):
+    logger.info('Received manual observation: ' + str(data))
+    requested_command = json.loads(data)
+    # handle received observation
+    scheduled_jobs = tasks.get_observation_list()
+    # Assign next biggest available observation id
+    if not scheduled_jobs:
+        obs_id = 1
+    else:
+        obs_id = int(scheduled_jobs[len(scheduled_jobs) - 1].id) + 1
+
+    if json is not None:
+        dict_out = {'tle0': requested_command['tle0'],
+                    'tle1': requested_command['tle1'],
+                    'tle2': requested_command['tle2'],
+                    'start': requested_command['start_time'],
+                    'end': requested_command['end_time'],
+                    'id': obs_id,
+                    'script_name': requested_command['script_name'],
+                    'user_args': requested_command['user_args']
+                    }
+        logger.info(dict_out)
+        obs = tasks.add_observation(dict_out)
+        if obs is not None:
+            response = {}
+            response['response_type'] = 'obs_success'
+            obs_list = []
+            obs_list.append(obs.kwargs['obj'])
+            response['scheduled_observation_list'] = obs_list
+            emit('backend_msg', response)
+        else:
+            logger.info('Error adding observation')
+
+
 @socketio.on('ecss_command', namespace='/cmd')
 def handle_requested_cmd(data):
     logger.info('Received backend change: ' + str(data))
@@ -140,7 +180,8 @@ def handle_requested_cmd(data):
                 logger.info('Storing packet for verification')
 
             buf = packet.construct_packet(ecss, os.environ['BACKEND'])
-            response = {'id': 1, 'log_message': 'ECSS command send', 'command_sent': ecss}
+            response = {
+                'id': 1, 'log_message': 'ECSS command send', 'command_sent': ecss}
             if len(buf) > packet_settings.MAX_COMMS_PKT_SIZE:
                 ld = Process(target=large_data_service.uplink, args=(buf,))
                 ld.daemon = True
@@ -162,10 +203,12 @@ def handle_comms_switch_cmd(data):
                 # TODO: Handle the comms_tx_rf request
                 if requested_command['custom_cmd']['comms_tx_rf'] == 'comms_off':
                     packet.comms_off()
-                    response = {'id': 1, 'log_message': 'COMMS_OFF command sent'}
+                    response = {
+                        'id': 1, 'log_message': 'COMMS_OFF command sent'}
                 elif requested_command['custom_cmd']['comms_tx_rf'] == 'comms_on':
                     packet.comms_on()
-                    response = {'id': 1, 'log_message': 'COMMS_ON command sent'}
+                    response = {
+                        'id': 1, 'log_message': 'COMMS_ON command sent'}
                 emit('backend_msg', response)
 
 

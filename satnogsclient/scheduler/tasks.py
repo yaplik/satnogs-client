@@ -1,3 +1,4 @@
+from satnogsclient.web.weblogger import WebLogger
 import logging
 import os
 import signal
@@ -24,7 +25,9 @@ from satnogsclient.upsat import serial_handler, ecss_logic_utils
 from satnogsclient.upsat.gnuradio_handler import read_from_gnuradio
 from time import sleep
 
-logger = logging.getLogger('satnogsclient')
+logging.setLoggerClass(WebLogger)
+logger = logging.getLogger('default')
+assert isinstance(logger, WebLogger)
 socketio = SocketIO(message_queue='redis://')
 log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
 
@@ -56,12 +59,22 @@ def spawn_observer(*args, **kwargs):
         'lat': settings.SATNOGS_STATION_LAT,
         'elev': settings.SATNOGS_STATION_ELEV
     }
-
+    frequency = ""
+    if 'user_args' in obj:
+        user_args = obj['user_args']
+        script_name = obj['script_name']
+        frequency = 100e6
+    else:
+        user_args = ""
+        script_name = ""
+        frequency = obj['frequency']
     setup_kwargs = {
         'observation_id': obj['id'],
         'tle': tle,
         'observation_end': end,
-        'frequency': obj['frequency']
+        'frequency': frequency,
+        'user_args': user_args,
+        'script_name': script_name
     }
 
     logger.debug('Observer args: {0}'.format(setup_kwargs))
@@ -82,12 +95,12 @@ def post_data():
 
     for f in os.walk(settings.SATNOGS_OUTPUT_PATH).next()[2]:
         file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, f])
-        # Ignore files in receiving state or without data
-        if (f.startswith('receiving') or
+        if (f.startswith('receiving_satnogs') or
                 os.stat(file_path).st_size == 0):
             continue
         observation_id = f.split('_')[1]
-        logger.info('Trying to PUT observation data for id: {0}'.format(observation_id))
+        logger.info(
+            'Trying to PUT observation data for id: {0}'.format(observation_id))
         if f.startswith('satnogs'):
             observation = {'payload': open(file_path, 'rb')}
         elif f.startswith('waterfall'):
@@ -122,10 +135,12 @@ def get_jobs():
     logger.debug('Params: {0}'.format(params))
     logger.debug('Headers: {0}'.format(headers))
     logger.info('Trying to GET observation jobs from the network')
-    response = requests.get(url, params=params, headers=headers, verify=settings.SATNOGS_VERIFY_SSL)
+    response = requests.get(
+        url, params=params, headers=headers, verify=settings.SATNOGS_VERIFY_SSL)
 
     if not response.status_code == 200:
-        raise Exception('Status code: {0} on request: {1}'.format(response.status_code, url))
+        raise Exception(
+            'Status code: {0} on request: {1}'.format(response.status_code, url))
 
     for job in scheduler.get_jobs():
         if job.name in [spawn_observer.__name__]:
@@ -168,12 +183,16 @@ def task_feeder(port):
         try:
             conn = sock.accept()
         except IOError:
-            logger.info('Task feeder is terminated or something bad happened to accept')
+            logger.info(
+                'Task feeder is terminated or something bad happened to accept')
             return
         if conn:
             data = conn.recv(sock.tasks_buffer_size)
             # Data must be sent to socket.io here
-            socketio.emit('backend_msg', data, namespace='/control_rx')
+            socketio.emit(
+                'backend_msg', json.loads(data), namespace='/control_rx')
+            socketio.emit(
+                'update_scheduled', json.loads(data), namespace='/update_status')
 
 
 def ecss_feeder(port):
@@ -184,11 +203,13 @@ def ecss_feeder(port):
         try:
             conn = sock.recv()
         except IOError:
-            logger.info('Ecss feeder is terminated or something bad happened to accept')
+            logger.info(
+                'Ecss feeder is terminated or something bad happened to accept')
             return
         data = ecss_logic_utils.ecss_logic(cPickle.loads(conn[0]))
         # Data must be sent to socket.io here
-        socketio.emit('backend_msg', data, namespace='/control_rx', callback=success_message_to_frontend())
+        socketio.emit('backend_msg', data, namespace='/control_rx',
+                      callback=success_message_to_frontend())
 
 
 def success_message_to_frontend():
@@ -202,10 +223,12 @@ def status_listener():
     scheduler.remove_all_jobs()
     interval = settings.SATNOGS_NETWORK_API_QUERY_INTERVAL
     scheduler.add_job(get_jobs, 'interval', minutes=interval)
-    msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
+    msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(
+        interval)
     logger.info(msg)
     interval = settings.SATNOGS_NETWORK_API_POST_INTERVAL
-    msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
+    msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(
+        interval)
     logger.info(msg)
     scheduler.add_job(post_data, 'interval', minutes=interval)
     tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT,))
@@ -251,9 +274,11 @@ def status_listener():
             logger.info('Changing mode')
             if dictionary['mode'] == 'cmd_ctrl':
                 logger.info('Starting ecss feeder thread...')
-                os.environ['MODE'] = 'cmd_ctrl'
+                logger.info('Clearing scheduled observations')
                 kill_netw_proc()
-                ef = Process(target=ecss_feeder, args=(settings.ECSS_FEEDER_UDP_PORT,))
+                os.environ['MODE'] = 'cmd_ctrl'
+                ef = Process(
+                    target=ecss_feeder, args=(settings.ECSS_FEEDER_UDP_PORT,))
                 start_wod_thread()
                 ef.start()
                 os.environ['ECSS_FEEDER_PID'] = str(ef.pid)
@@ -265,9 +290,19 @@ def status_listener():
                 if int(os.environ['ECSS_FEEDER_PID']) != 0:
                     os.kill(int(os.environ['ECSS_FEEDER_PID']), signal.SIGTERM)
                     os.environ['ECSS_FEEDER_PID'] = '0'
-                os.environ['SCHEDULER'] = 'ON'
-                scheduler.start()
-                tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT,))
+                scheduler.remove_all_jobs()
+                interval = settings.SATNOGS_NETWORK_API_QUERY_INTERVAL
+                scheduler.add_job(get_jobs, 'interval', minutes=interval)
+                msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(
+                    interval)
+                logger.info(msg)
+                interval = settings.SATNOGS_NETWORK_API_POST_INTERVAL
+                msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(
+                    interval)
+                logger.info(msg)
+                scheduler.add_job(post_data, 'interval', minutes=interval)
+                tf = Process(
+                    target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT,))
                 tf.start()
                 os.environ['TASK_FEEDER_PID'] = str(tf.pid)
                 logger.info('Started task feeder process %d', tf.pid)
@@ -284,7 +319,7 @@ def kill_netw_proc():
         logger.info('Killing feeder %d', int(os.environ['TASK_FEEDER_PID']))
         os.kill(int(os.environ['TASK_FEEDER_PID']), signal.SIGTERM)
         os.environ['TASK_FEEDER_PID'] = '0'
-    scheduler.shutdown()
+    scheduler.remove_all_jobs()
     logger.info('Scheduler shutting down')
 
 
@@ -302,7 +337,8 @@ def wod_listener():
         try:
             conn, addr = sock.recv()
         except IOError:
-            logger.info('WOD listerner is terminated or something bad happened to accept')
+            logger.error(
+                'WOD listerner is terminated or something bad happened to accept')
             return
         logger.debug("WOD received %s", conn)
 
@@ -323,7 +359,8 @@ def wod_listener():
         myfile.close()
 
         # Data must be sent to socket.io here
-        socketio.emit('backend_msg', data, namespace='/control_rx', callback=success_message_to_frontend())
+        socketio.emit('backend_msg', data, namespace='/control_rx',
+                      callback=success_message_to_frontend())
 
 
 def kill_wod_thread():
@@ -338,11 +375,23 @@ def add_observation(obj):
     kwargs = {'obj': obj}
     logger.info('Adding new job: {0}'.format(job_id))
     logger.debug('Observation obj: {0}'.format(obj))
-    scheduler.add_job(spawn_observer,
-                      'date',
-                      run_date=start,
-                      id='observer_{0}'.format(job_id),
-                      kwargs=kwargs)
+    obs = scheduler.add_job(spawn_observer,
+                            'date',
+                            run_date=start,
+                            id=format(job_id),
+                            kwargs=kwargs)
+    socketio.emit('update_scheduled', obj, namespace='/update_status')
+    return obs
+
+
+def get_observation_list():
+    obs_list = scheduler.get_jobs()
+    return obs_list
+
+
+def get_observation(id):
+    obs = scheduler.get_job(id)
+    return obs
 
 
 def exec_rigctld():

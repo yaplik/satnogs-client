@@ -19,7 +19,7 @@ def main():
     exec_rigctld()
     try:
         logger.info('Press Ctrl+C to exit SatNOGS poller')
-        socketio.run(app)
+        socketio.run(app, host='0.0.0.0')
     except (KeyboardInterrupt, SystemExit):
         socketio.stop()
 

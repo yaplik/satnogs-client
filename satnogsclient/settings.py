@@ -37,11 +37,12 @@ SATNOGS_SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQ
 
 SATNOGS_NETWORK_API_URL = environ.get('SATNOGS_NETWORK_API_URL', 'https://network-dev.satnogs.org/api/')
 SATNOGS_NETWORK_API_QUERY_INTERVAL = 1  # In minutes
-SATNOGS_NETWORK_API_POST_INTERVAL = 15  # In minutes
+SATNOGS_NETWORK_API_POST_INTERVAL = 2  # In minutes
 GNURADIO_UDP_PORT = 16886
 GNURADIO_IP = '127.0.0.1'
+GNURADIO_SCRIPT_PATH = ['/usr/bin', '/usr/local/bin']
 GNURADIO_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
-SATNOGS_RX_DEVICE = environ.get('SATNOGS_RX_DEVICE', 'usrpb200')
+SATNOGS_RX_DEVICE = environ.get('SATNOGS_RX_DEVICE', 'rtlsdr')
 CURRENT_PASS_TCP_PORT = 5005
 
 SATNOGS_ROT_IP = environ.get('SATNOGS_ROT_IP', '127.0.0.1')

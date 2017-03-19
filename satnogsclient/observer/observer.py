@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
+from satnogsclient.web.weblogger import WebLogger
 import logging
 import os
 
 from datetime import datetime
 from time import sleep
 from subprocess import call
+from flask_socketio import SocketIO
 from satnogsclient import settings
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
 from satnogsclient.upsat import gnuradio_handler
 
-logger = logging.getLogger('satnogsclient')
+logging.setLoggerClass(WebLogger)
+logger = logging.getLogger('default')
+assert isinstance(logger, WebLogger)
+socketio = SocketIO(message_queue='redis://')
 
 
 class Observer:
@@ -142,7 +147,7 @@ class Observer:
     def observation_waterfall_png(self, observation_waterfall_png):
         self._observation_waterfall_png = observation_waterfall_png
 
-    def setup(self, observation_id, tle, observation_end, frequency):
+    def setup(self, observation_id, tle, observation_end, frequency, user_args, script_name):
         """
         Sets up required internal variables.
         * returns True if setup is ok
@@ -151,6 +156,8 @@ class Observer:
 
         # Set attributes
         self.observation_id = observation_id
+        self.user_args = user_args
+        self.script_name = script_name
         self.tle = tle
         self.observation_end = observation_end
         self.frequency = frequency
@@ -201,10 +208,11 @@ class Observer:
         self._gnu_proc = gnuradio_handler.exec_gnuradio(
             self.observation_raw_file,
             self.observation_waterfall_file,
-            self.frequency)
+            self.frequency,
+            self.user_args,
+            self.script_name)
         logger.info('Start rotctrl thread.')
         self.run_rot()
-
         # start thread for rigctl
         logger.info('Start rigctrl thread.')
         self.run_rig()
@@ -233,7 +241,7 @@ class Observer:
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
                                        proc=self._gnu_proc)
-        logger.debug('Frequency {0}'.format(self.frequency))
+        logger.debug('Rig Frequency {0}'.format(self.frequency))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_freq.trackobject(self.location, self.tle)
         self.tracker_freq.trackstart(5006, False)
@@ -261,7 +269,7 @@ class Observer:
             if plot == 0 and settings.SATNOGS_REMOVE_RAW_FILES:
                 self.remove_waterfall_file()
         else:
-            logger.info('No waterfall data file found')
+            logger.error('No waterfall data file found')
 
     def remove_waterfall_file(self):
         if os.path.isfile(self.observation_waterfall_file):
