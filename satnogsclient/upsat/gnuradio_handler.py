@@ -51,12 +51,14 @@ def exec_gnuradio(observation_file, waterfall_file, freq):
     arguments = {'filename': observation_file,
                  'waterfall': waterfall_file,
                  'rx_device': client_settings.SATNOGS_RX_DEVICE,
-                 'center_freq': str(freq)}
+                 'center_freq': str(freq),
+                 'ppm': client_settings.SATNOGS_PPM_ERROR}
     arg_string = ' '
     arg_string += '--rx-sdr-device=' + arguments['rx_device'] + ' '
     arg_string += '--file-path=' + arguments['filename'] + ' '
     arg_string += '--waterfall-file-path=' + arguments['waterfall'] + ' '
     arg_string += '--rx-freq=' + arguments['center_freq'] + ' '
+    arg_string += '--ppm=' + arguments['ppm'] + ' '
     logger.info('Starting GNUradio python script')
     proc = subprocess.Popen([client_settings.GNURADIO_SCRIPT_FILENAME + " " + arg_string], shell=True)
     return proc

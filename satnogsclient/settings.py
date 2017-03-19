@@ -51,6 +51,8 @@ SATNOGS_RIG_PORT = int(environ.get('SATNOGS_RIG_PORT', 4532))
 
 SATNOGS_SERIAL_PORT = environ.get('SATNOGS_SERIAL_PORT', None)
 
+SATNOGS_PPM_ERROR = environ.get('SATNOGS_PPM_ERROR', 0)
+
 # Rigctld settings
 RIG_MODEL = ""
 RIG_FILE = ""
