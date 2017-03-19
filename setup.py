@@ -7,6 +7,17 @@ setup(
     url='https://github.com/satnogs/satnogs-client/',
     author='SatNOGS team',
     author_email='client-dev@satnogs.org',
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Telecommunications Industry',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Communications :: Ham Radio',
+    ],
+    license='AGPLv3',
     description='SatNOGS Client',
     zip_safe=False,
     install_requires=[
@@ -21,14 +32,14 @@ setup(
         'pyopenssl',
         'pyserial',
         'flask-socketio',
-        'redis'
+        'redis',
     ],
     extras_require={
-        'develop': 'flake8'
+        'develop': 'flake8',
     },
     entry_points={
         'console_scripts': ['satnogs-client=satnogsclient.main:main'],
     },
     include_package_data=True,
-    packages=find_packages()
+    packages=find_packages(),
 )
