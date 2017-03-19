@@ -73,5 +73,4 @@ running the scheduler in the background or help the development procedure.
 
 Our current scripts under ``bin/scripts`` are:
 
-* ``satnogs-poller``: Run the scheduler queue in the background and fetch jobs from the network.
-* ``satnogs-task``: Given the required data, manually spawn an observation task.
+* ``satnogs-client``: Run the scheduler queue in the background and fetch jobs from the network.

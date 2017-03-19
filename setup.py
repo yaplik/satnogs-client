@@ -26,7 +26,9 @@ setup(
     extras_require={
         'develop': 'flake8'
     },
-    scripts=['satnogsclient/bin/satnogs-poller'],
+    entry_points={
+        'console_scripts': ['satnogs-client=satnogsclient.main:main'],
+    },
     include_package_data=True,
     packages=find_packages()
 )

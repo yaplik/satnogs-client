@@ -11,7 +11,7 @@ import os
 logger = logging.getLogger('satnogsclient')
 
 
-if __name__ == '__main__':
+def main():
 
     logger.info('Starting status listener thread...')
     ser = threading.Thread(target=status_listener, args=())
@@ -24,3 +24,7 @@ if __name__ == '__main__':
         socketio.run(app)
     except (KeyboardInterrupt, SystemExit):
         socketio.stop()
+
+
+if __name__ == '__main__':
+    main()

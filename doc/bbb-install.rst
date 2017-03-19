@@ -97,7 +97,7 @@ Now, for the SatNOGS supervisord config file. This is also where you will config
 /etc/supervisord/conf.d/satnogs.conf::
 
    [program:satnogs]
-   command=/usr/local/bin/satnogs-poller
+   command=/usr/local/bin/satnogs-client
    directory=/home/debian/
    autostart=true
    autorestart=true

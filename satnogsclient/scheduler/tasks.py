@@ -33,7 +33,7 @@ def signal_term_handler(a, b):
     p = subprocess.Popen(['ps', '-ef'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
-        if 'satnogs-poller' in line:
+        if 'satnogs-client' in line:
             pid = int(line.split(None, 2)[1])
             os.kill(pid, signal.SIGKILL)
 
