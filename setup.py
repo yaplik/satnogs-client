@@ -5,8 +5,8 @@ setup(
     name='satnogsclient',
     version='0.2.5',
     url='https://github.com/satnogs/satnogs-client/',
-    author='SatNOGS team',
-    author_email='client-dev@satnogs.org',
+    author='SatNOGS project',
+    author_email='dev@satnogs.org',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
