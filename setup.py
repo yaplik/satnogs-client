@@ -1,27 +1,6 @@
 from setuptools import find_packages, setup
 
 
-install_requires = [
-    'APScheduler',
-    'SQLAlchemy',
-    'requests',
-    'validators',
-    'python-dateutil',
-    'ephem',
-    'pytz',
-    'flask',
-    'pyopenssl',
-    'pyserial',
-    'flask-socketio',
-    'redis'
-]
-
-flake8 = [
-    'flake8'
-]
-
-develop_requires = (install_requires + flake8)
-
 setup(name='satnogsclient',
       packages=find_packages(),
       version='0.2.5',
@@ -31,8 +10,21 @@ setup(name='satnogsclient',
       description='SatNOGS Client',
       include_package_data=True,
       zip_safe=False,
-      install_requires=install_requires,
+      install_requires=[
+          'APScheduler',
+          'SQLAlchemy',
+          'requests',
+          'validators',
+          'python-dateutil',
+          'ephem',
+          'pytz',
+          'flask',
+          'pyopenssl',
+          'pyserial',
+          'flask-socketio',
+          'redis'
+      ],
       extras_require={
-          "develop": develop_requires
+          'develop': 'flake8'
       },
       scripts=['satnogsclient/bin/satnogs-poller'])
