@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 import logging
 
-from satnogsclient.scheduler import scheduler
-from satnogsclient.scheduler.tasks import get_jobs, post_data, task_feeder, ecss_feeder, status_listener, exec_rigctld
+from satnogsclient.scheduler.tasks import status_listener, exec_rigctld
 from satnogsclient.web.app import app, socketio
 from satnogsclient.upsat.packet import folder_init
 import threading
-import os
 
 logger = logging.getLogger('satnogsclient')
 
