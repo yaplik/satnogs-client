@@ -339,10 +339,10 @@ def add_observation(obj):
     logger.info('Adding new job: {0}'.format(job_id))
     logger.debug('Observation obj: {0}'.format(obj))
     scheduler.add_job(spawn_observer,
-                        'date',
-                        run_date=start,
-                        id='observer_{0}'.format(job_id),
-                        kwargs=kwargs)
+                      'date',
+                      run_date=start,
+                      id='observer_{0}'.format(job_id),
+                      kwargs=kwargs)
 
 
 def exec_rigctld():

@@ -56,8 +56,8 @@ def ecss_encoder(port):
 
 def ecss_depacketizer(buf, dict_out):
     size = len(buf)
-    assert((buf != 0) == True)
-    assert((size > packet_settings.MIN_PKT_SIZE and size < packet_settings.MAX_PKT_SIZE) == True)
+    assert(buf != 0)
+    assert(size > packet_settings.MIN_PKT_SIZE and size < packet_settings.MAX_PKT_SIZE)
     tmp_crc1 = buf[size - 1]
     tmp_crc2 = 0
     for i in range(0, size - 2):
@@ -84,10 +84,10 @@ def ecss_depacketizer(buf, dict_out):
     pkt_ser_subtype = buf[8]
     pkt_dest_id = buf[9]
 
-    if not ((pkt_app_id < packet_settings.LAST_APP_ID) == True):
+    if not (pkt_app_id < packet_settings.LAST_APP_ID):
         return (dict_out, packet_settings.SATR_PKT_ILLEGAL_APPID)
 
-    if not ((pkt_len == size - packet_settings.ECSS_HEADER_SIZE - 1) == True):
+    if not (pkt_len == size - packet_settings.ECSS_HEADER_SIZE - 1):
         print "INV LEN", pkt_len, " ", size - packet_settings.ECSS_HEADER_SIZE - 1, " ", size
         return (dict_out, packet_settings.SATR_PKT_INV_LEN)
 
@@ -97,40 +97,41 @@ def ecss_depacketizer(buf, dict_out):
         print "INV CRC calc ", tmp_crc2, " pkt", tmp_crc1
         return (dict_out, packet_settings.SATR_PKT_INC_CRC)
 
-    if not ((ver == packet_settings.ECSS_VER_NUMBER) == True):
+    if not (ver == packet_settings.ECSS_VER_NUMBER):
         return (dict_out, packet_settings.SATR_ERROR)
 
-    if not ((tc_pus == packet_settings.ECSS_PUS_VER) == True):
+    if not (tc_pus == packet_settings.ECSS_PUS_VER):
         return (dict_out, packet_settings.SATR_ERROR)
 
-    if not ((ccsds_sec_hdr == packet_settings.ECSS_SEC_HDR_FIELD_FLG) == True):
+    if not (ccsds_sec_hdr == packet_settings.ECSS_SEC_HDR_FIELD_FLG):
         print "INV HDR FIELD", ccsds_sec_hdr
         return (dict_out, packet_settings.SATR_ERROR)
 
-    if not ((pkt_type == packet_settings.TC or pkt_type == packet_settings.TM) == True):
+    if not (pkt_type == packet_settings.TC or pkt_type == packet_settings.TM):
         print "INV TYPE", pkt_type
         return (dict_out, packet_settings.SATR_ERROR)
 
-    if not ((dfield_hdr == packet_settings.ECSS_DATA_FIELD_HDR_FLG) == True):
+    if not (dfield_hdr == packet_settings.ECSS_DATA_FIELD_HDR_FLG):
         return (dict_out, packet_settings.SATR_ERROR)
 
-    if not ((pkt_ack == packet_settings.TC_ACK_NO or pkt_ack == packet_settings.TC_ACK_ACC) == True):
+    if not (pkt_ack == packet_settings.TC_ACK_NO or pkt_ack == packet_settings.TC_ACK_ACC):
         return (dict_out, packet_settings.SATR_ERROR)
 
-    if not ((pkt_seq_flags == packet_settings.TC_TM_SEQ_SPACKET) == True):
+    if not (pkt_seq_flags == packet_settings.TC_TM_SEQ_SPACKET):
         return (dict_out, packet_settings.SATR_ERROR)
     pkt_data = bytes(pkt_len)
 
     pkt_data = buf[packet_settings.ECSS_DATA_OFFSET: size - 2]
-    dict_out = {'type': pkt_type,
-             'app_id': pkt_app_id,
-             'size': pkt_len,
-             'ack': pkt_ack,
-             'ser_type': pkt_ser_type,
-             'ser_subtype': pkt_ser_subtype,
-             'dest_id': pkt_dest_id,
-             'data': pkt_data
-             }
+    dict_out = {
+        'type': pkt_type,
+        'app_id': pkt_app_id,
+        'size': pkt_len,
+        'ack': pkt_ack,
+        'ser_type': pkt_ser_type,
+        'ser_subtype': pkt_ser_subtype,
+        'dest_id': pkt_dest_id,
+        'data': pkt_data
+    }
     logger.debug('Got packet: %s', dict_out)
     return (dict_out, packet_settings.SATR_OK)
 
@@ -149,15 +150,15 @@ def ecss_decoder(port):
 
 def ecss_packetizer(ecss, buf):
     Commsocket(packet_settings.FRAME_RECEIVER_IP, packet_settings.FRAME_RECEIVER_PORT)
-    assert(((ecss['type'] == 0) or (ecss['type'] == 1)) == True)
-    assert((ecss['app_id'] < packet_settings.LAST_APP_ID) == True)
+    assert((ecss['type'] == 0) or (ecss['type'] == 1))
+    assert(ecss['app_id'] < packet_settings.LAST_APP_ID)
     data_size = ecss['size']
     app_id = htons(ecss['app_id'])
     app_id_ms = app_id & 0xFF00
     app_id_ls = app_id & 0x00FF
     app_id_ms = app_id_ms >> 8
     buf[0] = (packet_settings.ECSS_VER_NUMBER << 5 | ecss['type']
-               << 4 | packet_settings.ECSS_DATA_FIELD_HDR_FLG << 3 | app_id_ls)
+              << 4 | packet_settings.ECSS_DATA_FIELD_HDR_FLG << 3 | app_id_ls)
     buf[1] = app_id_ms
     seq_flags = packet_settings.TC_TM_SEQ_SPACKET
     seq_count = htons(ecss['seq_count'])
@@ -185,7 +186,7 @@ def ecss_packetizer(ecss, buf):
         buf[buf_pointer + 1] = buf[buf_pointer + 1] ^ buf[i]
 
     size = buf_pointer + 2
-    assert((size > packet_settings.MIN_PKT_SIZE and size < packet_settings.MAX_PKT_SIZE) == True)
+    assert(size > packet_settings.MIN_PKT_SIZE and size < packet_settings.MAX_PKT_SIZE)
     logger.debug('Packet in hex: %s', ''.join(' {:02x} '.format(x) for x in buf))
     return packet_settings.SATR_OK
 

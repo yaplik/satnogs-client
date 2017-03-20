@@ -125,11 +125,11 @@ class Worker:
             if conn:
                 conn.recv(sock.buffer_size)
                 dict = {'azimuth': "{0:.2f}".format(self._azimuth),
-                  'altitude': "{0:.2f}".format(self._altitude),
-                  'frequency': self._frequency,
-                  'tle0': self.satellite_dict['tle0'],
-                  'tle1': self.satellite_dict['tle1'],
-                  'tle2': self.satellite_dict['tle2']}
+                        'altitude': "{0:.2f}".format(self._altitude),
+                        'frequency': self._frequency,
+                        'tle0': self.satellite_dict['tle0'],
+                        'tle1': self.satellite_dict['tle1'],
+                        'tle2': self.satellite_dict['tle2']}
                 conn.send(json.dumps(dict))
                 conn.close()
 

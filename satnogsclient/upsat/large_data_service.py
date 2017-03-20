@@ -58,15 +58,14 @@ def uplink(buf_in):
         else:
             ser_subtype = packet_settings.TC_LD_INT_UPLINK
         ecss = {'type': 1,
-             'app_id': 4,
-             'size': len(buf),
-             'ack': 1,
-             'ser_type': packet_settings.TC_LARGE_DATA_SERVICE,
-             'ser_subtype': ser_subtype,
-             'dest_id': 6,
-             'data': buf,
-             'seq_count': packet_count
-             }
+                'app_id': 4,
+                'size': len(buf),
+                'ack': 1,
+                'ser_type': packet_settings.TC_LARGE_DATA_SERVICE,
+                'ser_subtype': ser_subtype,
+                'dest_id': 6,
+                'data': buf,
+                'seq_count': packet_count}
         hldlc_buf = packet.construct_packet(ecss, os.environ['BACKEND'])
         gnuradio_sock.sendto(hldlc_buf, (client_settings.GNURADIO_IP, client_settings.GNURADIO_UDP_PORT))
         got_ack = 0
@@ -262,7 +261,8 @@ def request_packet(ld_id, ld_num, backend):
     buf.insert(0, packet_count_ls)
     buf.insert(0, packet_count_ms)
     buf.insert(0, ld_id)
-    ecss = {'type': 1,
+    ecss = {
+        'type': 1,
         'app_id': 4,
         'size': len(buf),
         'ack': 1,  # Ack 1?????

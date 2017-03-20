@@ -17,7 +17,7 @@ def HLDLC_deframe(buf_in, buf_out):
         elif buf_in[i] == packet_settings.HLDLC_CONTROL_FLAG:
             r.remove(i + 1)  # it skips the next ieteration
             i = i + 1
-            if not (i < size - 1) == True:
+            if not (i < size - 1):
                 return packet_settings.SATR_ERROR
             if buf_in[i] == 0x5E:
                 buf_out.append(0x7E)

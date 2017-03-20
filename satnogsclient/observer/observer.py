@@ -255,7 +255,7 @@ class Observer:
                          -e \"outfile='%s'\" -e \"height=1600\" \
                         /usr/share/satnogs/scripts/satnogs_waterfall.gp" %
                         (self.observation_waterfall_file,
-                        self.observation_waterfall_png),
+                         self.observation_waterfall_png),
                         shell=True)
             logger.info('Waterfall plot finished')
             if plot == 0 and settings.SATNOGS_REMOVE_RAW_FILES:
