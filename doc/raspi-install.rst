@@ -1,121 +1,207 @@
-===========================================
-Installing SatNOGS on a Raspberry Pi 2 or 3
-===========================================
-
-*The reference platform for SatNOGS is the BeagleBone Black. Since then, the Raspberry Pi 2 and 3 have been released with similar specs. The author's main reason behind using the RP2/3 instead of the BBB is the added USB ports onboard. In my setup I have need for 3 ports when the BBB provides 1. The USB hub I used initially in my tracker caused many issues handling the load of the rtl_sdr. While this tutorial is written for the Raspberry Pi running raspbian it could be used to guide similar setups with a debian based OS.*
+======================================
+Installing SatNOGS on a Raspberry Pi 3
+======================================
 
 This tutorial assumes the following:
 
-1. You have a raspberry pi 2b or 3 already installed. This tutorial was originally written with the Raspbian 2015-05-05 image, but also tested against Raspbian 2016-02-26 (the latter is recommended, especially if you are using a Raspberry Pi v3).
+1. You have a Raspberry Pi 3 with external power (5V, 2A).
 
-2. You have working network connectivity for your SatNOGS tracker (some adapters may take extra work, get those hurdles out of the way first)
+2. USB keyboard, HDMI screen, HDMI cable, network cable (Wi-Fi isn't working on Fedora for now) and a Class 10 SDHC card at least 8GB
 
-3. You are using a Class 10 SDHC card. Lower classes may work but my testing has been with Class 10. The performance is worth the extra cost. Also recommended is that you ensure the filesystem is expanded to your full SD card (run `sudo raspi-config`)
+3. One of the following sdr devices: RTL-SDR or USRP B200.
 
-4. You are not overclocking the board. Being that there is no climate control within the SatNOGS tracker, overclocking will run a high risk of overheating on warm days.
-
-5. You will be installing and running as the default `pi` user.
-
-6. You are using an rtl-sdr dongle per the reference platform.
-
-7. You have an account on either network.satnogs.org or network-dev.satnogs.org and have 1) your ground station ID number, 2) your API key
-
-8. Written for SatNOGS client v0.2.5, found at https://pypi.python.org/pypi/satnogsclient/0.2.5 or https://github.com/satnogs/satnogs-client.
+4. You have an account and a ground station registered on either `network.satnogs.org <https://network.satnogs.org>`_ or `network-dev.satnogs.org <https://network-dev.satnogs.org>`_. This is needed for getting your ground station ID number and your SatNOGS Network API key.
 
 -----------------------
-Install OS dependencies
+1. Prepare Raspberry Pi
 -----------------------
 
-Let's get some required packages out of the way first::
+**Step 1.1:** Download fedora minimal or server RPi image (current 25) from `ARM Fedora Project <https://arm.fedoraproject.org/>`_ (server edition provides a nice web interface, admin console, with several stats and SSH access).
 
-   sudo rpi-update
-   sudo apt-get update
-   sudo apt-get upgrade
-   sudo apt-get install -y python-pip python-dev supervisor cmake libusb-1.0-0-dev libhamlib-utils vorbis-tools git
+**Step 1.2:** Connect SD card to your computer/laptop and prepare it as described at `Fedora Wiki <https://fedoraproject.org/wiki/Raspberry_Pi#Preparing_the_SD_card>`_ (don't forget to `resize the root partition <https://fedoraproject.org/wiki/Raspberry_Pi#Resizing_the_root_partition>`_).
 
---------------------
-OS optional packages
---------------------
-(these may help in testing but are not required for SatNOGS)
+**Step 1.3:** Attach sdcard to your RPi, plug in the HDMI cable, keyboard and ethernet and turn on the HDMI screen. Plug RPi to the power source.
 
-* gpredict - for testing the rotor functionality of the tracker
-* tightvncserver - running gpredict through VNC instead of ssh x-forwarding takes less resources, allowing you to stream rtl_tcp at the same time
+**Step 1.4:** Fedora installation starts, follow the steps that show up in the screen. You'll have to set root password, timezone and create a new user, e.g. satnogs
 
-These are optional, install them with::
+**Step 1.5:** From now on you are able to access you RPi directly or through SSH. You can also use admin console if you have selected the fedora server version.
 
-   sudo apt-get install -y gpredict tightvncserver
+**Step 1.6:** Update fedora package to the latest version by running::
+    sudo dnf -y update
 
-------------
-Installation
-------------
+**Step 1.7:** Install dependencies for gr-satnogs and satnogs-client::
 
-^^^^^^^^^^^^^^^^^^^^^^^
-Install SatNOGS rtl-sdr
-^^^^^^^^^^^^^^^^^^^^^^^
+    sudo dnf install -y util-linux-user git gcc redhat-rpm-config python-devel redis vorbis-tools hamlib gnuradio gnuradio-devel cmake swig fftw3-devel gcc-c++ cppunit cppunit-devel doxygen gr-osmosdr libnova libnova-devel gnuplot libvorbis-devel libffi-devel openssl-devel
 
-*SatNOGS uses a custom modified rtl_fm binary made to change the frequency for doppler shifting.*
+**Step 1.8:** Enable Redis service in order to run automatically on startup::
 
-First, uninstall the pre-existing dvb_usb_rtl28xxu driver if it exists for your dongle::
+    sudo systemctl enable redis.service
 
-   sudo bash -c "echo blacklist dvb_usb_rtl28xxu > /etc/modprobe.d/rtl28xxu-blacklist.conf"
-   sudo rmmod dvb_usb_rtl28xxu
+---------------------
+2. Install gr-satnogs
+---------------------
 
-Next, clone and build the rtl-sdr tools::
+SatNOGS Client uses GNU Radio scripts in order to get observation data from satelites, gr-satnogs provide this functionality.
 
-   mkdir ~/git
-   cd ~/git
-   git clone https://github.com/satnogs/rtl-sdr.git
-   mkdir rtl-sdr/build
-   cd rtl-sdr/build
-   cmake ../ -DINSTALL_UDEV_RULES=ON
-   make
-   sudo make install
-   sudo ldconfig
-   sudo udevadm trigger
+**Step 2.1:**: Install gr-satnogs by running the next commands::
 
-At this point you should be able to run rtl_test with your dongle plugged in and it will be detected. Press CTRL-C to exit the test.
+    git clone https://github.com/satnogs/gr-satnogs.git
+    cd gr-satnogs
+    mkdir build
+    cd build
+    cmake -DLIB_SUFFIX=64 -DCMAKE_INSTALL_PREFIX=/usr ..
+    make -j4
+    sudo make install
+    sudo sh -c 'echo /usr/lib64 > /etc/ld.so.conf.d/lib64.conf'
+    sudo ldconfig
 
-^^^^^^^^^^^^^^^^^^^^^^
-Install satnogs-client
-^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
+3. Install satnogs-client
+-------------------------
 
-Building from source is outside of the scope of this document, we will use the packaged install for now::
+Building from source is outside of the scope of this document, we will use the packaged install for now.
 
-   sudo pip install satnogsclient==0.2.5
+**Step 3.1:** Run the following command to install the packaged version of SatNOGS Client::
 
+   sudo pip install satnogsclient==0.3
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-supervisord & configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
+4. Configure satnogs-client
+---------------------------
 
-I like to manage SatNOGS with supervisord. There are plenty of other ways to do it and your mileage may vary. Before we get to the SatNOGS client we have one a dependency that has not yet been discussed: rotctld for providing rotor control interface to the SatNOGS Arduino board. This should have been installed with libhamlib-utils above.
+SatNOGS Client needs some configuration before running:
 
-As with SatNOGS, I run rotctld through supervisord. Open your favorite editor and drop this into
-/etc/supervisord/conf.d/rotctld.conf::
+**Step 4.1:** Create a .env file and add station's details as they are defined at SatNOGS Network::
+
+    export SATNOGS_API_TOKEN="1234567890qwertyuiopasdfghjklzxcvbnm1234"
+    export SATNOGS_STATION_ID="65"
+    export SATNOGS_STATION_LAT="40.662"
+    export SATNOGS_STATION_LON="23.337"
+    export SATNOGS_STATION_ELEV="150"
+    export SATNOGS_NETWORK_API_URL="https://network-dev.satnogs.org/api/"
+
+.. _optional_settings:
+
+**Step 4.2:** There are more option you can export in the created .env file. You will probably need to change the default values of the settings bellow:
+
+  |  SATNOGS_RX_DEVICE
+  |    Defines the sdr device. It could be 'usrpb200' or 'rtlsdr'.
+  |    Default Type: string
+  |    Default Value: 'usrpb200'
+
+  |  SATNOGS_PPM_ERROR
+  |    Defines PPM error of sdr, check :doc:`finding-ppm` for more details on PPM. 
+  |    Default Type: integer
+  |    Default Value: 0
+
+**Step 4.3:** Other optional settings:
+
+  |  SATNOGS_APP_PATH
+  |    Defines the path where the sqlite database will be created.
+  |    Default Type: string
+  |    Default Value: '/tmp/.satnogs'
+     
+  |  SATNOGS_OUTPUT_PATH
+  |    Defines the path where the observation data will be saved.
+  |    Default Type: string
+  |    Default Value: '/tmp/.satnogs/data'
+
+  |  SATNOGS_COMPLETE_OUTPUT_PATH
+  |    Defines the path where data will be moved after succesful upload on network.
+  |    Default Type: string
+  |    Default Value: '/tmp/.satnogs/data/complete'
+     
+  |  SATNOGS_INCOMPLETE_OUTPUT_PATH
+  |    Defines the path where data will be moved after unsuccesful upload on network.
+  |    Default Type: string
+  |    Default Value: '/tmp/.satnogs/data/incomplete'
+
+  |  SATNOGS_ROT_IP
+  |    Defines IP address where rotctld process listens.
+  |    Default Type: string
+  |    Default Value: '127.0.0.1'
+     
+  |  SATNOGS_ROT_PORT
+  |    Defines port where rotctld process listens.
+  |    Default Type: integer
+  |    Default Value: 4533
+
+  |  SATNOGS_RIG_IP
+  |    Defines IP address where rigctld process listens.
+  |    Default Type: string
+  |    Default Value: '127.0.0.1'
+     
+  |  SATNOGS_RIG_PORT
+  |    Defines port where rigctld process listens.
+  |    Default Type: integer
+  |    Default Value: 4532
+
+---------------------
+5. Run satnogs-client
+---------------------
+^^^^^^^^^^^
+1. Manually
+^^^^^^^^^^^
+In order to manually run satnogs-client you need to follow the next steps:
+
+**Step 5.1.1:** Export all the environment variables::
+
+    source .env
+
+**Step 5.1.2:** Start rotctl daemon(note: given example parameters bellow, you may need to change, add or omit some of them)::
+
+    rotctld -m 202 -r /dev/ttyACM0 -s 19200 &
+
+**Step 5.1.3:** Run the SatNOGS Client::
+
+    satnogs-client
+
+**At this point your client should be fully functional! It will check in with the network URL at a 1 minute interval. You should check your ground station page on the website, the station ID will be in a red box until the station checks in, at which time it will turn green.**
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2. Automaticaly with Supervisord
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+`Supervisord <http://supervisord.org/introduction.html>`_ is one of the ways to automatically run SatNOGS Client. This is very useful especialy after a power failure or reboot of raspberry pi.
+
+In order to setup supervisord we need to follow the next steps:
+
+**Step 5.2.1:** Install supervisord::
+
+    sudo dnf install -y supervisor
+
+**Step 5.2.2:** Configure supervisord for rotctld
+
+Open your favorite editor and add this into /etc/supervisord/conf.d/rotctld.conf::
 
    [program:rotctld]
-   command=/usr/bin/rotctld -m 202 -r /dev/ttyACM0 -s 19200 -T 127.0.0.1
+   command=/usr/bin/rotctld <rotctld PARAMETERS>
    autostart=true
    autorestart=true
-   user=pi
+   user=<USERNAME>
    priority=1
 
-Now, for the SatNOGS supervisord config file. This is also where you will configure your client as today the settings are all passed in environment variables. Drop this into 
-/etc/supervisord/conf.d/satnogs.conf::
+Replace <USERNAME> with the username of the user you have created and <rotctld PARAMETERS> with the parameters needed to run rotctl in your case.
+
+**Step 5.2.3:** Configure supervisord for satnogs-client
+
+Add this into /etc/supervisord/conf.d/satnogs.conf::
 
    [program:satnogs]
    command=/usr/local/bin/satnogs-client
-   directory=/home/pi/
    autostart=true
    autorestart=true
-   user=pi
-   environment=SATNOGS_SQLITE_URL="sqlite:////tmp/jobs.sqlite",SATNOGS_NETWORK_API_URL="https://network.satnogs.org/api/",SATNOGS_API_TOKEN="<TOKEN>",SATNOGS_VERIFY_SSL="TRUE",SATNOGS_STATION_ID="<ID>",SATNOGS_STATION_LAT="<LATITUDE>",SATNOGS_STATION_LON="<LONGITUDE>",SATNOGS_STATION_ELEV="<ELEVATION>",SATNOGS_PPM_ERROR="<PPM>"
+   user=<USERNAME>
+   environment=SATNOGS_NETWORK_API_URL="<URL>",SATNOGS_API_TOKEN="<TOKEN>",SATNOGS_STATION_ID="<ID>",SATNOGS_STATION_LAT="<LATITUDE>",SATNOGS_STATION_LON="<LONGITUDE>",SATNOGS_STATION_ELEV="<ELEVATION>"
 
-Obviously there are fields above that will need configured appropriately, your latitude/longitude/elevation (example: 43.210 -86.123, elevation is in meters), API token, station ID, and PPM. Log in to the SatNOGS Network console and click on your user icon in the upper-right, then "My Profile". If you have not already added your ground station to the web site please do so now with the "Add Ground Station" button. Once that is done your ground station ID will be shown. In this screen as well you can click the "API Key" button for the token needed in the configuration above. All settings that can be changed in the environment can be found in the [settings.py file](https://github.com/satnogs/satnogs-client/blob/master/satnogsclient/settings.py)
+Replace <USERNAME> with the username of the user you have created.
+Replace <...> instances in environment with the values you used in .env file,
+you can also add in this list any other of the :ref:`optional settings <optional_settings>`.
 
-With these files in place, run **sudo supervisorctl reload** and the new configuration files will be picked up and the apps started. You can follow the logs in /var/log/supervisord/.
+**Step 5.2.4:** Reloading supervisord to get the new configuration::
 
-Other configuration variables can be found by looking at the settings file at https://github.com/satnogs/satnogs-client/blob/0.2.3pypi/satnogsclient/settings.py
+  sudo supervisorctl reload
 
-**At this point your client should be fully functional! It will check in with the network URL at a 5 minute interval. You should check your ground station page on the website, the station ID will be in a red box until the station checks in, at which time it will turn green.**
+With that rotctld and satnogs should have started, you can follow the logs in /var/log/supervisord/.
 
+*NOTE:* In case that you want to change something in satnogs environment variables, like url from the dev one to production one, then you will need to run again Step 5.2.4.

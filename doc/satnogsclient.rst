@@ -9,14 +9,6 @@ satnogsclient Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`receiver` Module
-----------------------
-
-.. automodule:: satnogsclient.receiver
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`settings` Module
 ----------------------
 
