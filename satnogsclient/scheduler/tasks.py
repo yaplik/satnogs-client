@@ -63,7 +63,10 @@ def spawn_observer(*args, **kwargs):
     if 'user_args' in obj:
         user_args = obj['user_args']
         script_name = obj['script_name']
-        frequency = 100e6
+        if '--rx-freq=' in user_args:
+            frequency = int(user_args.split('--rx-freq=')[1].split(' ')[0])
+        else:
+            frequency = 100e6
     else:
         user_args = ""
         script_name = ""
