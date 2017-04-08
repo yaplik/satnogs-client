@@ -256,9 +256,13 @@ In order to setup supervisord we need to follow the next steps:
 
     sudo dnf install -y supervisor
 
-**Step 6.2.2:** Configure supervisord for rotctld
+**Step 6.2.2:** Automate creating of supervisor directory in /var/log path after boot by running::
 
-Open your favorite editor and add this into /etc/supervisord/conf.d/rotctld.conf::
+    sudo sh -c 'echo "d     /var/log/supervisor 0750 root  root  3d  -" >> /etc/tmpfiles.d/logdirs.conf'
+
+**Step 6.2.3:** Configure supervisord for rotctld
+
+Open with sudo and your favorite editor and add this into /etc/supervisord.d/rotctld.ini::
 
    [program:rotctld]
    command=/usr/bin/rotctld <rotctld PARAMETERS>
@@ -266,28 +270,92 @@ Open your favorite editor and add this into /etc/supervisord/conf.d/rotctld.conf
    autorestart=true
    user=<USERNAME>
    priority=1
+   stdout_logfile=/var/log/supervisor/rotctld.log
+   stderr_logfile=/var/log/supervisor/rotctld-error.log
 
 Replace <USERNAME> with the username of the user you have created and <rotctld PARAMETERS> with the parameters needed to run rotctl in your case.
 
-**Step 6.2.3:** Configure supervisord for satnogs-client
+**Step 6.2.4:** Configure supervisord for satnogs-client
 
-Add this into /etc/supervisord/conf.d/satnogs.conf::
+Add this into /etc/supervisord.d/satnogs.ini::
 
    [program:satnogs]
-   command=/usr/local/bin/satnogs-client
+   command=/usr/bin/satnogs-client
    autostart=true
    autorestart=true
    user=<USERNAME>
    environment=SATNOGS_NETWORK_API_URL="<URL>",SATNOGS_API_TOKEN="<TOKEN>",SATNOGS_STATION_ID="<ID>",SATNOGS_STATION_LAT="<LATITUDE>",SATNOGS_STATION_LON="<LONGITUDE>",SATNOGS_STATION_ELEV="<ELEVATION>"
+   stdout_logfile=/var/log/supervisor/satnogs.log
+   stderr_logfile=/var/log/supervisor/satnogs-error.log
 
 Replace <USERNAME> with the username of the user you have created.
 Replace <...> instances in environment with the values you used in .env file,
 you can also add in this list any other of the :ref:`optional settings <optional_settings>`.
 
-**Step 6.2.4:** Reloading supervisord to get the new configuration::
+**Step 6.2.5:** Reloading supervisord to get the new configuration::
 
-  sudo supervisorctl reload
+  sudo systemctl enable supervisord.service
+  sudo systemctl start supervisord.service
 
-With that rotctld and satnogs should have started, you can follow the logs in /var/log/supervisord/.
+With that rotctld and satnogs-client should have started, you can follow the logs in /var/log/supervisor/.
 
-*NOTE:* In case that you want to change something in satnogs environment variables, like url from the dev one to production one, then you will need to run again Step 5.2.4.
+*NOTE:* In case that you want to change something in .ini files like satnogs environment variables (url from the dev one to production one), then you will need to run::
+
+ sudo supervisorctl reload
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3. Automaticaly with Systemd
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+`Systemd <https://www.freedesktop.org/wiki/Software/systemd/>`_ is one of the ways to automatically run SatNOGS Client. This is very useful especialy after a power failure or reboot of raspberry pi.
+
+In order to setup systemd we need to follow the next steps:
+
+**Step 6.3.1:** Create the script which will initialize and run rotctld and satnogs-client in your home directory (`~/start-satnogs-client.sh`) with the following content::
+
+    rotctld <rotctld PARAMETERS>
+    date >> satnogs-auto.log
+    source .env
+    satnogs-client
+
+Replace <rotctld PARAMETERS> with the parameters needed to run rotctl in your case.
+
+**Step 6.3.2:** Create as root the file /lib/systemd/system/satnogs-client.service and add the following content::
+
+    [Unit]
+    Description=Satnogs Client
+    Requires=redis.service
+    After=redis.service
+
+    [Service]
+    User=<USERNAME>
+    WorkingDirectory=/home/<USERNAME>/
+    ExecStart=/bin/bash start-satnogs-client.sh
+    KillMode=control-group
+
+    [Install]
+    WantedBy=multi-user.target
+
+Replace <USERNAME> with the username of the user you have created.
+
+**Step 6.3.3:** Enable and start satnogs-client.service::
+
+    sudo systemctl enable satnogs-client.service
+    sudo systemctl start satnogs-client.service
+
+With that rotctld and satnogs-client should have started, you can follow the logs with journactl::
+
+    journalctl -u satnogs-client.service
+
+Use `-f` flag if you want to see the latest updates on logs::
+
+    journalctl -f -u satnogs-client.service
+
+*NOTE:* In case that you want to change something in start-satnogs-client.sh, make the change and then run::
+
+    sudo systemctl stop satnogs-client.service
+    sudo systemctl start satnogs-client.service
+
+*NOTE:* In case that you want to change something in satnogs-client.service, make the change and then run::
+
+    sudo systemctl daemon-reload
