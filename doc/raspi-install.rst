@@ -84,57 +84,57 @@ SatNOGS Client needs some configuration before running:
 
 **Step 4.2:** There are more option you can export in the created .env file. You will probably need to change the default values of the settings bellow:
 
-  |  SATNOGS_RX_DEVICE
-  |    Defines the sdr device. It could be 'usrpb200' or 'rtlsdr'.
-  |    Default Type: string
-  |    Default Value: 'usrpb200'
+SATNOGS_RX_DEVICE
+  * Defines the sdr device. It could be 'usrpb200' or 'rtlsdr'.
+  * Default Type: string
+  * Default Value: 'usrpb200'
 
-  |  SATNOGS_PPM_ERROR
-  |    Defines PPM error of sdr, check :doc:`finding-ppm` for more details on PPM. 
-  |    Default Type: integer
-  |    Default Value: 0
+SATNOGS_PPM_ERROR
+  * Defines PPM error of sdr, check :doc:`finding-ppm` for more details on PPM. 
+  * Default Type: integer
+  * Default Value: 0
 
 **Step 4.3:** Other optional settings:
 
-  |  SATNOGS_APP_PATH
-  |    Defines the path where the sqlite database will be created.
-  |    Default Type: string
-  |    Default Value: '/tmp/.satnogs'
+SATNOGS_APP_PATH
+  * Defines the path where the sqlite database will be created.
+  * Default Type: string
+  * Default Value: '/tmp/.satnogs'
      
-  |  SATNOGS_OUTPUT_PATH
-  |    Defines the path where the observation data will be saved.
-  |    Default Type: string
-  |    Default Value: '/tmp/.satnogs/data'
+SATNOGS_OUTPUT_PATH
+  * Defines the path where the observation data will be saved.
+  * Default Type: string
+  * Default Value: '/tmp/.satnogs/data'
 
-  |  SATNOGS_COMPLETE_OUTPUT_PATH
-  |    Defines the path where data will be moved after succesful upload on network.
-  |    Default Type: string
-  |    Default Value: '/tmp/.satnogs/data/complete'
+SATNOGS_COMPLETE_OUTPUT_PATH
+  * Defines the path where data will be moved after succesful upload on network.
+  * Default Type: string
+  * Default Value: '/tmp/.satnogs/data/complete'
      
-  |  SATNOGS_INCOMPLETE_OUTPUT_PATH
-  |    Defines the path where data will be moved after unsuccesful upload on network.
-  |    Default Type: string
-  |    Default Value: '/tmp/.satnogs/data/incomplete'
+SATNOGS_INCOMPLETE_OUTPUT_PATH
+  * Defines the path where data will be moved after unsuccesful upload on network.
+  * Default Type: string
+  * Default Value: '/tmp/.satnogs/data/incomplete'
 
-  |  SATNOGS_ROT_IP
-  |    Defines IP address where rotctld process listens.
-  |    Default Type: string
-  |    Default Value: '127.0.0.1'
+SATNOGS_ROT_IP
+  * Defines IP address where rotctld process listens.
+  * Default Type: string
+  * Default Value: '127.0.0.1'
      
-  |  SATNOGS_ROT_PORT
-  |    Defines port where rotctld process listens.
-  |    Default Type: integer
-  |    Default Value: 4533
+SATNOGS_ROT_PORT
+  * Defines port where rotctld process listens.
+  * Default Type: integer
+  * Default Value: 4533
 
-  |  SATNOGS_RIG_IP
-  |    Defines IP address where rigctld process listens.
-  |    Default Type: string
-  |    Default Value: '127.0.0.1'
+SATNOGS_RIG_IP
+  * Defines IP address where rigctld process listens.
+  * Default Type: string
+  * Default Value: '127.0.0.1'
      
-  |  SATNOGS_RIG_PORT
-  |    Defines port where rigctld process listens.
-  |    Default Type: integer
-  |    Default Value: 4532
+SATNOGS_RIG_PORT
+  * Defines port where rigctld process listens.
+  * Default Type: integer
+  * Default Value: 4532
 
 ---------------------
 5. Run satnogs-client
