@@ -218,7 +218,7 @@ class Observer:
         self.run_rig()
         # Polling gnuradio process status
         self.poll_gnu_proc_status()
-        if "satnogs_fm_demod.py" in settings.GNURADIO_SCRIPT_FILENAME:
+        if "satnogs_generic_iq_receiver.py" not in settings.GNURADIO_SCRIPT_FILENAME:
             logger.info('Rename encoded file for uploading.')
             self.rename_ogg_file()
             logger.info('Creating waterfall plot.')

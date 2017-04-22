@@ -42,6 +42,8 @@ GNURADIO_UDP_PORT = 16886
 GNURADIO_IP = '127.0.0.1'
 GNURADIO_SCRIPT_PATH = ['/usr/bin', '/usr/local/bin']
 GNURADIO_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
+GNURADIO_FM_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
+GNURADIO_CW_SCRIPT_FILENAME = 'satnogs_cw_demod.py'
 SATNOGS_RX_DEVICE = environ.get('SATNOGS_RX_DEVICE', 'rtlsdr')
 CURRENT_PASS_TCP_PORT = 5005
 
