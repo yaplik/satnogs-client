@@ -2,6 +2,7 @@ from satnogsclient.web.weblogger import WebLogger
 import logging
 import cPickle
 import subprocess
+import os
 
 from satnogsclient.upsat import packet_settings
 from satnogsclient import settings as client_settings
@@ -114,5 +115,6 @@ def exec_gnuradio(observation_file, waterfall_file, freq, user_args, script_name
     arg_string += rigctl_port
 
     logger.info('Starting GNUradio python script')
-    proc = subprocess.Popen([scriptname + " " + arg_string], shell=True)
+    proc = subprocess.Popen([scriptname + " " + arg_string], shell=True,
+                            preexec_fn=os.setsid)
     return proc

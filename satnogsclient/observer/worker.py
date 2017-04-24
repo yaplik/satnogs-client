@@ -5,6 +5,8 @@ import math
 import threading
 import time
 import json
+import os
+import signal
 
 from datetime import datetime
 
@@ -154,7 +156,7 @@ class Worker:
         logger.info('Tracking stopped.')
         self.is_alive = False
         if self._gnu_proc:
-            self._gnu_proc.terminate()
+            os.killpg(os.getpgid(self._gnu_proc.pid), signal.SIGKILL)
 
     def check_observation_end_reached(self):
         if datetime.now(pytz.utc) > self._observation_end:
