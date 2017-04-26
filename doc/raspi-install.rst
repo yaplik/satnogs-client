@@ -6,7 +6,7 @@ This tutorial assumes the following:
 
 1. You have a Raspberry Pi 3 with external power (5V, 2A).
 
-2. USB keyboard, HDMI screen, HDMI cable, network cable (Wi-Fi isn't working on Fedora for now) and a Class 10 SDHC card at least 8GB
+2. USB keyboard, HDMI screen, HDMI cable, network cable (Wi-Fi isn't working on Fedora for now) and a Class 10 SDHC card at least 8GB.
 
 3. One of the following sdr devices: RTL-SDR or USRP B200.
 
@@ -22,20 +22,39 @@ This tutorial assumes the following:
 
 **Step 1.3:** Attach sdcard to your RPi, plug in the HDMI cable, keyboard and ethernet and turn on the HDMI screen. Plug RPi to the power source.
 
-**Step 1.4:** Fedora installation starts, follow the steps that show up in the screen. You'll have to set root password, timezone and create a new user, e.g. satnogs
+**Step 1.4:** Fedora installation starts, follow the steps that show up in the screen. You'll have to setup:
+  * root password
+  * network connection
+  * timezone and ntp server, add at least one, `pool.ntp.org` is suggested
+  * a new user, e.g. `satnogs`. Don't forget to set administrator flag and add user to `dialout` group (needed for having access to sdr device).
 
 **Step 1.5:** From now on you are able to access you RPi directly or through SSH. You can also use admin console if you have selected the fedora server version.
 
 **Step 1.6:** Update fedora package to the latest version by running::
+
     sudo dnf -y update
 
 **Step 1.7:** Install dependencies for gr-satnogs and satnogs-client::
 
-    sudo dnf install -y util-linux-user git gcc redhat-rpm-config python-devel redis vorbis-tools hamlib gnuradio gnuradio-devel cmake swig fftw3-devel gcc-c++ cppunit cppunit-devel doxygen gr-osmosdr libnova libnova-devel gnuplot libvorbis-devel libffi-devel openssl-devel
+    sudo dnf install -y util-linux-user git gcc redhat-rpm-config python-devel redis vorbis-tools hamlib gnuradio gnuradio-devel cmake swig fftw3-devel gcc-c++ cppunit cppunit-devel doxygen gr-osmosdr libnova libnova-devel gnuplot libvorbis-devel libffi-devel openssl-devel libpng-devel
 
-**Step 1.8:** Enable Redis service in order to run automatically on startup::
+**Step 1.8:** In order to expand the lifetime of the SD Card, edit /etc/fstab file with your favourite editor:
+  * Comment out the line of the swap partition
+  * Change options of root partition line (/ ext4) from `defaults,noatime` to `defaults,noatime,commit=1800`. This change means that changes on root partition will be written on SD Card every 30min
+  * Move /var/log and /var/tmp directories to memory by adding the following two lines::
+
+      tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=20m 0 0
+      tmpfs /var/log tmpfs defaults,noatime,nosuid,mode=0755,size=80m 0 0
+
+**Step 1.9:** Automate creating of redis directory in /var/log path after boot by running::
+
+    sudo sh -c 'echo "#Type Path                Mode UID   GID   Age Argument" > /etc/tmpfiles.d/logdirs.conf'
+    sudo sh -c 'echo "d     /var/log/redis      0750 redis redis 1d  -" >> /etc/tmpfiles.d/logdirs.conf'
+
+**Step 1.10:** Enable and start Redis service in order to run automatically on startup::
 
     sudo systemctl enable redis.service
+    sudo systemctl start redis.service
 
 ---------------------
 2. Install gr-satnogs
