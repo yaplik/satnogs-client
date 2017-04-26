@@ -90,7 +90,7 @@ Building from source is outside of the scope of this document, we will use the p
 
 SatNOGS Client needs some configuration before running:
 
-**Step 4.1:** Create a .env file and add station's details as they are defined at SatNOGS Network::
+**Step 4.1:** Create a .env file in your home directory (`~/.env`) and add station's details as they are defined at SatNOGS Network::
 
     export SATNOGS_API_TOKEN="1234567890qwertyuiopasdfghjklzxcvbnm1234"
     export SATNOGS_STATION_ID="65"
@@ -106,10 +106,10 @@ SatNOGS Client needs some configuration before running:
 SATNOGS_RX_DEVICE
   * Defines the sdr device. It could be 'usrpb200' or 'rtlsdr'.
   * Default Type: string
-  * Default Value: 'usrpb200'
+  * Default Value: 'rtlsdr'
 
 SATNOGS_PPM_ERROR
-  * Defines PPM error of sdr, check :doc:`finding-ppm` for more details on PPM. 
+  * Defines PPM error of sdr, check :doc:`finding-ppm` for more details on PPM.
   * Default Type: integer
   * Default Value: 0
 
@@ -119,7 +119,7 @@ SATNOGS_APP_PATH
   * Defines the path where the sqlite database will be created.
   * Default Type: string
   * Default Value: '/tmp/.satnogs'
-     
+
 SATNOGS_OUTPUT_PATH
   * Defines the path where the observation data will be saved.
   * Default Type: string
@@ -129,7 +129,7 @@ SATNOGS_COMPLETE_OUTPUT_PATH
   * Defines the path where data will be moved after succesful upload on network.
   * Default Type: string
   * Default Value: '/tmp/.satnogs/data/complete'
-     
+
 SATNOGS_INCOMPLETE_OUTPUT_PATH
   * Defines the path where data will be moved after unsuccesful upload on network.
   * Default Type: string
@@ -139,7 +139,7 @@ SATNOGS_ROT_IP
   * Defines IP address where rotctld process listens.
   * Default Type: string
   * Default Value: '127.0.0.1'
-     
+
 SATNOGS_ROT_PORT
   * Defines port where rotctld process listens.
   * Default Type: integer
@@ -149,7 +149,7 @@ SATNOGS_RIG_IP
   * Defines IP address where rigctld process listens.
   * Default Type: string
   * Default Value: '127.0.0.1'
-     
+
 SATNOGS_RIG_PORT
   * Defines port where rigctld process listens.
   * Default Type: integer
@@ -313,7 +313,7 @@ In order to setup systemd we need to follow the next steps:
 
 **Step 6.3.1:** Create the script which will initialize and run rotctld and satnogs-client in your home directory (`~/start-satnogs-client.sh`) with the following content::
 
-    rotctld <rotctld PARAMETERS>
+    rotctld <rotctld PARAMETERS> &
     date >> satnogs-auto.log
     source .env
     satnogs-client
