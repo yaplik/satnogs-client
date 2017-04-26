@@ -156,22 +156,89 @@ SATNOGS_RIG_PORT
   * Default Value: 4532
 
 ---------------------
-5. Run satnogs-client
+5. Prepare SDR Device
+---------------------
+In order to have access and use SDR device you need to follow the next steps for you device:
+
+^^^^^^^^^^^^
+1. USRP B200
+^^^^^^^^^^^^
+**Step 5.1.1:** Install uhd package::
+
+    sudo dnf install -y uhd
+
+**Step 5.1.2:** Download uhd images::
+
+    sudo /usr/bin/uhd_images_downloader
+
+**Step 5.1.3:** As the access will be only by ssh and not by direct login we are not be able to access SDR device through `Access Control List(ACL) <https://en.wikipedia.org/wiki/Access_control_list>`_, so we need to setup the appropriate udev rules by following the next steps:
+
+  * Copy udev rules from `/usr/lib/udev/rules.d/10-usrp-uhd.rules` to `/etc/udev/rules.d/10-usrp-uhd.rules`::
+
+      sudo cp /usr/lib/udev/rules.d/10-usrp-uhd.rules /etc/udev/rules.d/10-usrp-uhd.rules
+
+  * Replace ACL reference::
+
+      sudo sed -i 's/0", ENV{ID_SOFTWARE_RADIO}="1"/6"/g' /etc/udev/rules.d/10-usrp-uhd.rules
+
+  * Reload udev rules::
+
+      sudo udevadm control --reload-rules
+
+  * Confirm access on device by running (without sudo, just as single user)::
+
+      uhd_find_devices
+
+  * In case you don't have access, make sure that the device is connected and that the created user is member of the `dialout` group by running::
+
+      groups
+
+  * If user isn't member of `dialout` group run (replace satnogs with the username of your user)::
+
+      sudo usermod -aG dialout satnogs
+
+^^^^^^^^^^^^
+2. RTL-SDR
+^^^^^^^^^^^^
+**Step 5.2.1:** As the access will be only by ssh and not by direct login we are not be able to access SDR device through `Access Control List(ACL) <https://en.wikipedia.org/wiki/Access_control_list>`_, so we need to setup the appropriate udev rules by following the next steps:
+
+  * Copy udev rules from `/usr/lib/udev/rules.d/10-rtl-sdr.rules` to `/etc/udev/rules.d/10-rtl-sdr.rules`::
+
+      sudo cp /usr/lib/udev/rules.d/10-rtl-sdr.rules /etc/udev/rules.d/10-rtl-sdr.rules
+
+  * Replace ACL reference::
+
+      sudo sed -i 's/0", ENV{ID_SOFTWARE_RADIO}="1"/6"/g' /etc/udev/rules.d/10-rtl-sdr.rules
+
+  * Reload udev rules::
+
+      sudo udevadm control --reload-rules
+
+  * In case you don't have access, make sure that the device is connected and that the created user is member of the `dialout` group by running::
+
+      groups
+
+  * If user isn't member of `dialout` group run (replace satnogs with the username of your user)::
+
+      sudo usermod -aG dialout satnogs
+
+---------------------
+6. Run satnogs-client
 ---------------------
 ^^^^^^^^^^^
 1. Manually
 ^^^^^^^^^^^
 In order to manually run satnogs-client you need to follow the next steps:
 
-**Step 5.1.1:** Export all the environment variables::
+**Step 6.1.1:** Export all the environment variables::
 
     source .env
 
-**Step 5.1.2:** Start rotctl daemon(note: given example parameters bellow, you may need to change, add or omit some of them)::
+**Step 6.1.2:** Start rotctl daemon(note: given example parameters bellow, you may need to change, add or omit some of them)::
 
     rotctld -m 202 -r /dev/ttyACM0 -s 19200 &
 
-**Step 5.1.3:** Run the SatNOGS Client::
+**Step 6.1.3:** Run the SatNOGS Client::
 
     satnogs-client
 
@@ -185,11 +252,11 @@ In order to manually run satnogs-client you need to follow the next steps:
 
 In order to setup supervisord we need to follow the next steps:
 
-**Step 5.2.1:** Install supervisord::
+**Step 6.2.1:** Install supervisord::
 
     sudo dnf install -y supervisor
 
-**Step 5.2.2:** Configure supervisord for rotctld
+**Step 6.2.2:** Configure supervisord for rotctld
 
 Open your favorite editor and add this into /etc/supervisord/conf.d/rotctld.conf::
 
@@ -202,7 +269,7 @@ Open your favorite editor and add this into /etc/supervisord/conf.d/rotctld.conf
 
 Replace <USERNAME> with the username of the user you have created and <rotctld PARAMETERS> with the parameters needed to run rotctl in your case.
 
-**Step 5.2.3:** Configure supervisord for satnogs-client
+**Step 6.2.3:** Configure supervisord for satnogs-client
 
 Add this into /etc/supervisord/conf.d/satnogs.conf::
 
@@ -217,7 +284,7 @@ Replace <USERNAME> with the username of the user you have created.
 Replace <...> instances in environment with the values you used in .env file,
 you can also add in this list any other of the :ref:`optional settings <optional_settings>`.
 
-**Step 5.2.4:** Reloading supervisord to get the new configuration::
+**Step 6.2.4:** Reloading supervisord to get the new configuration::
 
   sudo supervisorctl reload
 
