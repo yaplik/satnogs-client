@@ -40,7 +40,7 @@ This tutorial assumes the following:
 
 **Step 1.8:** In order to expand the lifetime of the SD Card, edit /etc/fstab file with your favourite editor:
   * Comment out the line of the swap partition
-  * Change options of root partition line (/ ext4) from `defaults,noatime` to `defaults,noatime,commit=1800`. This change means that changes on root partition will be written on SD Card every 30min
+  * Only if you used the "minimal" Fedora installation (not the "server" build), change options of root partition line (/ ext4) from `defaults,noatime` to `defaults,noatime,commit=1800`. This change means that changes on root partition will be written on SD Card every 30min
   * Move /var/log and /var/tmp directories to memory by adding the following two lines::
 
       tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=20m 0 0
@@ -55,6 +55,18 @@ This tutorial assumes the following:
 
     sudo systemctl enable redis.service
     sudo systemctl start redis.service
+
+**Step 1.11:** Configure automatic cleanup of old data (while this is an optional step, if old files are not cleaned out regularly you run the risk of filling your disk over time)
+  * As-is this will clean out files older than 1 week. Adjust mtime to your liking
+  * Create /etc/cron.daily/satnogs with your favorite editor and add the following::
+
+    #!/bin/sh
+    find /tmp/.satnogs/data -type f -mtime +7 -delete
+
+  * Then run::
+
+    sudo cron -x /etc/cron.daily/satnogs
+
 
 ---------------------
 2. Install gr-satnogs
@@ -206,13 +218,16 @@ In order to have access and use SDR device you need to follow the next steps for
 
       sudo cp /usr/lib/udev/rules.d/10-rtl-sdr.rules /etc/udev/rules.d/10-rtl-sdr.rules
 
-  * Replace ACL reference::
+  * Replace ACL reference and change group ownership::
 
       sudo sed -i 's/0", ENV{ID_SOFTWARE_RADIO}="1"/6"/g' /etc/udev/rules.d/10-rtl-sdr.rules
+      sudo sed -i 's/rtlsdr/dialout/g' /etc/udev/rules.d/10-rtl-sdr.rules
 
   * Reload udev rules::
 
       sudo udevadm control --reload-rules
+
+  * If your rtlsdr device was already plugged in, you will need to unplug it and plug it back in. Otherwise, it is safe to plug it in now.
 
   * In case you don't have access, make sure that the device is connected and that the created user is member of the `dialout` group by running::
 
@@ -221,6 +236,8 @@ In order to have access and use SDR device you need to follow the next steps for
   * If user isn't member of `dialout` group run (replace satnogs with the username of your user)::
 
       sudo usermod -aG dialout satnogs
+
+  * If you had to take that step, log out and log back in
 
 ---------------------
 6. Run satnogs-client
@@ -234,7 +251,7 @@ In order to manually run satnogs-client you need to follow the next steps:
 
     source .env
 
-**Step 6.1.2:** Start rotctl daemon(note: given example parameters bellow, you may need to change, add or omit some of them)::
+**Step 6.1.2:** Start rotctl daemon(note: given example parameters bellow, you may need to change, add or omit some of them. For a Yaesu G-5500 use -m 601 and -s 9600)::
 
     rotctld -m 202 -r /dev/ttyACM0 -s 19200 &
 
@@ -242,7 +259,7 @@ In order to manually run satnogs-client you need to follow the next steps:
 
     satnogs-client
 
-**At this point your client should be fully functional! It will check in with the network URL at a 1 minute interval. You should check your ground station page on the website, the station ID will be in a red box until the station checks in, at which time it will turn green.**
+**At this point your client should be fully functional! It will check in with the network URL at a 1 minute interval. You should check your ground station page on the website, the station ID will be in a red box until the station checks in, at which time it will turn green. There are many ways to automate the running and control of satnogs, we will give you 2 options below, supervisord and systemd.**
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 2. Automaticaly with Supervisord
