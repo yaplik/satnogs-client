@@ -108,6 +108,9 @@ def post_data():
             observation = {'payload': open(file_path, 'rb')}
         elif f.startswith('waterfall'):
             observation = {'waterfall': open(file_path, 'rb')}
+        else:
+            logger.debug('Ignore file: {0}', f)
+            continue
         url = urljoin(base_url, observation_id)
         if not url.endswith('/'):
             url += '/'
