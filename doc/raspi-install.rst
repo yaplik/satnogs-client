@@ -60,12 +60,12 @@ This tutorial assumes the following:
   * As-is this will clean out files older than 1 week. Adjust mtime to your liking
   * Create /etc/cron.daily/satnogs with your favorite editor and add the following::
 
-    #!/bin/sh
-    find /tmp/.satnogs/data -type f -mtime +7 -delete
+      #!/bin/sh
+      find /tmp/.satnogs/data -type f -mtime +7 -delete
 
   * Then run::
 
-    sudo cron -x /etc/cron.daily/satnogs
+      sudo chmod +x /etc/cron.daily/satnogs
 
 
 ---------------------
