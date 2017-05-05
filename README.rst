@@ -17,7 +17,7 @@ To get the latest development version::
   $ python setup.py build
   $ python setup.py install
 
-For more information see our `documentation <http://docs.satnogs.org/client/>`_.
+For more information see our `documentation <http://docs.satnogs.org/en/stable/client/index.html>`_.
 
 Provisioning
 ------------
