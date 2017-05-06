@@ -19,11 +19,6 @@ To get the latest development version::
 
 For more information see our `documentation <http://docs.satnogs.org/en/stable/client/index.html>`_.
 
-Provisioning
-------------
-In order to make the provisioning of ``satnogs-client`` easier, we maintain an ansible-playbook for that purpose.
-For more information see our `ansible-satnogs-client <https://github.com/satnogs/satnogs-client-ansible>`_ repository.
-
 License
 -------
 
