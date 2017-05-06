@@ -27,6 +27,6 @@ For more information see our `ansible-satnogs-client <https://github.com/satnogs
 License
 -------
 
-©2014-2015 `Libre Space Foundation <http://librespacefoundation.org>`_.
+©2014-2017 `Libre Space Foundation <https://libre.space>`_.
 
 Licensed under the `AGPLv3 <LICENSE>`_.
