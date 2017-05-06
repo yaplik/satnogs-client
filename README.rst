@@ -14,8 +14,7 @@ To get the latest development version::
 
   $ git clone https://github.com/satnogs/satnogs-client.git
   $ cd satnogs-client
-  $ python setup.py build
-  $ python setup.py install
+  $ pip install -e .
 
 For more information see our `documentation <http://docs.satnogs.org/en/stable/client/index.html>`_.
 
