@@ -67,6 +67,20 @@ This tutorial assumes the following:
 
       sudo chmod +x /etc/cron.daily/satnogs
 
+**Step 1.12:** If you used Fedora Server, configure firewall for SatNOGS web user interface
+  * Create /usr/lib/firewalld/services/satnogs.xml and add the following::
+
+      <?xml version="1.0" encoding="utf-8"?>
+        <service>
+        <short>SatNOGS (HTTP)</short>
+        <description>HTTP is the protocol used to serve Web pages. If you plan to make your Web server publicly available, enable this option. This option is not required for viewing pages locally or developing Web pages.</description>
+        <port protocol="tcp" port="5000"/>
+      </service>
+
+  * Then run::
+
+      sudo firewall-cmd --zone=FedoraServer --add-service=satnogs --permanent
+      sudo firewall-cmd --zone=FedoraServer --add-service=satnogs
 
 ---------------------
 2. Install gr-satnogs
