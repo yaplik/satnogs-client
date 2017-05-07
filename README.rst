@@ -16,7 +16,7 @@ To get the latest development version::
   $ cd satnogs-client
   $ pip install -e .
 
-For more information see our `documentation <http://satnogs.readthedocs.io/en/latest/satnogs-client/doc/index.html>`_.
+For more information see our `documentation <http://docs.satnogs.org/en/stable/satnogs-client/doc/index.html>`_.
 
 License
 -------
