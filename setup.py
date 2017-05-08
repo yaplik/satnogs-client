@@ -34,9 +34,6 @@ setup(
         'flask-socketio',
         'redis',
     ],
-    extras_require={
-        'develop': 'flake8',
-    },
     entry_points={
         'console_scripts': ['satnogs-client=satnogsclient.main:main'],
     },
