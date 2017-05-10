@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from satnogsclient.web.weblogger import WebLogger
 import logging
 import sys
 
@@ -9,9 +8,7 @@ import ephem
 import pytz
 
 
-logging.setLoggerClass(WebLogger)
 logger = logging.getLogger('default')
-assert isinstance(logger, WebLogger)
 
 
 def pinpoint(observer_dict, satellite_dict, timestamp=None):

@@ -1,34 +1,18 @@
-from satnogsclient.web.weblogger import WebLogger
 import logging
 import os
 import signal
-import time
-import sys
-import cPickle
 from dateutil import parser
 from urlparse import urljoin
 from multiprocessing import Process
-import json
 from satnogsclient.scheduler import scheduler
-from flask_socketio import SocketIO
-from satnogsclient.upsat.large_data_service import downlink
-from satnogsclient.upsat.wod import wod_decode
 import subprocess
 
 import requests
 
 from satnogsclient import settings
 from satnogsclient.observer.observer import Observer
-from satnogsclient.observer.commsocket import Commsocket
-from satnogsclient.observer.udpsocket import Udpsocket
-from satnogsclient.upsat import serial_handler, ecss_logic_utils
-from satnogsclient.upsat.gnuradio_handler import read_from_gnuradio
-from time import sleep
 
-logging.setLoggerClass(WebLogger)
 logger = logging.getLogger('default')
-assert isinstance(logger, WebLogger)
-socketio = SocketIO(message_queue='redis://')
 log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
 
 
@@ -155,8 +139,6 @@ def get_jobs():
         if job.name in [spawn_observer.__name__]:
             job.remove()
 
-    sock = Commsocket('127.0.0.1', settings.TASK_FEEDER_TCP_PORT)
-
     tasks = []
     for obj in response.json():
         tasks.append(obj)
@@ -172,61 +154,12 @@ def get_jobs():
                           kwargs=kwargs)
     tasks.reverse()
 
-    while sys.getsizeof(json.dumps(tasks)) > sock.tasks_buffer_size:
-        tasks.pop()
-
-    b = sock.connect()
-    if b:
-        sock.send_not_recv(json.dumps(tasks))
-    else:
-        logger.info('Task listener thread not online')
-
-
-def task_feeder(port):
-    sleep(1)
-    logger.info('Started task feeder')
-    sock = Commsocket('127.0.0.1', port)
-    sock.bind()
-    sock.listen()
-    while 1:
-        try:
-            conn = sock.accept()
-        except IOError:
-            logger.info(
-                'Task feeder is terminated or something bad happened to accept')
-            return
-        if conn:
-            data = conn.recv(sock.tasks_buffer_size)
-            # Data must be sent to socket.io here
-            socketio.emit(
-                'backend_msg', json.loads(data), namespace='/control_rx')
-            socketio.emit(
-                'update_scheduled', json.loads(data), namespace='/update_status')
-
-
-def ecss_feeder(port):
-    sleep(1)
-    logger.info('Started ecss feeder')
-    sock = Udpsocket(('127.0.0.1', port))
-    while 1:
-        try:
-            conn = sock.recv()
-        except IOError:
-            logger.info(
-                'Ecss feeder is terminated or something bad happened to accept')
-            return
-        data = ecss_logic_utils.ecss_logic(cPickle.loads(conn[0]))
-        # Data must be sent to socket.io here
-        socketio.emit('backend_msg', data, namespace='/control_rx',
-                      callback=success_message_to_frontend())
-
 
 def success_message_to_frontend():
     logger.debug('Successfuly emit to frontend')
 
 
 def status_listener():
-    logger.info('Started upsat status listener')
     logger.info('Starting scheduler...')
     scheduler.start()
     scheduler.remove_all_jobs()
@@ -240,81 +173,10 @@ def status_listener():
         interval)
     logger.info(msg)
     scheduler.add_job(post_data, 'interval', minutes=interval)
-    tf = Process(target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT,))
-    tf.start()
-    d = Process(target=downlink, args=())
-    d.daemon = True
-    d.start()
-    os.environ['TASK_FEEDER_PID'] = str(tf.pid)
-    sock = Udpsocket(('127.0.0.1', settings.STATUS_LISTENER_PORT))
-    os.environ['BACKEND_TX_PID'] = '0'
-    os.environ['BACKEND_RX_PID'] = '0'
     os.environ['BACKEND'] = ""
     os.environ['MODE'] = "network"
-    os.environ['ECSS_FEEDER_PID'] = '0'
     os.environ['GNURADIO_SCRIPT_PID'] = '0'
     os.environ['SCHEDULER'] = 'ON'
-    while 1:
-        conn = sock.recv()
-        dictionary = json.loads(conn[0])
-        if 'backend' in dictionary.keys():
-            if dictionary['backend'] == os.environ['BACKEND']:
-                continue
-            kill_cmd_ctrl_proc()
-            if dictionary['backend'] == 'gnuradio':
-                if os.environ['BACKEND'] == 'serial':
-                    serial_handler.close()
-                os.environ['BACKEND'] = 'gnuradio'
-                rx = Process(target=read_from_gnuradio, args=())
-                rx.daemon = True
-                rx.start()
-                logger.info('Started gnuradio rx process %d', rx.pid)
-                os.environ['BACKEND_RX_PID'] = str(rx.pid)
-            elif dictionary['backend'] == 'serial':
-                os.environ['BACKEND'] = 'serial'
-                serial_handler.init()
-                rx = Process(target=serial_handler.read_from_serial, args=())
-                rx.daemon = True
-                rx.start()
-                os.environ['BACKEND_RX_PID'] = str(rx.pid)
-        if 'mode' in dictionary.keys():
-            if dictionary['mode'] == os.environ['MODE']:
-                continue
-            logger.info('Changing mode')
-            if dictionary['mode'] == 'cmd_ctrl':
-                logger.info('Starting ecss feeder thread...')
-                logger.info('Clearing scheduled observations')
-                kill_netw_proc()
-                os.environ['MODE'] = 'cmd_ctrl'
-                ef = Process(
-                    target=ecss_feeder, args=(settings.ECSS_FEEDER_UDP_PORT,))
-                start_wod_thread()
-                ef.start()
-                os.environ['ECSS_FEEDER_PID'] = str(ef.pid)
-                logger.info('Started ecss_feeder process %d', ef.pid)
-            elif dictionary['mode'] == 'network':
-                os.environ['MODE'] = 'network'
-                kill_cmd_ctrl_proc()
-                kill_wod_thread()
-                if int(os.environ['ECSS_FEEDER_PID']) != 0:
-                    os.kill(int(os.environ['ECSS_FEEDER_PID']), signal.SIGTERM)
-                    os.environ['ECSS_FEEDER_PID'] = '0'
-                scheduler.remove_all_jobs()
-                interval = settings.SATNOGS_NETWORK_API_QUERY_INTERVAL
-                scheduler.add_job(get_jobs, 'interval', minutes=interval)
-                msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(
-                    interval)
-                logger.info(msg)
-                interval = settings.SATNOGS_NETWORK_API_POST_INTERVAL
-                msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(
-                    interval)
-                logger.info(msg)
-                scheduler.add_job(post_data, 'interval', minutes=interval)
-                tf = Process(
-                    target=task_feeder, args=(settings.TASK_FEEDER_TCP_PORT,))
-                tf.start()
-                os.environ['TASK_FEEDER_PID'] = str(tf.pid)
-                logger.info('Started task feeder process %d', tf.pid)
 
 
 def kill_cmd_ctrl_proc():
@@ -332,52 +194,6 @@ def kill_netw_proc():
     logger.info('Scheduler shutting down')
 
 
-def start_wod_thread():
-    wd = Process(target=wod_listener, args=())
-    wd.daemon = True
-    wd.start()
-    os.environ['WOD_THREAD_PID'] = str(wd.pid)
-    logger.info('WOD listener thread initialized')
-
-
-def wod_listener():
-    sock = Udpsocket(('127.0.0.1', settings.WOD_UDP_PORT))
-    while 1:
-        try:
-            conn, addr = sock.recv()
-        except IOError:
-            logger.error(
-                'WOD listerner is terminated or something bad happened to accept')
-            return
-        logger.debug("WOD received %s", conn)
-
-        # Write to disk the binary packet
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        fwname = log_path + "WOD_RX/wod_" + timestr + ".hex"
-        myfile = open(fwname, 'w')
-        myfile.write(conn)
-        myfile.close()
-
-        data = wod_decode(conn)
-
-        # Write to disk the decoded packet
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        fwname = log_path + "WOD_RX_DEC/wod_" + timestr + ".json"
-        myfile = open(fwname, 'w')
-        myfile.write(str(data['content']))
-        myfile.close()
-
-        # Data must be sent to socket.io here
-        socketio.emit('backend_msg', data, namespace='/control_rx',
-                      callback=success_message_to_frontend())
-
-
-def kill_wod_thread():
-    if 'WOD_THREAD_PID' in os.environ:
-        os.kill(int(os.environ['WOD_THREAD_PID']), signal.SIGKILL)
-        os.environ['WOD_THREAD_PID'] = '0'
-
-
 def add_observation(obj):
     start = parser.parse(obj['start'])
     job_id = str(obj['id'])
@@ -389,7 +205,6 @@ def add_observation(obj):
                             run_date=start,
                             id=format(job_id),
                             kwargs=kwargs)
-    socketio.emit('update_scheduled', obj, namespace='/update_status')
     return obs
 
 
@@ -404,7 +219,6 @@ def get_observation(id):
 
 
 def exec_rigctld():
-    from multiprocessing import Process
     rig = Process(target=rigctld_subprocess, args=())
     rig.start()
 

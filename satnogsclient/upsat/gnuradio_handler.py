@@ -1,4 +1,3 @@
-from satnogsclient.web.weblogger import WebLogger
 import logging
 import cPickle
 import subprocess
@@ -10,9 +9,7 @@ from satnogsclient.observer.udpsocket import Udpsocket
 from satnogsclient.upsat import packet
 
 
-logging.setLoggerClass(WebLogger)
 logger = logging.getLogger('default')
-assert isinstance(logger, WebLogger)
 
 backend_listener_sock = Udpsocket(('0.0.0.0', client_settings.BACKEND_LISTENER_PORT))  # Port in which client listens for frames from gnuradio
 ui_listener_sock = Udpsocket(('127.0.0.1', client_settings.BACKEND_FEEDER_PORT))

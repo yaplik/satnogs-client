@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from satnogsclient.web.weblogger import WebLogger
 import logging
 import math
 import threading
@@ -13,15 +12,11 @@ from datetime import datetime
 import ephem
 import pytz
 
-from flask_socketio import SocketIO
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 
 
-logging.setLoggerClass(WebLogger)
 logger = logging.getLogger('default')
-assert isinstance(logger, WebLogger)
-socketio = SocketIO(message_queue='redis://')
 
 
 class Worker:
@@ -119,13 +114,6 @@ class Worker:
 
             p = pinpoint(self.observer_dict, self.satellite_dict)
             if p['ok']:
-                dict = {'azimuth': p['az'].conjugate() * 180 / math.pi,
-                        'altitude': p['alt'].conjugate() * 180 / math.pi,
-                        'frequency': self._frequency * (1 - (p['rng_vlct'] / ephem.c)),
-                        'tle0': self.satellite_dict['tle0'],
-                        'tle1': self.satellite_dict['tle1'],
-                        'tle2': self.satellite_dict['tle2']}
-                socketio.emit('update_rotator', dict, namespace='/update_status')
                 self.send_to_socket(p, sock)
                 time.sleep(self.SLEEP_TIME)
 

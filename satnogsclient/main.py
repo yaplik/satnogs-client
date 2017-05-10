@@ -2,9 +2,8 @@
 import logging
 
 from satnogsclient.scheduler.tasks import status_listener, exec_rigctld
-from satnogsclient.web.app import app, socketio
-from satnogsclient.upsat.packet import folder_init
 import threading
+import time
 
 logger = logging.getLogger('satnogsclient')
 
@@ -15,13 +14,10 @@ def main():
     ser = threading.Thread(target=status_listener, args=())
     ser.daemon = True
     ser.start()
-    folder_init()
     exec_rigctld()
-    try:
-        logger.info('Press Ctrl+C to exit SatNOGS poller')
-        socketio.run(app, host='0.0.0.0')
-    except (KeyboardInterrupt, SystemExit):
-        socketio.stop()
+    logger.info('Press Ctrl+C to exit SatNOGS poller')
+    while True:
+        time.sleep(10)
 
 
 if __name__ == '__main__':

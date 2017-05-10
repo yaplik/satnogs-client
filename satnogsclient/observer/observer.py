@@ -1,20 +1,15 @@
 # -*- coding: utf-8 -*-
-from satnogsclient.web.weblogger import WebLogger
 import logging
 import os
 
 from datetime import datetime
 from time import sleep
 from subprocess import call
-from flask_socketio import SocketIO
 from satnogsclient import settings
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
 from satnogsclient.upsat import gnuradio_handler
 
-logging.setLoggerClass(WebLogger)
 logger = logging.getLogger('default')
-assert isinstance(logger, WebLogger)
-socketio = SocketIO(message_queue='redis://')
 
 
 class Observer:
