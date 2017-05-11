@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from distutils.util import strtobool
 from os import environ, path
