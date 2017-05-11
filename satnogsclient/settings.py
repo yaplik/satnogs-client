@@ -1,3 +1,6 @@
+"""
+SatNOGS Client settings file
+"""
 import os
 from distutils.util import strtobool
 from os import environ, path
@@ -6,7 +9,7 @@ from os import environ, path
 def _cast_or_none(func, value):
     try:
         return func(value)
-    except:
+    except (ValueError, TypeError):
         return None
 
 
@@ -16,7 +19,6 @@ SATNOGS_STATION_ID = _cast_or_none(int, environ.get('SATNOGS_STATION_ID', None))
 SATNOGS_STATION_LAT = _cast_or_none(float, environ.get('SATNOGS_STATION_LAT', None))
 SATNOGS_STATION_LON = _cast_or_none(float, environ.get('SATNOGS_STATION_LON', None))
 SATNOGS_STATION_ELEV = _cast_or_none(float, environ.get('SATNOGS_STATION_ELEV', None))
-
 
 # Output paths
 SATNOGS_APP_PATH = environ.get('SATNOGS_APP_PATH', '/tmp/.satnogs')

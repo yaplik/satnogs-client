@@ -1,15 +1,31 @@
+"""
+SatNOGS Client module initialization
+"""
+from __future__ import absolute_import
+
+import logging
 import logging.config
-from os import environ
+import threading
+import time
 
 from validators.url import url
 
 from satnogsclient.settings import (SATNOGS_API_TOKEN, DEFAULT_LOGGING, SATNOGS_STATION_ID,
                                     SATNOGS_STATION_LAT, SATNOGS_STATION_LON, SATNOGS_STATION_ELEV,
                                     SATNOGS_NETWORK_API_URL)
+from satnogsclient.scheduler.tasks import status_listener, exec_rigctld
+
+__author__ = "SatNOGS project"
+__email__ = "dev@satnogs.org"
+__version__ = "0.3"
+
+LOGGER = logging.getLogger('satnogsclient')
 
 
-# Avoid validation when building docs
-if not environ.get('READTHEDOCS', False):
+def main():
+    """
+    Main function
+    """
     try:
         url(SATNOGS_NETWORK_API_URL)
     except:
@@ -31,3 +47,12 @@ if not environ.get('READTHEDOCS', False):
         raise Exception('SATNOGS_API_TOKEN not configured')
 
     logging.config.dictConfig(DEFAULT_LOGGING)
+
+    LOGGER.info('Starting status listener thread...')
+    ser = threading.Thread(target=status_listener, args=())
+    ser.daemon = True
+    ser.start()
+    exec_rigctld()
+    LOGGER.info('Press Ctrl+C to exit SatNOGS poller')
+    while True:
+        time.sleep(10)
