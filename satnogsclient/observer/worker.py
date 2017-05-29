@@ -1,6 +1,5 @@
 import logging
 import math
-import threading
 import time
 import json
 import os
@@ -69,28 +68,6 @@ class Worker:
         """
         self.observer_dict = observer_dict
         self.satellite_dict = satellite_dict
-
-    def trackstart(self, port, start_thread):
-        """
-        Starts the thread that communicates tracking info to remote socket.
-        Stops by calling trackstop()
-        """
-        self.is_alive = True
-        logger.info('Tracking initiated')
-        if not all([self.observer_dict, self.satellite_dict]):
-            raise ValueError('Satellite or observer dictionary not defined.')
-
-        self.t = threading.Thread(target=self._communicate_tracking_info)
-        self.t.daemon = True
-        self.t.start()
-
-        if start_thread:
-            self.r = threading.Thread(
-                target=self._status_interface, args=(port,))
-            self.r.daemon = True
-            self.r.start()
-
-        return self.is_alive
 
     def send_to_socket(self):
         # Needs to be implemented in freq/track workers implicitly

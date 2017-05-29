@@ -3,18 +3,8 @@ import subprocess
 import os
 
 from satnogsclient import settings as client_settings
-from satnogsclient.observer.udpsocket import Udpsocket
-
 
 logger = logging.getLogger('default')
-
-backend_listener_sock = Udpsocket(('0.0.0.0', client_settings.BACKEND_LISTENER_PORT))  # Port in which client listens for frames from gnuradio
-ui_listener_sock = Udpsocket(('127.0.0.1', client_settings.BACKEND_FEEDER_PORT))
-ecss_feeder_sock = Udpsocket([])  # The socket with which we communicate with the ecss feeder thread
-backend_feeder_sock = Udpsocket([])
-ld_socket = Udpsocket([])
-ld_uplink_socket = Udpsocket([])
-ld_downlink_socket = Udpsocket([])
 
 
 def exec_gnuradio(observation_file, waterfall_file, freq, user_args, script_name):

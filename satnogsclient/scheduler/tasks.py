@@ -173,25 +173,8 @@ def status_listener():
         interval)
     logger.info(msg)
     scheduler.add_job(post_data, 'interval', minutes=interval)
-    os.environ['BACKEND'] = ""
-    os.environ['MODE'] = "network"
     os.environ['GNURADIO_SCRIPT_PID'] = '0'
     os.environ['SCHEDULER'] = 'ON'
-
-
-def kill_cmd_ctrl_proc():
-    if int(os.environ['BACKEND_RX_PID']) != 0:
-        os.kill(int(os.environ['BACKEND_RX_PID']), signal.SIGKILL)
-        os.environ['BACKEND_RX_PID'] = '0'
-
-
-def kill_netw_proc():
-    if int(os.environ['TASK_FEEDER_PID']) != 0:
-        logger.info('Killing feeder %d', int(os.environ['TASK_FEEDER_PID']))
-        os.kill(int(os.environ['TASK_FEEDER_PID']), signal.SIGTERM)
-        os.environ['TASK_FEEDER_PID'] = '0'
-    scheduler.remove_all_jobs()
-    logger.info('Scheduler shutting down')
 
 
 def add_observation(obj):

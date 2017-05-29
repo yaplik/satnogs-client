@@ -227,7 +227,6 @@ class Observer:
         logger.debug('TLE: {0}'.format(self.tle))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_rot.trackobject(self.location, self.tle)
-        self.tracker_rot.trackstart(settings.CURRENT_PASS_TCP_PORT, True)
 
     def run_rig(self):
         self.tracker_freq = WorkerFreq(ip=self.rig_ip,
@@ -238,7 +237,6 @@ class Observer:
         logger.debug('Rig Frequency {0}'.format(self.frequency))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_freq.trackobject(self.location, self.tle)
-        self.tracker_freq.trackstart(5006, False)
 
     def poll_gnu_proc_status(self):
         while self._gnu_proc.poll() is None:
