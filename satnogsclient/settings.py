@@ -45,6 +45,7 @@ GNURADIO_SCRIPT_PATH = ['/usr/bin', '/usr/local/bin']
 GNURADIO_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
 GNURADIO_FM_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
 GNURADIO_CW_SCRIPT_FILENAME = 'satnogs_cw_demod.py'
+GNURADIO_APT_SCRIPT_FILENAME = 'satnogs_apt_demod.py'
 SATNOGS_RX_DEVICE = environ.get('SATNOGS_RX_DEVICE', 'rtlsdr')
 
 SATNOGS_ROT_IP = environ.get('SATNOGS_ROT_IP', '127.0.0.1')
