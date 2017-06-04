@@ -60,6 +60,8 @@ def spawn_observer(*args, **kwargs):
             script_name = settings.GNURADIO_CW_SCRIPT_FILENAME
         elif obj['mode'] == "APT":
             script_name = settings.GNURADIO_APT_SCRIPT_FILENAME
+        elif obj['mode'].startswith('BPSK'):
+            script_name = settings.GNURADIO_BPSK_SCRIPT_FILENAME
     setup_kwargs = {
         'observation_id': obj['id'],
         'tle': tle,
