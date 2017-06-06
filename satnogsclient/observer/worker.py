@@ -1,7 +1,7 @@
 import logging
 import math
+import threading
 import time
-import json
 import os
 import signal
 
@@ -69,6 +69,22 @@ class Worker:
         self.observer_dict = observer_dict
         self.satellite_dict = satellite_dict
 
+    def trackstart(self):
+        """
+        Starts the thread that communicates tracking info to remote socket.
+        Stops by calling trackstop()
+        """
+        self.is_alive = True
+        logger.info('Tracking initiated')
+        if not all([self.observer_dict, self.satellite_dict]):
+            raise ValueError('Satellite or observer dictionary not defined.')
+
+        self.t = threading.Thread(target=self._communicate_tracking_info)
+        self.t.daemon = True
+        self.t.start()
+
+        return self.is_alive
+
     def send_to_socket(self):
         # Needs to be implemented in freq/track workers implicitly
         raise NotImplementedError
@@ -94,24 +110,6 @@ class Worker:
                 time.sleep(self.SLEEP_TIME)
 
         sock.disconnect()
-
-    def _status_interface(self, port):
-        sock = Commsocket('127.0.0.1', port)
-        # sock.get_sock().bind(('127.0.0.1',port))
-        sock.bind()
-        sock.listen()
-        while self.is_alive:
-            conn = sock.accept()
-            if conn:
-                conn.recv(sock.buffer_size)
-                dict = {'azimuth': "{0:.2f}".format(self._azimuth),
-                        'altitude': "{0:.2f}".format(self._altitude),
-                        'frequency': self._frequency,
-                        'tle0': self.satellite_dict['tle0'],
-                        'tle1': self.satellite_dict['tle1'],
-                        'tle2': self.satellite_dict['tle2']}
-                conn.send(json.dumps(dict))
-                conn.close()
 
     def trackstop(self):
         """
