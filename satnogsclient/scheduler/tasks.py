@@ -86,6 +86,7 @@ def post_data():
     for f in os.walk(settings.SATNOGS_OUTPUT_PATH).next()[2]:
         file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, f])
         if (f.startswith('receiving_satnogs') or
+                f.startswith('receiving_waterfall') or
                 os.stat(file_path).st_size == 0):
             continue
         observation_id = f.split('_')[1]
