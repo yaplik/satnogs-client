@@ -223,7 +223,8 @@ class Observer:
                                        port=self.rot_port,
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
-                                       proc=self._gnu_proc)
+                                       proc=self._gnu_proc,
+                                       sleep_time=3)
         logger.debug('TLE: {0}'.format(self.tle))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_rot.trackobject(self.location, self.tle)
