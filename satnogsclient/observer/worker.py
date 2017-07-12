@@ -39,11 +39,13 @@ class Worker:
     _altitude = None
     _gnu_proc = None
 
+    _post_exec_script = None
+
     observer_dict = {}
     satellite_dict = {}
 
     def __init__(self, ip, port, time_to_stop=None, frequency=None, proc=None,
-                 sleep_time=None):
+                 sleep_time=None, _post_exec_script=None):
         """Initialize worker class."""
         self._IP = ip
         self._PORT = port
@@ -55,6 +57,8 @@ class Worker:
             self._gnu_proc = proc
         if sleep_time:
             self._sleep_time = sleep_time
+        if _post_exec_script is not None:
+            self._post_exec_script = _post_exec_script
 
     @property
     def is_alive(self):
@@ -124,6 +128,9 @@ class Worker:
         self.is_alive = False
         if self._gnu_proc:
             os.killpg(os.getpgid(self._gnu_proc.pid), signal.SIGKILL)
+        if self._post_exec_script is not None:
+            logger.info('Executing post-observation script.')
+            os.system(self._post_exec_script)
 
     def check_observation_end_reached(self):
         if datetime.now(pytz.utc) > self._observation_end:

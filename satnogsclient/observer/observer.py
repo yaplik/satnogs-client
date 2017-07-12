@@ -32,6 +32,7 @@ class Observer:
     _rig_ip = settings.SATNOGS_RIG_IP
     _rig_port = settings.SATNOGS_RIG_PORT
 
+    _post_exec_script = settings.SATNOGS_POST_OBSERVATION_SCRIPT
     # Variables from settings
     # Mainly present so we can support multiple ground stations from the client
 
@@ -197,6 +198,10 @@ class Observer:
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
+        if settings.SATNOGS_PRE_OBSERVATION_SCRIPT is not None:
+            logger.info('Executing pre-observation script.')
+            os.system(settings.SATNOGS_PRE_OBSERVATION_SCRIPT)
+
         # start thread for rotctl
         logger.info('Start gnuradio thread.')
         self._gnu_proc = gnuradio_handler.exec_gnuradio(
@@ -224,7 +229,8 @@ class Observer:
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
                                        proc=self._gnu_proc,
-                                       sleep_time=3)
+                                       sleep_time=3,
+                                       _post_exec_script=self._post_exec_script)
         logger.debug('TLE: {0}'.format(self.tle))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_rot.trackobject(self.location, self.tle)
@@ -235,7 +241,8 @@ class Observer:
                                        port=self.rig_port,
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
-                                       proc=self._gnu_proc)
+                                       proc=self._gnu_proc,
+                                       _post_exec_script=self._post_exec_script)
         logger.debug('Rig Frequency {0}'.format(self.frequency))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_freq.trackobject(self.location, self.tle)
