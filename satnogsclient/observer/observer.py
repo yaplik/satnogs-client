@@ -21,6 +21,8 @@ class Observer:
     _location = None
     _gnu_proc = None
 
+    _origin = None
+
     _observation_raw_file = None
     _observation_ogg_file = None
     _observation_waterfall_file = None
@@ -111,6 +113,14 @@ class Observer:
         self._frequency = frequency
 
     @property
+    def origin(self):
+        return self._origin
+
+    @origin.setter
+    def origin(self, origin):
+        self._origin = origin
+
+    @property
     def observation_raw_file(self):
         return self._observation_raw_file
 
@@ -142,7 +152,7 @@ class Observer:
     def observation_waterfall_png(self, observation_waterfall_png):
         self._observation_waterfall_png = observation_waterfall_png
 
-    def setup(self, observation_id, tle, observation_end, frequency, user_args, script_name):
+    def setup(self, observation_id, tle, observation_end, frequency, origin, user_args, script_name):
         """
         Sets up required internal variables.
         * returns True if setup is ok
@@ -156,6 +166,7 @@ class Observer:
         self.tle = tle
         self.observation_end = observation_end
         self.frequency = frequency
+        self.origin = origin
 
         not_completed_prefix = 'receiving_satnogs'
         completed_prefix = 'satnogs'
@@ -188,9 +199,8 @@ class Observer:
             self.observation_id,
             timestamp,
             'png')
-
         return all([self.observation_id, self.tle,
-                    self.observation_end, self.frequency,
+                    self.observation_end, self.frequency, self.origin,
                     self.observation_raw_file,
                     self.observation_ogg_file,
                     self.observation_waterfall_file,
@@ -207,6 +217,7 @@ class Observer:
         self._gnu_proc = gnuradio_handler.exec_gnuradio(
             self.observation_raw_file,
             self.observation_waterfall_file,
+            self.origin,
             self.frequency,
             self.user_args,
             self.script_name)

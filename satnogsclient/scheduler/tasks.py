@@ -43,30 +43,29 @@ def spawn_observer(*args, **kwargs):
         'lat': settings.SATNOGS_STATION_LAT,
         'elev': settings.SATNOGS_STATION_ELEV
     }
-    frequency = ""
-    if 'user_args' in obj:
+    frequency = 100e6
+    if obj['origin'] == 'manual':
         user_args = obj['user_args']
         script_name = obj['script_name']
         if '--rx-freq=' in user_args:
             frequency = int(user_args.split('--rx-freq=')[1].split(' ')[0])
-        else:
-            frequency = 100e6
     else:
         user_args = ""
         frequency = obj['frequency']
-    script_name = settings.GNURADIO_FM_SCRIPT_FILENAME
-    if 'mode' in obj:
-        if obj['mode'] == "CW":
-            script_name = settings.GNURADIO_CW_SCRIPT_FILENAME
-        elif obj['mode'] == "APT":
-            script_name = settings.GNURADIO_APT_SCRIPT_FILENAME
-        elif obj['mode'].startswith('BPSK'):
-            script_name = settings.GNURADIO_BPSK_SCRIPT_FILENAME
+        script_name = settings.GNURADIO_FM_SCRIPT_FILENAME
+        if 'mode' in obj:
+            if obj['mode'] == "CW":
+                script_name = settings.GNURADIO_CW_SCRIPT_FILENAME
+            elif obj['mode'] == "APT":
+                script_name = settings.GNURADIO_APT_SCRIPT_FILENAME
+            elif obj['mode'].startswith('BPSK'):
+                script_name = settings.GNURADIO_BPSK_SCRIPT_FILENAME
     setup_kwargs = {
         'observation_id': obj['id'],
         'tle': tle,
         'observation_end': end,
         'frequency': frequency,
+        'origin': obj['origin'],
         'user_args': user_args,
         'script_name': script_name
     }
@@ -149,6 +148,7 @@ def get_jobs():
         tasks.append(obj)
         start = parser.parse(obj['start'])
         job_id = str(obj['id'])
+        obj['origin'] = 'network'
         kwargs = {'obj': obj}
         logger.info('Adding new job: {0}'.format(job_id))
         logger.debug('Observation obj: {0}'.format(obj))
@@ -185,6 +185,7 @@ def status_listener():
 def add_observation(obj):
     start = parser.parse(obj['start'])
     job_id = str(obj['id'])
+    obj['origin'] = 'manual'
     kwargs = {'obj': obj}
     logger.info('Adding new job: {0}'.format(job_id))
     logger.debug('Observation obj: {0}'.format(obj))
