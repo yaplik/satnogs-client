@@ -47,7 +47,7 @@ GNURADIO_SCRIPT_PATH = ['/usr/bin', '/usr/local/bin']
 GNURADIO_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
 GNURADIO_FM_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
 GNURADIO_CW_SCRIPT_FILENAME = 'satnogs_cw_demod.py'
-GNURADIO_APT_SCRIPT_FILENAME = 'satnogs_apt_demod.py'
+GNURADIO_APT_SCRIPT_FILENAME = 'satnogs_noaa_apt_decoder.py'
 GNURADIO_BPSK_SCRIPT_FILENAME = 'satnogs_bpsk_demod.py'
 SATNOGS_RX_DEVICE = environ.get('SATNOGS_RX_DEVICE', 'rtlsdr')
 
@@ -57,14 +57,23 @@ SATNOGS_RIG_IP = environ.get('SATNOGS_RIG_IP', '127.0.0.1')
 SATNOGS_RIG_PORT = int(environ.get('SATNOGS_RIG_PORT', 4532))
 SATNOGS_ROT_THRESHOLD = int(environ.get('SATNOGS_ROT_THRESHOLD', 4))
 
-SATNOGS_PPM_ERROR = environ.get('SATNOGS_PPM_ERROR', 0)
-
 # Rigctld settings
 RIG_MODEL = ""
 RIG_FILE = ""
 RIG_PTT_FILE = ""
 RIG_PTT_TYPE = ""
 RIG_SERIAL_SPEED = ""
+
+# Common script parameters
+
+SATNOGS_DOPPLER_CORR_PER_SEC = environ.get('SATNOGS_DOPPLER_CORR_PER_SEC', None)
+SATNOGS_LO_OFFSET = environ.get('SATNOGS_LO_OFFSET', None)
+SATNOGS_PPM_ERROR = environ.get('SATNOGS_PPM_ERROR', None)
+SATNOGS_IF_GAIN = environ.get('SATNOGS_IF_GAIN', None)
+SATNOGS_RF_GAIN = environ.get('SATNOGS_RF_GAIN', None)
+SATNOGS_BB_GAIN = environ.get('SATNOGS_BB_GAIN', None)
+SATNOGS_ANTENNA = environ.get('SATNOGS_ANTENNA', None)
+SATNOGS_DEV_ARGS = environ.get('SATNOGS_DEV_ARGS', None)
 
 # Logging configuration
 DEFAULT_LOGGING = {
