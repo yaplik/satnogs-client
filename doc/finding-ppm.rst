@@ -6,7 +6,7 @@ Finding PPM
 
 The rtl-sdr dongles are not perfectly tuned and there is always a bit of shift in the crystal used. To calibrate this we need to find PPM. While rtl_test comes with PPM detection now, it is not very accurate on the raspberry pi due to the lack of a real time clock. To find our PPM from the command line we will use Kalibrate which finds the PPM against known GSM frequencies.::
 
-   sudo apt-get install autoconf libtool libfftw3-dev
+   sudo apt-get install autoconf libtool libfftw3-dev librtlsdr-dev
    git clone https://github.com/steve-m/kalibrate-rtl
    cd kalibrate-rtl
    ./bootstrap
