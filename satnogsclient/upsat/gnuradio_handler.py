@@ -7,13 +7,14 @@ from satnogsclient import settings as client_settings
 logger = logging.getLogger('default')
 
 
-def exec_gnuradio(observation_file, waterfall_file, origin, freq, user_args, script_name):
+def exec_gnuradio(observation_file, waterfall_file, origin, freq, user_args, script_name, noaa_png):
     arguments = {'filename': observation_file,
                  'waterfall': waterfall_file,
                  'rx_device': client_settings.SATNOGS_RX_DEVICE,
                  'center_freq': str(freq),
                  'user_args': user_args,
-                 'script_name': script_name}
+                 'script_name': script_name,
+                 'noaa_png': noaa_png}
     scriptname = arguments['script_name']
     arg_string = ' '
     if not scriptname:
@@ -48,6 +49,8 @@ def exec_gnuradio(observation_file, waterfall_file, origin, freq, user_args, scr
         arg_string += '--antenna=' + client_settings.ANTENNA + ' '
     if client_settings.SATNOGS_DEV_ARGS and "--dev-args" not in arg_string:
         arg_string += '--dev-args=' + client_settings.SATNOGS_DEV_ARGS + ' '
+    if 'noaa_png' != "":
+        arg_string += '--image-file-path=' + arguments['noaa_png'] + ' '
 
     logger.info('Starting GNUradio python script')
     proc = subprocess.Popen([scriptname + " " + arg_string], shell=True,
