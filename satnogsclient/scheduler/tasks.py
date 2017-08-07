@@ -92,9 +92,6 @@ def post_data():
                 f.startswith('receiving_waterfall') or
                 os.stat(file_path).st_size == 0):
             continue
-        observation_id = f.split('_')[1]
-        logger.info(
-            'Trying to PUT observation data for id: {0}'.format(observation_id))
         if f.startswith('satnogs'):
             observation = {'payload': open(file_path, 'rb')}
         elif f.startswith('waterfall'):
@@ -102,6 +99,11 @@ def post_data():
         else:
             logger.debug('Ignore file: {0}', f)
             continue
+        if '_' not in f:
+            continue
+        observation_id = f.split('_')[1]
+        logger.info(
+            'Trying to PUT observation data for id: {0}'.format(observation_id))
         url = urljoin(base_url, observation_id)
         if not url.endswith('/'):
             url += '/'
