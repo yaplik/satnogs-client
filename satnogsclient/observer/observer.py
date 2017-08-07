@@ -153,12 +153,12 @@ class Observer:
         self._observation_waterfall_png = observation_waterfall_png
 
     @property
-    def observation_noaa_png(self):
-        return self._observation_noaa_png
+    def observation_decoded_data(self):
+        return self._observation_decoded_data
 
-    @observation_noaa_png.setter
-    def observation_noaa_png(self, observation_noaa_png):
-        self._observation_noaa_png = observation_noaa_png
+    @observation_decoded_data.setter
+    def observation_decoded_data(self, observation_decoded_data):
+        self._observation_decoded_data = observation_decoded_data
 
     def setup(self, observation_id, tle, observation_end, frequency, origin, user_args, script_name):
         """
@@ -180,7 +180,7 @@ class Observer:
         completed_prefix = 'satnogs'
         receiving_waterfall_prefix = 'receiving_waterfall'
         waterfall_prefix = 'waterfall'
-        noaa_prefix = 'noaa'
+        decoded_data_prefix = 'data'
         timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S%z')
         raw_file_extension = 'out'
         encoded_file_extension = 'ogg'
@@ -208,22 +208,17 @@ class Observer:
             self.observation_id,
             timestamp,
             'png')
-        if 'noaa' in script_name:
-            self.observation_noaa_png = '{0}/{1}_{2}_{3}.{4}'.format(
-                settings.SATNOGS_OUTPUT_PATH,
-                noaa_prefix,
-                self.observation_id,
-                timestamp,
-                'png')
-        else:
-            self.observation_noaa_png = ""
+        self.observation_decoded_data = '{0}/{1}_{2}'.format(
+            settings.SATNOGS_OUTPUT_PATH,
+            decoded_data_prefix,
+            self.observation_id)
         return all([self.observation_id, self.tle,
                     self.observation_end, self.frequency, self.origin,
                     self.observation_raw_file,
                     self.observation_ogg_file,
                     self.observation_waterfall_file,
                     self.observation_waterfall_png,
-                    self.observation_noaa_png])
+                    self.observation_decoded_data])
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
@@ -240,7 +235,7 @@ class Observer:
             self.frequency,
             self.user_args,
             self.script_name,
-            self.observation_noaa_png)
+            self.observation_decoded_data)
         logger.info('Start rotctrl thread.')
         self.run_rot()
         # start thread for rigctl
