@@ -74,6 +74,8 @@ SATNOGS_RF_GAIN = environ.get('SATNOGS_RF_GAIN', None)
 SATNOGS_BB_GAIN = environ.get('SATNOGS_BB_GAIN', None)
 SATNOGS_ANTENNA = environ.get('SATNOGS_ANTENNA', None)
 SATNOGS_DEV_ARGS = environ.get('SATNOGS_DEV_ARGS', None)
+ENABLE_IQ_DUMP = environ.get('ENABLE_IQ_DUMP', 0)
+IQ_DUMP_FILENAME = environ.get('IQ_DUMP_FILENAME', None)
 
 # Logging configuration
 DEFAULT_LOGGING = {
