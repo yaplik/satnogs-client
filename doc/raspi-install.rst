@@ -16,7 +16,7 @@ This tutorial assumes the following:
 1. Prepare Raspberry Pi
 -----------------------
 
-**Step 1.1:** Download fedora minimal or server RPi image (current 25) from `ARM Fedora Project <https://arm.fedoraproject.org/>`_ (server edition provides a nice web interface, admin console, with several stats and SSH access).
+**Step 1.1:** Download fedora minimal or server RPi image (current 26) from `ARM Fedora Project <https://arm.fedoraproject.org/>`_ (server edition provides a nice web interface, admin console, with several stats and SSH access).
 
 **Step 1.2:** Connect SD card to your computer/laptop and prepare it as described at `Fedora Wiki <https://fedoraproject.org/wiki/Raspberry_Pi#Preparing_the_SD_card>`_ (don't forget to `resize the root partition <https://fedoraproject.org/wiki/Raspberry_Pi#Resizing_the_root_partition>`_).
 
@@ -43,7 +43,7 @@ This tutorial assumes the following:
   * Only if you used the "minimal" Fedora installation (not the "server" build), change options of root partition line (/ ext4) from `defaults,noatime` to `defaults,noatime,commit=1800`. This change means that changes on root partition will be written on SD Card every 30min
   * Move /var/log and /var/tmp directories to memory by adding the following two lines::
 
-      tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=20m 0 0
+      tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=120m 0 0
       tmpfs /var/log tmpfs defaults,noatime,nosuid,mode=0755,size=80m 0 0
 
 **Step 1.9:** Automate creating of redis directory in /var/log path after boot by running::
@@ -77,10 +77,15 @@ This tutorial assumes the following:
         <port protocol="tcp" port="5000"/>
       </service>
 
-  * Then run::
+  * If you used the server image run::
 
       sudo firewall-cmd --zone=FedoraServer --add-service=satnogs --permanent
       sudo firewall-cmd --zone=FedoraServer --add-service=satnogs
+
+  * Or for the minimal image::
+
+      sudo firewall-cmd --zone=public --add-service=satnogs --permanent
+      sudo firewall-cmd --zone=public --add-service=satnogs
 
 ---------------------
 2. Install gr-satnogs
