@@ -53,7 +53,8 @@ def exec_gnuradio(observation_file, waterfall_file, origin, freq, user_args, scr
         arg_string += '--enable-iq-dump=' + client_settings.ENABLE_IQ_DUMP + ' '
     if client_settings.IQ_DUMP_FILENAME and "--iq-file-path" not in arg_string:
         arg_string += '--iq-file-path=' + client_settings.IQ_DUMP_FILENAME + ' '
-    arg_string += '--decoded-data-file-path=' + arguments['decoded_data'] + ' '
+    if client_settings.ENABLE_DECODED_DATA and "--decoded-data-file-path" not in arg_string:
+        arg_string += '--decoded-data-file-path=' + arguments['decoded_data'] + ' '
 
     logger.info('Starting GNUradio python script')
     proc = subprocess.Popen([scriptname + " " + arg_string], shell=True,
