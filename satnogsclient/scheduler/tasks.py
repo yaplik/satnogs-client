@@ -135,7 +135,8 @@ def get_jobs():
     logger.debug('Headers: {0}'.format(headers))
     logger.info('Trying to GET observation jobs from the network')
     response = requests.get(
-        url, params=params, headers=headers, verify=settings.SATNOGS_VERIFY_SSL)
+        url, params=params, headers=headers,
+        verify=settings.SATNOGS_VERIFY_SSL, timeout=45)
 
     if not response.status_code == 200:
         raise Exception(
