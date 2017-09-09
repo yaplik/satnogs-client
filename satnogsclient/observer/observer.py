@@ -153,6 +153,16 @@ class Observer:
         self._observation_waterfall_png = observation_waterfall_png
 
     @property
+    def observation_receiving_decoded_data(self):
+        return self._observation_receiving_decoded_data
+
+    @observation_receiving_decoded_data.setter
+    def observation_receiving_decoded_data(self,
+                                           observation_receiving_decoded_data):
+        self._observation_receiving_decoded_data =\
+             observation_receiving_decoded_data
+
+    @property
     def observation_decoded_data(self):
         return self._observation_decoded_data
 
@@ -180,6 +190,7 @@ class Observer:
         completed_prefix = 'satnogs'
         receiving_waterfall_prefix = 'receiving_waterfall'
         waterfall_prefix = 'waterfall'
+        receiving_decoded_data_prefix = 'receiving_data'
         decoded_data_prefix = 'data'
         timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S%z')
         raw_file_extension = 'out'
@@ -208,6 +219,18 @@ class Observer:
             self.observation_id,
             timestamp,
             'png')
+        self.observation_receiving_decoded_data = '{0}/{1}_{2}_{3}.{4}'.format(
+            settings.SATNOGS_OUTPUT_PATH,
+            receiving_decoded_data_prefix,
+            self.observation_id,
+            timestamp,
+            'png')
+        self.observation_done_decoded_data = '{0}/{1}_{2}_{3}.{4}'.format(
+            settings.SATNOGS_OUTPUT_PATH,
+            decoded_data_prefix,
+            self.observation_id,
+            timestamp,
+            'png')
         self.observation_decoded_data = '{0}/{1}_{2}'.format(
             settings.SATNOGS_OUTPUT_PATH,
             decoded_data_prefix,
@@ -225,6 +248,12 @@ class Observer:
         if settings.SATNOGS_PRE_OBSERVATION_SCRIPT is not None:
             logger.info('Executing pre-observation script.')
             os.system(settings.SATNOGS_PRE_OBSERVATION_SCRIPT)
+
+        # if it is APT we want to save with a prefix until the observation
+        # is complete, then rename.
+        if settings.GNURADIO_APT_SCRIPT_FILENAME in self.script_name:
+            self.observation_decoded_data =\
+                 self.observation_receiving_decoded_data
 
         # start thread for rotctl
         logger.info('Start gnuradio thread.')
@@ -244,8 +273,9 @@ class Observer:
         # Polling gnuradio process status
         self.poll_gnu_proc_status()
         if "satnogs_generic_iq_receiver.py" not in settings.GNURADIO_SCRIPT_FILENAME:
-            logger.info('Rename encoded file for uploading.')
+            logger.info('Rename encoded files for uploading.')
             self.rename_ogg_file()
+            self.rename_data_file()
             logger.info('Creating waterfall plot.')
             self.plot_waterfall()
 
@@ -284,6 +314,12 @@ class Observer:
             os.rename(self.observation_raw_file,
                       self.observation_ogg_file)
         logger.info('Rename encoded file for uploading finished')
+
+    def rename_data_file(self):
+        if os.path.isfile(self.observation_receiving_decoded_data):
+            os.rename(self.observation_receiving_decoded_data,
+                      self.observation_done_decoded_data)
+        logger.info('Rename data file for uploading finished')
 
     def plot_waterfall(self):
         if os.path.isfile(self.observation_waterfall_file):

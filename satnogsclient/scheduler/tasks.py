@@ -90,12 +90,15 @@ def post_data():
         file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, f])
         if (f.startswith('receiving_satnogs') or
                 f.startswith('receiving_waterfall') or
+                f.startswith('receiving_data') or
                 os.stat(file_path).st_size == 0):
             continue
         if f.startswith('satnogs'):
             observation = {'payload': open(file_path, 'rb')}
         elif f.startswith('waterfall'):
             observation = {'waterfall': open(file_path, 'rb')}
+        elif f.startswith('data'):
+            observation = {'demoddata': open(file_path, 'rb')}
         else:
             logger.debug('Ignore file: {0}', f)
             continue
