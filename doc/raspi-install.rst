@@ -113,7 +113,7 @@ Building from source is outside of the scope of this document, we will use the p
 
 **Step 3.1:** Run the following command to install the packaged version of SatNOGS Client::
 
-   sudo pip install satnogsclient==0.3
+   sudo pip install satnogsclient
 
 ---------------------------
 4. Configure satnogs-client
