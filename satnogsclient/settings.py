@@ -49,6 +49,7 @@ GNURADIO_FM_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
 GNURADIO_CW_SCRIPT_FILENAME = 'satnogs_cw_demod.py'
 GNURADIO_APT_SCRIPT_FILENAME = 'satnogs_noaa_apt_decoder.py'
 GNURADIO_BPSK_SCRIPT_FILENAME = 'satnogs_bpsk_demod.py'
+GNURADIO_FSK9K6_SCRIPT_FILENAME = 'satnogs_fsk9600_g3ruh_ax25.py'
 SATNOGS_RX_DEVICE = environ.get('SATNOGS_RX_DEVICE', 'rtlsdr')
 
 SATNOGS_ROT_IP = environ.get('SATNOGS_ROT_IP', '127.0.0.1')
