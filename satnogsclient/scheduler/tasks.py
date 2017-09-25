@@ -122,11 +122,13 @@ def post_data():
                                 stream=True)
         if response.status_code == 200:
             logger.info('Success: status code 200')
-            dst = os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, f)
+            if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
+                os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, f), os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH))
+            else:
+                os.remove(os.path.join(settings.SATNOGS_OUTPUT_PATH, f))
         else:
             logger.error('Bad status code: {0}'.format(response.status_code))
-            dst = os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, f)
-        os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, f), dst)
+            os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, f), os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH))
 
 
 def get_jobs():

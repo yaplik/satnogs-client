@@ -159,7 +159,7 @@ SATNOGS_OUTPUT_PATH
 SATNOGS_COMPLETE_OUTPUT_PATH
   * Defines the path where data will be moved after succesful upload on network.
   * Default Type: string
-  * Default Value: '/tmp/.satnogs/data/complete'
+  * Default Value: ''
 
 SATNOGS_INCOMPLETE_OUTPUT_PATH
   * Defines the path where data will be moved after unsuccesful upload on network.
