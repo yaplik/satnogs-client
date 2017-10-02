@@ -91,7 +91,7 @@ DEFAULT_LOGGING = {
     'loggers': {
         'satnogsclient': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
         'apscheduler.executors.default': {
             'handlers': ['console'],
