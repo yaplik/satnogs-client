@@ -119,7 +119,8 @@ def post_data():
         response = requests.put(url, headers=headers,
                                 files=observation,
                                 verify=settings.SATNOGS_VERIFY_SSL,
-                                stream=True)
+                                stream=True,
+                                timeout=45)
         if response.status_code == 200:
             logger.info('Success: status code 200')
             if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
