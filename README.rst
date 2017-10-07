@@ -12,7 +12,7 @@ To install ``SatNOGS`` client, simply::
 
 To get the latest development version::
 
-  $ git clone https://github.com/satnogs/satnogs-client.git
+  $ git clone https://gitlab.com/librespacefoundation/satnogs/satnogs-client.git
   $ cd satnogs-client
   $ pip install -e .
 
