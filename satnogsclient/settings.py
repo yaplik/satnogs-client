@@ -81,9 +81,9 @@ SATNOGS_RF_GAIN = environ.get('SATNOGS_RF_GAIN', None)
 SATNOGS_BB_GAIN = environ.get('SATNOGS_BB_GAIN', None)
 SATNOGS_ANTENNA = environ.get('SATNOGS_ANTENNA', None)
 SATNOGS_DEV_ARGS = environ.get('SATNOGS_DEV_ARGS', None)
-ENABLE_IQ_DUMP = environ.get('ENABLE_IQ_DUMP', 0)
+ENABLE_IQ_DUMP = bool(strtobool(environ.get('ENABLE_IQ_DUMP', 'False')))
 IQ_DUMP_FILENAME = environ.get('IQ_DUMP_FILENAME', None)
-DISABLE_DECODED_DATA = environ.get('DISABLE_DECODED_DATA', 0)
+DISABLE_DECODED_DATA = bool(strtobool(environ.get('DISABLE_DECODED_DATA', 'False')))
 
 # Logging configuration
 DEFAULT_LOGGING = {
