@@ -63,7 +63,7 @@ class Commsocket:
             logger.debug('Opening TCP socket: {0}:{1}'.format(self.ip, self.port))
             self.s.connect((self.ip, self.port))
             self._connected = True
-        except:
+        except socket.error:
             logger.error('Cannot connect to socket {0}:{1}'.format(self.ip, self.port))
             self._connected = False
         return self.is_connected

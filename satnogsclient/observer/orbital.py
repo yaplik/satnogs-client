@@ -41,7 +41,7 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
         tle2 = str(satellite_dict['tle2'])
         try:
             satellite = ephem.readtle(tle0, tle1, tle2)
-        except:
+        except ValueError:
             logger.error('Something went wrong: {0}'.format(satellite_dict))
             logger.error(sys.exc_info()[0])
             return {'ok': False}

@@ -28,7 +28,7 @@ def main():
     """
     try:
         url(SATNOGS_NETWORK_API_URL)
-    except:
+    except ValueError:
         raise Exception('Invalid SATNOGS_NETWORK_API_URL: {0}'.format(SATNOGS_NETWORK_API_URL))
 
     if not SATNOGS_STATION_ID:
