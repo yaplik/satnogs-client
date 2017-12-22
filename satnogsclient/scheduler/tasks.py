@@ -85,7 +85,7 @@ def spawn_observer(*args, **kwargs):
 def post_data():
     logger.info('Post data started')
     """PUT observation data back to Network API."""
-    base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'data/')
+    base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
     headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
 
     for f in os.walk(settings.SATNOGS_OUTPUT_PATH).next()[2]:
