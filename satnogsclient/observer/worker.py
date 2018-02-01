@@ -39,13 +39,11 @@ class Worker:
     _altitude = None
     _gnu_proc = None
 
-    _post_exec_script = None
-
     observer_dict = {}
     satellite_dict = {}
 
     def __init__(self, ip, port, time_to_stop=None, frequency=None, proc=None,
-                 sleep_time=None, _post_exec_script=None):
+                 sleep_time=None):
         """Initialize worker class."""
         self._IP = ip
         self._PORT = port
@@ -57,8 +55,6 @@ class Worker:
             self._gnu_proc = proc
         if sleep_time:
             self._sleep_time = sleep_time
-        if _post_exec_script is not None:
-            self._post_exec_script = _post_exec_script
 
     @property
     def is_alive(self):

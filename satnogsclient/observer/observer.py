@@ -287,8 +287,7 @@ class Observer:
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
                                        proc=self._gnu_proc,
-                                       sleep_time=3,
-                                       _post_exec_script=self._post_exec_script)
+                                       sleep_time=3)
         logger.debug('TLE: {0}'.format(self.tle))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_rot.trackobject(self.location, self.tle)
@@ -299,8 +298,7 @@ class Observer:
                                        port=self.rig_port,
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
-                                       proc=self._gnu_proc,
-                                       _post_exec_script=self._post_exec_script)
+                                       proc=self._gnu_proc)
         logger.debug('Rig Frequency {0}'.format(self.frequency))
         logger.debug('Observation end: {0}'.format(self.observation_end))
         self.tracker_freq.trackobject(self.location, self.tle)
@@ -310,6 +308,8 @@ class Observer:
         while self._gnu_proc.poll() is None:
             sleep(30)
         logger.info('Observation Finished')
+        logger.info('Executing post-observation script.')
+        os.system(self._post_exec_script)
 
     def rename_ogg_file(self):
         if os.path.isfile(self.observation_raw_file):
