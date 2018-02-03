@@ -7,7 +7,8 @@ from satnogsclient import settings as client_settings
 logger = logging.getLogger('default')
 
 
-def exec_gnuradio(observation_file, waterfall_file, origin, freq, user_args, script_name, decoded_data):
+def exec_gnuradio(observation_file, waterfall_file, origin, freq, baud,
+                  user_args, script_name, decoded_data):
     arguments = {'filename': observation_file,
                  'waterfall': waterfall_file,
                  'rx_device': client_settings.SATNOGS_RX_DEVICE,
@@ -29,6 +30,10 @@ def exec_gnuradio(observation_file, waterfall_file, origin, freq, user_args, scr
         arg_string += '--file-path=' + file_path + ' '
         if arguments['waterfall'] != "":
             arg_string += '--waterfall-file-path=' + waterfall_file_path + ' '
+
+        # If this is a CW observation pass the WPM parameter
+        if scriptname == client_settings.GNURADIO_CW_SCRIPT_FILENAME and baud > 0:
+            arg_string += '--wpm=' + str(baud)
     else:
         arg_string = user_args + ' '
     if client_settings.SATNOGS_RX_DEVICE and "--rx-sdr-device" not in arg_string:
@@ -46,7 +51,7 @@ def exec_gnuradio(observation_file, waterfall_file, origin, freq, user_args, scr
     if client_settings.SATNOGS_BB_GAIN and "--bb-gain" not in arg_string:
         arg_string += '--bb-gain=' + client_settings.SATNOGS_BB_GAIN + ' '
     if client_settings.SATNOGS_ANTENNA and "--antenna" not in arg_string:
-        arg_string += '--antenna=' + client_settings.ANTENNA + ' '
+        arg_string += '--antenna=' + client_settings.SATNOGS_ANTENNA + ' '
     if client_settings.SATNOGS_DEV_ARGS and "--dev-args" not in arg_string:
         arg_string += '--dev-args=' + client_settings.SATNOGS_DEV_ARGS + ' '
     if client_settings.ENABLE_IQ_DUMP and "--enable-iq-dump" not in arg_string:

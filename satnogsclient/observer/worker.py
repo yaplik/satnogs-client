@@ -127,7 +127,7 @@ class Worker:
         logger.info('Tracking stopped.')
         self.is_alive = False
         if self._gnu_proc:
-            os.killpg(os.getpgid(self._gnu_proc.pid), signal.SIGKILL)
+            os.killpg(os.getpgid(self._gnu_proc.pid), signal.SIGINT)
         if self._post_exec_script is not None:
             logger.info('Executing post-observation script.')
             os.system(self._post_exec_script)

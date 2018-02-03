@@ -44,6 +44,10 @@ def spawn_observer(*args, **kwargs):
         'elev': settings.SATNOGS_STATION_ELEV
     }
     frequency = 100e6
+    # Get the baudrate. In case of CW baudrate equals the WPM
+    baud = 0
+    if 'baud' in obj:
+        baud = obj['baud']
     if obj['origin'] == 'manual':
         user_args = obj['user_args']
         script_name = obj['script_name']
@@ -70,6 +74,7 @@ def spawn_observer(*args, **kwargs):
         'tle': tle,
         'observation_end': end,
         'frequency': frequency,
+        'baud': baud,
         'origin': obj['origin'],
         'user_args': user_args,
         'script_name': script_name
