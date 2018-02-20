@@ -91,8 +91,8 @@ def spawn_observer(**kwargs):
 
 
 def post_data():
-    logger.info('Post data started')
     """PUT observation data back to Network API."""
+    logger.info('Post data started')
     base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
     headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
 
@@ -141,8 +141,8 @@ def post_data():
 
 
 def get_jobs():
-    logger.info('Get jobs started')
     """Query SatNOGS Network API to GET jobs."""
+    logger.info('Get jobs started')
     url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'jobs/')
     params = {'ground_station': settings.SATNOGS_STATION_ID}
     headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
