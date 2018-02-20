@@ -110,7 +110,7 @@ def post_data():
         elif f.startswith('data'):
             observation = {'demoddata': open(file_path, 'rb')}
         else:
-            logger.debug('Ignore file: {0}', f)
+            logger.debug('Ignore file: {0}'.format(f))
             continue
         if '_' not in f:
             continue
