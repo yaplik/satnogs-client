@@ -94,7 +94,7 @@ class Worker:
 
         return self.is_alive
 
-    def send_to_socket(self):
+    def send_to_socket(self, p, sock):
         # Needs to be implemented in freq/track workers implicitly
         raise NotImplementedError
 
