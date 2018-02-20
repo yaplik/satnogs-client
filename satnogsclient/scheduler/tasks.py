@@ -16,7 +16,7 @@ logger = logging.getLogger('default')
 log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
 
 
-def signal_term_handler(a, b):
+def signal_term_handler():
     p = subprocess.Popen(['ps', '-ef'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
@@ -28,7 +28,7 @@ def signal_term_handler(a, b):
 signal.signal(signal.SIGINT, signal_term_handler)
 
 
-def spawn_observer(*args, **kwargs):
+def spawn_observer(**kwargs):
     obj = kwargs.pop('obj')
     tle = {
         'tle0': obj['tle0'],
