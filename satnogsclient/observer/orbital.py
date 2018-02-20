@@ -23,7 +23,7 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
             Dictionary containing azimuth, altitude and "ok" for error detection.
     """
     # observer object
-    if all(map(lambda x: x in observer_dict, ['lat', 'lon', 'elev'])):
+    if all(x in observer_dict for x in ['lat', 'lon', 'elev']):
         logger.debug('Observer data: {0}'.format(observer_dict))
         observer = ephem.Observer()
         observer.lon = str(observer_dict['lon'])
@@ -34,7 +34,7 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
         return {'ok': False}
 
     # satellite object
-    if all(map(lambda x: x in satellite_dict, ['tle0', 'tle1', 'tle2'])):
+    if all(x in satellite_dict for x in ['tle0', 'tle1', 'tle2']):
         logger.debug('Satellite data: {0}'.format(satellite_dict))
         tle0 = str(satellite_dict['tle0'])
         tle1 = str(satellite_dict['tle1'])
