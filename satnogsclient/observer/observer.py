@@ -309,7 +309,8 @@ class Observer:
             sleep(30)
         logger.info('Observation Finished')
         logger.info('Executing post-observation script.')
-        os.system(self._post_exec_script)
+        if self._post_exec_script is not None:
+            os.system(self._post_exec_script)
 
     def rename_ogg_file(self):
         if os.path.isfile(self.observation_raw_file):
