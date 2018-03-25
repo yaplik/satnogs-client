@@ -124,9 +124,6 @@ class Worker:
         self.is_alive = False
         if self._gnu_proc:
             os.killpg(os.getpgid(self._gnu_proc.pid), signal.SIGINT)
-        if self._post_exec_script is not None:
-            logger.info('Executing post-observation script.')
-            os.system(self._post_exec_script)
 
     def check_observation_end_reached(self):
         if datetime.now(pytz.utc) > self._observation_end:
