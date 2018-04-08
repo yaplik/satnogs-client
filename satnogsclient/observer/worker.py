@@ -55,6 +55,7 @@ class Worker:
             self._gnu_proc = proc
         if sleep_time:
             self._sleep_time = sleep_time
+        self.track = None
 
     @property
     def is_alive(self):
@@ -84,9 +85,9 @@ class Worker:
         if not all([self.observer_dict, self.satellite_dict]):
             raise ValueError('Satellite or observer dictionary not defined.')
 
-        self.t = threading.Thread(target=self._communicate_tracking_info)
-        self.t.daemon = True
-        self.t.start()
+        self.track = threading.Thread(target=self._communicate_tracking_info)
+        self.track.daemon = True
+        self.track.start()
 
         return self.is_alive
 

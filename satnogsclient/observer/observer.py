@@ -13,162 +13,35 @@ logger = logging.getLogger('default')
 
 class Observer:
 
-    _observation_id = None
-    _tle = None
-    _observation_end = None
-    _frequency = None
-
-    _location = None
     _gnu_proc = None
-
-    _origin = None
-
-    _observation_raw_file = None
-    _observation_ogg_file = None
-    _observation_waterfall_file = None
-    _observation_waterfall_png = None
-
-    _rot_ip = settings.SATNOGS_ROT_IP
-    _rot_port = settings.SATNOGS_ROT_PORT
-
-    _rig_ip = settings.SATNOGS_RIG_IP
-    _rig_port = settings.SATNOGS_RIG_PORT
 
     _post_exec_script = settings.SATNOGS_POST_OBSERVATION_SCRIPT
     # Variables from settings
     # Mainly present so we can support multiple ground stations from the client
 
-    @property
-    def location(self):
-        return self._location
-
-    @location.setter
-    def location(self, location):
-        self._location = location
-
-    @property
-    def rot_ip(self):
-        return self._rot_ip
-
-    @rot_ip.setter
-    def rot_ip(self, ip):
-        self._rot_ip = ip
-
-    @property
-    def rot_port(self):
-        return self._rot_port
-
-    @rot_port.setter
-    def rot_port(self, port):
-        self._rot_port = port
-
-    @property
-    def rig_ip(self):
-        return self._rig_ip
-
-    @rig_ip.setter
-    def rig_ip(self, ip):
-        self._rig_ip = ip
-
-    @property
-    def rig_port(self):
-        return self._rig_port
-
-    @rig_port.setter
-    def rig_port(self, port):
-        self._rig_port = port
-
-    # Passed variables
-
-    @property
-    def observation_id(self):
-        return self._observation_id
-
-    @observation_id.setter
-    def observation_id(self, observation_id):
-        self._observation_id = observation_id
-
-    @property
-    def tle(self):
-        return self._tle
-
-    @tle.setter
-    def tle(self, tle):
-        self._tle = tle
-
-    @property
-    def observation_end(self):
-        return self._observation_end
-
-    @observation_end.setter
-    def observation_end(self, timestamp):
-        self._observation_end = timestamp
-
-    @property
-    def frequency(self):
-        return self._frequency
-
-    @frequency.setter
-    def frequency(self, frequency):
-        self._frequency = frequency
-
-    @property
-    def origin(self):
-        return self._origin
-
-    @origin.setter
-    def origin(self, origin):
-        self._origin = origin
-
-    @property
-    def observation_raw_file(self):
-        return self._observation_raw_file
-
-    @observation_raw_file.setter
-    def observation_raw_file(self, observation_raw_file):
-        self._observation_raw_file = observation_raw_file
-
-    @property
-    def observation_ogg_file(self):
-        return self._observation_ogg_file
-
-    @observation_ogg_file.setter
-    def observation_ogg_file(self, observation_ogg_file):
-        self._observation_ogg_file = observation_ogg_file
-
-    @property
-    def observation_waterfall_file(self):
-        return self._observation_waterfall_file
-
-    @observation_waterfall_file.setter
-    def observation_waterfall_file(self, observation_waterfall_file):
-        self._observation_waterfall_file = observation_waterfall_file
-
-    @property
-    def observation_waterfall_png(self):
-        return self._observation_waterfall_png
-
-    @observation_waterfall_png.setter
-    def observation_waterfall_png(self, observation_waterfall_png):
-        self._observation_waterfall_png = observation_waterfall_png
-
-    @property
-    def observation_receiving_decoded_data(self):
-        return self._observation_receiving_decoded_data
-
-    @observation_receiving_decoded_data.setter
-    def observation_receiving_decoded_data(self,
-                                           observation_receiving_decoded_data):
-        self._observation_receiving_decoded_data =\
-             observation_receiving_decoded_data
-
-    @property
-    def observation_decoded_data(self):
-        return self._observation_decoded_data
-
-    @observation_decoded_data.setter
-    def observation_decoded_data(self, observation_decoded_data):
-        self._observation_decoded_data = observation_decoded_data
+    def __init__(self):
+        self.location = None
+        self.rot_ip = settings.SATNOGS_ROT_IP
+        self.rot_port = settings.SATNOGS_ROT_PORT
+        self.rig_ip = settings.SATNOGS_RIG_IP
+        self.rig_port = settings.SATNOGS_RIG_PORT
+        self.observation_id = None
+        self.tle = None
+        self.observation_end = None
+        self.frequency = None
+        self.origin = None
+        self.observation_raw_file = None
+        self.observation_ogg_file = None
+        self.observation_waterfall_file = None
+        self.observation_waterfall_png = None
+        self.observation_receiving_decoded_data = None
+        self.observation_decoded_data = None
+        self.baud = None
+        self.observation_done_decoded_data = None
+        self.tracker_freq = None
+        self.tracker_rot = None
+        self.user_args = None
+        self.script_name = None
 
     def setup(self, observation_id, tle, observation_end, frequency, baud, origin, user_args, script_name):
         """
