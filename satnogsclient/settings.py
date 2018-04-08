@@ -38,7 +38,7 @@ SATNOGS_VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
 DEFAULT_SQLITE_PATH = path.join(SATNOGS_APP_PATH, 'jobs.sqlite')
 SATNOGS_SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQLITE_PATH)
 
-SATNOGS_NETWORK_API_URL = environ.get('SATNOGS_NETWORK_API_URL', 'https://network-dev.satnogs.org/api/')
+SATNOGS_NETWORK_API_URL = environ.get('SATNOGS_NETWORK_API_URL', 'https://network.satnogs.org/api/')
 SATNOGS_NETWORK_API_QUERY_INTERVAL = 1  # In minutes
 SATNOGS_NETWORK_API_POST_INTERVAL = 2  # In minutes
 GNURADIO_UDP_PORT = 16886
