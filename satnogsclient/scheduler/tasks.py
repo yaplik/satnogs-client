@@ -18,7 +18,7 @@ log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
 
 def signal_term_handler():
     p = subprocess.Popen(['ps', '-ef'], stdout=subprocess.PIPE)
-    out, err = p.communicate()
+    out, err = p.communicate()  # pylint: disable=W0612
     for line in out.splitlines():
         if 'satnogs-client' in line:
             pid = int(line.split(None, 2)[1])

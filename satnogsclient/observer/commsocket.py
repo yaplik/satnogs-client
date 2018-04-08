@@ -96,7 +96,7 @@ class Commsocket:
         self.s.listen(1)
 
     def accept(self):
-        conn, addr = self.s.accept()
+        conn, addr = self.s.accept()  # pylint: disable=W0612
         return conn
 
     def bind(self):
