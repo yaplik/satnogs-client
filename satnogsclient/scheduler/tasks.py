@@ -223,8 +223,8 @@ def get_observation_list():
     return obs_list
 
 
-def get_observation(id):
-    obs = scheduler.get_job(id)
+def get_observation(job_id):
+    obs = scheduler.get_job(job_id)
     return obs
 
 
