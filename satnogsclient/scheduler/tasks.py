@@ -82,7 +82,7 @@ def spawn_observer(**kwargs):
         'script_name': script_name
     }
 
-    logger.debug('Observer args: {0}'.format(setup_kwargs))
+    logger.debug('Observer args: %s', setup_kwargs)
     setup = observer.setup(**setup_kwargs)
 
     if setup:
@@ -112,20 +112,20 @@ def post_data():
         elif f.startswith('data'):
             observation = {'demoddata': open(file_path, 'rb')}
         else:
-            logger.debug('Ignore file: {0}'.format(f))
+            logger.debug('Ignore file: %s', f)
             continue
         if '_' not in f:
             continue
         observation_id = f.split('_')[1]
         logger.info(
-            'Trying to PUT observation data for id: {0}'.format(observation_id))
+            'Trying to PUT observation data for id: %s', observation_id)
         url = urljoin(base_url, observation_id)
         if not url.endswith('/'):
             url += '/'
-        logger.debug('PUT file {0} to network API'.format(f))
-        logger.debug('URL: {0}'.format(url))
-        logger.debug('Headers: {0}'.format(headers))
-        logger.debug('Observation file: {0}'.format(observation))
+        logger.debug('PUT file %s to network API', f)
+        logger.debug('URL: %s', url)
+        logger.debug('Headers: %s', headers)
+        logger.debug('Observation file: %s', observation)
         response = requests.put(url, headers=headers,
                                 files=observation,
                                 verify=settings.SATNOGS_VERIFY_SSL,
@@ -138,7 +138,7 @@ def post_data():
             else:
                 os.remove(os.path.join(settings.SATNOGS_OUTPUT_PATH, f))
         else:
-            logger.error('Bad status code: {0}'.format(response.status_code))
+            logger.error('Bad status code: %s', response.status_code)
             os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, f), os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, f))
 
 
@@ -148,9 +148,9 @@ def get_jobs():
     url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'jobs/')
     params = {'ground_station': settings.SATNOGS_STATION_ID}
     headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
-    logger.debug('URL: {0}'.format(url))
-    logger.debug('Params: {0}'.format(params))
-    logger.debug('Headers: {0}'.format(headers))
+    logger.debug('URL: %s', url)
+    logger.debug('Params: %s', params)
+    logger.debug('Headers: %s', headers)
     logger.info('Trying to GET observation jobs from the network')
     response = requests.get(
         url, params=params, headers=headers,
@@ -171,8 +171,8 @@ def get_jobs():
         job_id = str(obj['id'])
         obj['origin'] = 'network'
         kwargs = {'obj': obj}
-        logger.info('Adding new job: {0}'.format(job_id))
-        logger.debug('Observation obj: {0}'.format(obj))
+        logger.info('Adding new job: %s', job_id)
+        logger.debug('Observation obj: %s', obj)
         scheduler.add_job(spawn_observer,
                           'date',
                           run_date=start,
@@ -208,8 +208,8 @@ def add_observation(obj):
     job_id = str(obj['id'])
     obj['origin'] = 'manual'
     kwargs = {'obj': obj}
-    logger.info('Adding new job: {0}'.format(job_id))
-    logger.debug('Observation obj: {0}'.format(obj))
+    logger.info('Adding new job: %s', job_id)
+    logger.debug('Observation obj: %s', obj)
     obs = scheduler.add_job(spawn_observer,
                             'date',
                             run_date=start,

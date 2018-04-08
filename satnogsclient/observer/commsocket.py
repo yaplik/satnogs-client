@@ -60,31 +60,31 @@ class Commsocket:
 
     def connect(self):
         try:
-            logger.debug('Opening TCP socket: {0}:{1}'.format(self.ip, self.port))
+            logger.debug('Opening TCP socket: %s:%s', self.ip, self.port)
             self.s.connect((self.ip, self.port))
             self._connected = True
         except socket.error:
-            logger.error('Cannot connect to socket {0}:{1}'.format(self.ip, self.port))
+            logger.error('Cannot connect to socket %s:%s', self.ip, self.port)
             self._connected = False
         return self.is_connected
 
     def send(self, message):
         if not self.is_connected:
             self.connect()
-        logger.debug('Sending message: {0}'.format(message))
+        logger.debug('Sending message: %s', message)
         self.s.send(message)
         response = self.s.recv(self._TASKS_BUFFER_SIZE)
-        logger.debug('Received message: {0}'.format(response))
+        logger.debug('Received message: %s', response)
         return response
 
     def send_not_recv(self, message):
         if not self.is_connected:
             self.connect()
-        logger.debug('Sending message: {0}'.format(message))
+        logger.debug('Sending message: %s', message)
         self.s.send(message)
 
     def disconnect(self):
-        logger.info('Closing socket: {0}'.format(self.s))
+        logger.info('Closing socket: %s', self.s)
         self.s.close()
         self._connected = False
 

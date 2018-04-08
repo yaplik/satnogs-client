@@ -145,7 +145,7 @@ class WorkerTrack(Worker):
             abs(az - float(position[0])) > settings.SATNOGS_ROT_THRESHOLD or
                 abs(alt - float(position[1])) > settings.SATNOGS_ROT_THRESHOLD):
                     msg = 'P {0} {1}\n'.format(az, alt)
-                    logger.debug('Rotctld msg: {0}'.format(msg))
+                    logger.debug('Rotctld msg: %s', msg)
                     sock.send(msg)
 
 
@@ -154,6 +154,6 @@ class WorkerFreq(Worker):
     def send_to_socket(self, p, sock):
         doppler_calc_freq = self._frequency * (1 - (p['rng_vlct'] / ephem.c))
         msg = 'F {0}\n'.format(int(doppler_calc_freq))
-        logger.debug('Initial frequency: {0}'.format(self._frequency))
-        logger.debug('Rigctld msg: {0}'.format(msg))
+        logger.debug('Initial frequency: %s', self._frequency)
+        logger.debug('Rigctld msg: %s', msg)
         sock.send(msg)

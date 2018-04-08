@@ -288,8 +288,8 @@ class Observer:
                                        time_to_stop=self.observation_end,
                                        proc=self._gnu_proc,
                                        sleep_time=3)
-        logger.debug('TLE: {0}'.format(self.tle))
-        logger.debug('Observation end: {0}'.format(self.observation_end))
+        logger.debug('TLE: %s', self.tle)
+        logger.debug('Observation end: %s', self.observation_end)
         self.tracker_rot.trackobject(self.location, self.tle)
         self.tracker_rot.trackstart()
 
@@ -299,8 +299,8 @@ class Observer:
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
                                        proc=self._gnu_proc)
-        logger.debug('Rig Frequency {0}'.format(self.frequency))
-        logger.debug('Observation end: {0}'.format(self.observation_end))
+        logger.debug('Rig Frequency %s', self.frequency)
+        logger.debug('Observation end: %s', self.observation_end)
         self.tracker_freq.trackobject(self.location, self.tle)
         self.tracker_freq.trackstart()
 

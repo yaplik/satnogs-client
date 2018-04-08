@@ -24,25 +24,25 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
     """
     # observer object
     if all(x in observer_dict for x in ['lat', 'lon', 'elev']):
-        logger.debug('Observer data: {0}'.format(observer_dict))
+        logger.debug('Observer data: %s', observer_dict)
         observer = ephem.Observer()
         observer.lon = str(observer_dict['lon'])
         observer.lat = str(observer_dict['lat'])
         observer.elevation = float(observer_dict['elev'])
     else:
-        logger.error('Something went wrong: {0}'.format(observer_dict))
+        logger.error('Something went wrong: %s', observer_dict)
         return {'ok': False}
 
     # satellite object
     if all(x in satellite_dict for x in ['tle0', 'tle1', 'tle2']):
-        logger.debug('Satellite data: {0}'.format(satellite_dict))
+        logger.debug('Satellite data: %s', satellite_dict)
         tle0 = str(satellite_dict['tle0'])
         tle1 = str(satellite_dict['tle1'])
         tle2 = str(satellite_dict['tle2'])
         try:
             satellite = ephem.readtle(tle0, tle1, tle2)
         except ValueError:
-            logger.error('Something went wrong: {0}'.format(satellite_dict))
+            logger.error('Something went wrong: %s', satellite_dict)
             logger.error(sys.exc_info()[0])
             return {'ok': False}
     else:
@@ -63,5 +63,5 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
         'ok': True
     }
 
-    logger.debug('Calculated data: {0}'.format(calculated_data))
+    logger.debug('Calculated data: %s', calculated_data)
     return calculated_data
