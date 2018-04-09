@@ -26,9 +26,13 @@ SATNOGS_STATION_ELEV = _cast_or_none(float, environ.get('SATNOGS_STATION_ELEV', 
 SATNOGS_APP_PATH = environ.get('SATNOGS_APP_PATH', '/tmp/.satnogs')
 SATNOGS_OUTPUT_PATH = environ.get('SATNOGS_OUTPUT_PATH', '/tmp/.satnogs/data')
 SATNOGS_COMPLETE_OUTPUT_PATH = environ.get('SATNOGS_COMPLETE_OUTPUT_PATH', '')
-SATNOGS_INCOMPLETE_OUTPUT_PATH = environ.get('SATNOGS_INCOMPLETE_OUTPUT_PATH', '/tmp/.satnogs/data/incomplete')
+SATNOGS_INCOMPLETE_OUTPUT_PATH = environ.get('SATNOGS_INCOMPLETE_OUTPUT_PATH',
+                                             '/tmp/.satnogs/data/incomplete')
 
-for p in [SATNOGS_APP_PATH, SATNOGS_OUTPUT_PATH, SATNOGS_COMPLETE_OUTPUT_PATH, SATNOGS_INCOMPLETE_OUTPUT_PATH]:
+for p in [SATNOGS_APP_PATH,
+          SATNOGS_OUTPUT_PATH,
+          SATNOGS_COMPLETE_OUTPUT_PATH,
+          SATNOGS_INCOMPLETE_OUTPUT_PATH]:
     if p != "" and not os.path.exists(p):
         os.mkdir(p)
 

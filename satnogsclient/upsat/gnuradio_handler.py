@@ -34,8 +34,11 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud,
         arg_string += '--wpm=' + str(int(baud)) + ' '
     if client_settings.SATNOGS_RX_DEVICE and "--rx-sdr-device" not in arg_string:
         arg_string += '--rx-sdr-device=' + client_settings.SATNOGS_RX_DEVICE + ' '
-    if client_settings.SATNOGS_DOPPLER_CORR_PER_SEC and "--doppler-correction-per-sec" not in arg_string:
-        arg_string += '--doppler-correction-per-sec=' + client_settings.SATNOGS_DOPPLER_CORR_PER_SEC + ' '
+    if (client_settings.SATNOGS_DOPPLER_CORR_PER_SEC and
+            "--doppler-correction-per-sec" not in arg_string):
+        arg_string += ('--doppler-correction-per-sec=' +
+                       client_settings.SATNOGS_DOPPLER_CORR_PER_SEC +
+                       ' ')
     if client_settings.SATNOGS_LO_OFFSET and "--lo-offset" not in arg_string:
         arg_string += '--lo-offset=' + client_settings.SATNOGS_LO_OFFSET + ' '
     if client_settings.SATNOGS_PPM_ERROR and "--ppm" not in arg_string:
