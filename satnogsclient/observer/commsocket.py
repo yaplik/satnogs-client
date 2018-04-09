@@ -5,7 +5,7 @@ import socket
 logger = logging.getLogger('satnogsclient')
 
 
-class Commsocket:
+class Commsocket(object):
     """
     Handles connectivity with remote ctl demons
     Namely: rotctl and rigctl

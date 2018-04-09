@@ -19,7 +19,7 @@ from satnogsclient import settings
 logger = logging.getLogger('default')
 
 
-class Worker:
+class Worker(object):
 
     """Class to facilitate as a worker for rotctl/rigctl."""
 

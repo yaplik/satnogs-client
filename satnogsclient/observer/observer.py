@@ -11,7 +11,7 @@ from satnogsclient.upsat import gnuradio_handler
 logger = logging.getLogger('default')
 
 
-class Observer:
+class Observer(object):
 
     _gnu_proc = None
 
