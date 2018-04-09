@@ -5,12 +5,12 @@ from dateutil import parser
 from urlparse import urljoin
 from multiprocessing import Process
 from satnogsclient.scheduler import scheduler
+from satnogsclient import settings
+from satnogsclient.observer.observer import Observer
+
 import subprocess
 
 import requests
-
-from satnogsclient import settings
-from satnogsclient.observer.observer import Observer
 
 logger = logging.getLogger('default')
 log_path = settings.SATNOGS_OUTPUT_PATH + "/files/"
