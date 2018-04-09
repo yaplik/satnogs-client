@@ -29,7 +29,6 @@ class Observer:
         self.tle = None
         self.observation_end = None
         self.frequency = None
-        self.origin = None
         self.observation_raw_file = None
         self.observation_ogg_file = None
         self.observation_waterfall_file = None
@@ -40,10 +39,9 @@ class Observer:
         self.observation_done_decoded_data = None
         self.tracker_freq = None
         self.tracker_rot = None
-        self.user_args = None
         self.script_name = None
 
-    def setup(self, observation_id, tle, observation_end, frequency, baud, origin, user_args, script_name):
+    def setup(self, observation_id, tle, observation_end, frequency, baud, script_name):
         """
         Sets up required internal variables.
         * returns True if setup is ok
@@ -52,13 +50,11 @@ class Observer:
 
         # Set attributes
         self.observation_id = observation_id
-        self.user_args = user_args
         self.script_name = script_name
         self.tle = tle
         self.observation_end = observation_end
         self.frequency = frequency
         self.baud = baud
-        self.origin = origin
 
         not_completed_prefix = 'receiving_satnogs'
         completed_prefix = 'satnogs'
@@ -110,7 +106,7 @@ class Observer:
             decoded_data_prefix,
             self.observation_id)
         return all([self.observation_id, self.tle,
-                    self.observation_end, self.frequency, self.origin,
+                    self.observation_end, self.frequency,
                     self.observation_raw_file,
                     self.observation_ogg_file,
                     self.observation_waterfall_file,
@@ -134,10 +130,8 @@ class Observer:
         self._gnu_proc = gnuradio_handler.exec_gnuradio(
             self.observation_raw_file,
             self.observation_waterfall_file,
-            self.origin,
             self.frequency,
             self.baud,
-            self.user_args,
             self.script_name,
             self.observation_decoded_data)
         logger.info('Start rotctrl thread.')

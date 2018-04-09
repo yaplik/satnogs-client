@@ -48,13 +48,7 @@ def spawn_observer(**kwargs):
     baud = 0
     if 'baud' in obj:
         baud = obj['baud']
-    if obj['origin'] == 'manual':
-        user_args = obj['user_args']
-        script_name = obj['script_name']
-        if '--rx-freq=' in user_args:
-            frequency = int(user_args.split('--rx-freq=')[1].split(' ')[0])
     else:
-        user_args = ""
         frequency = obj['frequency']
         script_name = settings.GNURADIO_FM_SCRIPT_FILENAME
         if 'mode' in obj:
@@ -77,8 +71,6 @@ def spawn_observer(**kwargs):
         'observation_end': end,
         'frequency': frequency,
         'baud': baud,
-        'origin': obj['origin'],
-        'user_args': user_args,
         'script_name': script_name
     }
 
@@ -169,7 +161,6 @@ def get_jobs():
         tasks.append(obj)
         start = parser.parse(obj['start'])
         job_id = str(obj['id'])
-        obj['origin'] = 'network'
         kwargs = {'obj': obj}
         logger.info('Adding new job: %s', job_id)
         logger.debug('Observation obj: %s', obj)
@@ -179,10 +170,6 @@ def get_jobs():
                           id='observer_{0}'.format(job_id),
                           kwargs=kwargs)
     tasks.reverse()
-
-
-def success_message_to_frontend():
-    logger.debug('Successfuly emit to frontend')
 
 
 def status_listener():
@@ -201,21 +188,6 @@ def status_listener():
     scheduler.add_job(post_data, 'interval', minutes=interval)
     os.environ['GNURADIO_SCRIPT_PID'] = '0'
     os.environ['SCHEDULER'] = 'ON'
-
-
-def add_observation(obj):
-    start = parser.parse(obj['start'])
-    job_id = str(obj['id'])
-    obj['origin'] = 'manual'
-    kwargs = {'obj': obj}
-    logger.info('Adding new job: %s', job_id)
-    logger.debug('Observation obj: %s', obj)
-    obs = scheduler.add_job(spawn_observer,
-                            'date',
-                            run_date=start,
-                            id=format(job_id),
-                            kwargs=kwargs)
-    return obs
 
 
 def get_observation_list():
