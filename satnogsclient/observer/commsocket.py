@@ -2,7 +2,7 @@ import logging
 import socket
 
 
-logger = logging.getLogger('satnogsclient')
+LOGGER = logging.getLogger('satnogsclient')
 
 
 class Commsocket(object):
@@ -11,48 +11,48 @@ class Commsocket(object):
     Namely: rotctl and rigctl
     """
 
-    _BUFFER_SIZE = 2048
-    _TASKS_BUFFER_SIZE = 10480
+    _buffer_size = 2048
+    _tasks_buffer_size = 10480
     _connected = False
 
-    def __init__(self, ip, port):
-        self._TCP_IP = ip
-        self._TCP_PORT = port
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    def __init__(self, ip_address, port):
+        self._tcp_ip = ip_address
+        self._tcp_port = port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     @property
-    def ip(self):
-        return self._TCP_IP
+    def ip_address(self):
+        return self._tcp_ip
 
-    @ip.setter
-    def ip(self, new_ip):
-        self._TCP_IP = new_ip
+    @ip_address.setter
+    def ip_address(self, new_ip):
+        self._tcp_ip = new_ip
 
     @property
     def port(self):
-        return self._TCP_PORT
+        return self._tcp_port
 
     @port.setter
     def port(self, new_port):
-        self._TCP_PORT = new_port
+        self._tcp_port = new_port
 
     @property
     def buffer_size(self):
-        return self._BUFFER_SIZE
+        return self._buffer_size
 
     @buffer_size.setter
     def buffer_size(self, new_buffer_size):
-        self._BUFFER_SIZE = new_buffer_size
+        self._buffer_size = new_buffer_size
 
     @property
     def tasks_buffer_size(self):
-        return self._TASKS_BUFFER_SIZE
+        return self._tasks_buffer_size
 
     @tasks_buffer_size.setter
     def tasks_buffer_size(self, new_buffer_size):
-        self._TASKS_BUFFER_SIZE = new_buffer_size
+        self._tasks_buffer_size = new_buffer_size
 
     @property
     def is_connected(self):
@@ -60,44 +60,44 @@ class Commsocket(object):
 
     def connect(self):
         try:
-            logger.debug('Opening TCP socket: %s:%s', self.ip, self.port)
-            self.s.connect((self.ip, self.port))
+            LOGGER.debug('Opening TCP socket: %s:%s', self.ip_address, self.port)
+            self.sock.connect((self.ip_address, self.port))
             self._connected = True
         except socket.error:
-            logger.error('Cannot connect to socket %s:%s', self.ip, self.port)
+            LOGGER.error('Cannot connect to socket %s:%s', self.ip_address, self.port)
             self._connected = False
         return self.is_connected
 
     def send(self, message):
         if not self.is_connected:
             self.connect()
-        logger.debug('Sending message: %s', message)
-        self.s.send(message)
-        response = self.s.recv(self._TASKS_BUFFER_SIZE)
-        logger.debug('Received message: %s', response)
+        LOGGER.debug('Sending message: %s', message)
+        self.sock.send(message)
+        response = self.sock.recv(self._tasks_buffer_size)
+        LOGGER.debug('Received message: %s', response)
         return response
 
     def send_not_recv(self, message):
         if not self.is_connected:
             self.connect()
-        logger.debug('Sending message: %s', message)
-        self.s.send(message)
+        LOGGER.debug('Sending message: %s', message)
+        self.sock.send(message)
 
     def disconnect(self):
-        logger.info('Closing socket: %s', self.s)
-        self.s.close()
+        LOGGER.info('Closing socket: %s', self.sock)
+        self.sock.close()
         self._connected = False
 
     def receive(self, size):
-        resp = self.s.recv(size)
+        resp = self.sock.recv(size)
         return resp
 
     def listen(self):
-        self.s.listen(1)
+        self.sock.listen(1)
 
     def accept(self):
-        conn, addr = self.s.accept()  # pylint: disable=W0612
+        conn, addr = self.sock.accept()  # pylint: disable=W0612
         return conn
 
     def bind(self):
-        self.s.bind((self._TCP_IP, self._TCP_PORT))
+        self.sock.bind((self._tcp_ip, self._tcp_port))

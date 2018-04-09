@@ -7,19 +7,19 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from satnogsclient import settings
 
 
-jobstores = {
+JOBSTORES = {
     'default': SQLAlchemyJobStore(url=settings.SATNOGS_SQLITE_URL)
 }
 
-executors = {
+EXECUTORS = {
     'default': ThreadPoolExecutor(20),
 }
 
-job_defaults = {
+JOB_DEFAULTS = {
     'coalesce': True,
     'max_instances': 1,
     'misfire_grace_time': 5
 }
 
-scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults,
+SCHEDULER = BackgroundScheduler(jobstores=JOBSTORES, executors=EXECUTORS, job_defaults=JOB_DEFAULTS,
                                 timezone=utc)

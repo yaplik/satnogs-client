@@ -4,7 +4,7 @@ import os
 
 from satnogsclient import settings as client_settings
 
-logger = logging.getLogger('default')
+LOGGER = logging.getLogger('default')
 
 
 def exec_gnuradio(observation_file, waterfall_file, freq, baud,
@@ -60,7 +60,7 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud,
     if not client_settings.DISABLE_DECODED_DATA and "--decoded-data-file-path" not in arg_string:
         arg_string += '--decoded-data-file-path=' + arguments['decoded_data'] + ' '
 
-    logger.info('Starting GNUradio python script')
+    LOGGER.info('Starting GNUradio python script')
     proc = subprocess.Popen([scriptname + " " + arg_string], shell=True,
                             preexec_fn=os.setsid)
     return proc

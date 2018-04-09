@@ -8,7 +8,7 @@ from satnogsclient import settings
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
 from satnogsclient.upsat import gnuradio_handler
 
-logger = logging.getLogger('default')
+LOGGER = logging.getLogger('default')
 
 
 class Observer(object):
@@ -33,7 +33,7 @@ class Observer(object):
         self.observation_ogg_file = None
         self.observation_waterfall_file = None
         self.observation_waterfall_png = None
-        self.observation_receiving_decoded_data = None
+        self.observation_receiving_decoded_data = None  # pylint: disable=C0103
         self.observation_decoded_data = None
         self.baud = None
         self.observation_done_decoded_data = None
@@ -116,7 +116,7 @@ class Observer(object):
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
         if settings.SATNOGS_PRE_OBSERVATION_SCRIPT is not None:
-            logger.info('Executing pre-observation script.')
+            LOGGER.info('Executing pre-observation script.')
             os.system(settings.SATNOGS_PRE_OBSERVATION_SCRIPT)
 
         # if it is APT we want to save with a prefix until the observation
@@ -126,7 +126,7 @@ class Observer(object):
                  self.observation_receiving_decoded_data
 
         # start thread for rotctl
-        logger.info('Start gnuradio thread.')
+        LOGGER.info('Start gnuradio thread.')
         self._gnu_proc = gnuradio_handler.exec_gnuradio(
             self.observation_raw_file,
             self.observation_waterfall_file,
@@ -134,18 +134,18 @@ class Observer(object):
             self.baud,
             self.script_name,
             self.observation_decoded_data)
-        logger.info('Start rotctrl thread.')
+        LOGGER.info('Start rotctrl thread.')
         self.run_rot()
         # start thread for rigctl
-        logger.info('Start rigctrl thread.')
+        LOGGER.info('Start rigctrl thread.')
         self.run_rig()
         # Polling gnuradio process status
         self.poll_gnu_proc_status()
         if "satnogs_generic_iq_receiver.py" not in settings.GNURADIO_SCRIPT_FILENAME:
-            logger.info('Rename encoded files for uploading.')
+            LOGGER.info('Rename encoded files for uploading.')
             self.rename_ogg_file()
             self.rename_data_file()
-            logger.info('Creating waterfall plot.')
+            LOGGER.info('Creating waterfall plot.')
             self.plot_waterfall()
 
     def run_rot(self):
@@ -155,8 +155,8 @@ class Observer(object):
                                        time_to_stop=self.observation_end,
                                        proc=self._gnu_proc,
                                        sleep_time=3)
-        logger.debug('TLE: %s', self.tle)
-        logger.debug('Observation end: %s', self.observation_end)
+        LOGGER.debug('TLE: %s', self.tle)
+        LOGGER.debug('Observation end: %s', self.observation_end)
         self.tracker_rot.trackobject(self.location, self.tle)
         self.tracker_rot.trackstart()
 
@@ -166,16 +166,16 @@ class Observer(object):
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
                                        proc=self._gnu_proc)
-        logger.debug('Rig Frequency %s', self.frequency)
-        logger.debug('Observation end: %s', self.observation_end)
+        LOGGER.debug('Rig Frequency %s', self.frequency)
+        LOGGER.debug('Observation end: %s', self.observation_end)
         self.tracker_freq.trackobject(self.location, self.tle)
         self.tracker_freq.trackstart()
 
     def poll_gnu_proc_status(self):
         while self._gnu_proc.poll() is None:
             sleep(30)
-        logger.info('Observation Finished')
-        logger.info('Executing post-observation script.')
+        LOGGER.info('Observation Finished')
+        LOGGER.info('Executing post-observation script.')
         if self._post_exec_script is not None:
             os.system(self._post_exec_script)
 
@@ -183,13 +183,13 @@ class Observer(object):
         if os.path.isfile(self.observation_raw_file):
             os.rename(self.observation_raw_file,
                       self.observation_ogg_file)
-        logger.info('Rename encoded file for uploading finished')
+        LOGGER.info('Rename encoded file for uploading finished')
 
     def rename_data_file(self):
         if os.path.isfile(self.observation_receiving_decoded_data):
             os.rename(self.observation_receiving_decoded_data,
                       self.observation_done_decoded_data)
-        logger.info('Rename data file for uploading finished')
+        LOGGER.info('Rename data file for uploading finished')
 
     def plot_waterfall(self):
         if os.path.isfile(self.observation_waterfall_file):
@@ -199,11 +199,11 @@ class Observer(object):
                         (self.observation_waterfall_file,
                          self.observation_waterfall_png),
                         shell=True)
-            logger.info('Waterfall plot finished')
+            LOGGER.info('Waterfall plot finished')
             if plot == 0 and settings.SATNOGS_REMOVE_RAW_FILES:
                 self.remove_waterfall_file()
         else:
-            logger.error('No waterfall data file found')
+            LOGGER.error('No waterfall data file found')
 
     def remove_waterfall_file(self):
         if os.path.isfile(self.observation_waterfall_file):

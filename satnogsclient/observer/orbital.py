@@ -7,7 +7,7 @@ import ephem
 import pytz
 
 
-logger = logging.getLogger('default')
+LOGGER = logging.getLogger('default')
 
 
 def pinpoint(observer_dict, satellite_dict, timestamp=None):
@@ -24,26 +24,26 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
     """
     # observer object
     if all(x in observer_dict for x in ['lat', 'lon', 'elev']):
-        logger.debug('Observer data: %s', observer_dict)
+        LOGGER.debug('Observer data: %s', observer_dict)
         observer = ephem.Observer()
         observer.lon = str(observer_dict['lon'])
         observer.lat = str(observer_dict['lat'])
         observer.elevation = float(observer_dict['elev'])
     else:
-        logger.error('Something went wrong: %s', observer_dict)
+        LOGGER.error('Something went wrong: %s', observer_dict)
         return {'ok': False}
 
     # satellite object
     if all(x in satellite_dict for x in ['tle0', 'tle1', 'tle2']):
-        logger.debug('Satellite data: %s', satellite_dict)
+        LOGGER.debug('Satellite data: %s', satellite_dict)
         tle0 = str(satellite_dict['tle0'])
         tle1 = str(satellite_dict['tle1'])
         tle2 = str(satellite_dict['tle2'])
         try:
             satellite = ephem.readtle(tle0, tle1, tle2)
         except ValueError:
-            logger.error('Something went wrong: %s', satellite_dict)
-            logger.error(sys.exc_info()[0])
+            LOGGER.error('Something went wrong: %s', satellite_dict)
+            LOGGER.error(sys.exc_info()[0])
             return {'ok': False}
     else:
         return {'ok': False}
@@ -63,5 +63,5 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
         'ok': True
     }
 
-    logger.debug('Calculated data: %s', calculated_data)
+    LOGGER.debug('Calculated data: %s', calculated_data)
     return calculated_data

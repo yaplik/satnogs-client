@@ -16,7 +16,7 @@ from satnogsclient.observer.orbital import pinpoint
 from satnogsclient import settings
 
 
-logger = logging.getLogger('default')
+LOGGER = logging.getLogger('default')
 
 
 class Worker(object):
@@ -45,8 +45,8 @@ class Worker(object):
     def __init__(self, ip, port, time_to_stop=None, frequency=None, proc=None,
                  sleep_time=None):
         """Initialize worker class."""
-        self._IP = ip
-        self._PORT = port
+        self._ip = ip
+        self._port = port
         if frequency:
             self._frequency = frequency
         if time_to_stop:
@@ -81,7 +81,7 @@ class Worker(object):
         Stops by calling trackstop()
         """
         self.is_alive = True
-        logger.info('Tracking initiated')
+        LOGGER.info('Tracking initiated')
         if not all([self.observer_dict, self.satellite_dict]):
             raise ValueError('Satellite or observer dictionary not defined.')
 
@@ -91,7 +91,7 @@ class Worker(object):
 
         return self.is_alive
 
-    def send_to_socket(self, p, sock):
+    def send_to_socket(self, pin, sock):
         # Needs to be implemented in freq/track workers implicitly
         raise NotImplementedError
 
@@ -101,7 +101,7 @@ class Worker(object):
         Uses observer and satellite objects set by trackobject().
         Will exit when observation_end timestamp is reached.
         """
-        sock = Commsocket(self._IP, self._PORT)
+        sock = Commsocket(self._ip, self._port)
         sock.connect()
 
         # track satellite
@@ -110,9 +110,9 @@ class Worker(object):
             # check if we need to exit
             self.check_observation_end_reached()
 
-            p = pinpoint(self.observer_dict, self.satellite_dict)
-            if p['ok']:
-                self.send_to_socket(p, sock)
+            pin = pinpoint(self.observer_dict, self.satellite_dict)
+            if pin['ok']:
+                self.send_to_socket(pin, sock)
                 time.sleep(self._sleep_time)
 
         sock.disconnect()
@@ -121,7 +121,7 @@ class Worker(object):
         """
         Sets object flag to false and stops the tracking thread.
         """
-        logger.info('Tracking stopped.')
+        LOGGER.info('Tracking stopped.')
         self.is_alive = False
         if self._gnu_proc:
             os.killpg(os.getpgid(self._gnu_proc.pid), signal.SIGINT)
@@ -133,28 +133,28 @@ class Worker(object):
 
 class WorkerTrack(Worker):
 
-    def send_to_socket(self, p, sock):
+    def send_to_socket(self, pin, sock):
         # Read az/alt of sat and convert to radians
-        az = p['az'].conjugate() * 180 / math.pi
-        alt = p['alt'].conjugate() * 180 / math.pi
-        self._azimuth = az
+        azi = pin['az'].conjugate() * 180 / math.pi
+        alt = pin['alt'].conjugate() * 180 / math.pi
+        self._azimuth = azi
         self._altitude = alt
         # read current position of rotator, [0] az and [1] el
         position = sock.send("p\n").split('\n')
         # if the need to move exceeds threshold, then do it
         if (position[0].startswith("RPRT") or
-                abs(az - float(position[0])) > settings.SATNOGS_ROT_THRESHOLD or
+                abs(azi - float(position[0])) > settings.SATNOGS_ROT_THRESHOLD or
                 abs(alt - float(position[1])) > settings.SATNOGS_ROT_THRESHOLD):
-            msg = 'P {0} {1}\n'.format(az, alt)
-            logger.debug('Rotctld msg: %s', msg)
+            msg = 'P {0} {1}\n'.format(azi, alt)
+            LOGGER.debug('Rotctld msg: %s', msg)
             sock.send(msg)
 
 
 class WorkerFreq(Worker):
 
-    def send_to_socket(self, p, sock):
-        doppler_calc_freq = self._frequency * (1 - (p['rng_vlct'] / ephem.c))
+    def send_to_socket(self, pin, sock):
+        doppler_calc_freq = self._frequency * (1 - (pin['rng_vlct'] / ephem.c))
         msg = 'F {0}\n'.format(int(doppler_calc_freq))
-        logger.debug('Initial frequency: %s', self._frequency)
-        logger.debug('Rigctld msg: %s', msg)
+        LOGGER.debug('Initial frequency: %s', self._frequency)
+        LOGGER.debug('Rigctld msg: %s', msg)
         sock.send(msg)
