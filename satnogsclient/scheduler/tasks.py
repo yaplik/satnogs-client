@@ -1,14 +1,14 @@
 import logging
 import os
 import signal
-from dateutil import parser
 from urlparse import urljoin
 from multiprocessing import Process
+import subprocess
+
+from dateutil import parser
 from satnogsclient.scheduler import scheduler
 from satnogsclient import settings
 from satnogsclient.observer.observer import Observer
-
-import subprocess
 
 import requests
 
