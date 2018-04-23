@@ -130,10 +130,12 @@ def post_data():
                           os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, fil))
             else:
                 os.remove(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil))
-        else:
+        elif response.status_code == 404:
             LOGGER.error('Bad status code: %s', response.status_code)
             os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
                       os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
+        else:
+            LOGGER.error('Bad status code: %s', response.status_code)
 
 
 def get_jobs():
