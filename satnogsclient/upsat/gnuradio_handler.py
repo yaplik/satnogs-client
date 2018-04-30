@@ -1,10 +1,32 @@
 import logging
 import subprocess
 import os
+import json
 
 from satnogsclient import settings as client_settings
 
 LOGGER = logging.getLogger('default')
+
+
+def get_gnuradio_info():
+    process = subprocess.Popen(['python', '-m', 'satnogs.satnogs_info'],
+                               stdout=subprocess.PIPE)
+    gr_satnogs_info, _ = process.communicate()  # pylint: disable=W0612
+    client_metadata = {'radio': 'gr-satnogs'}
+    if process.returncode == 0:
+        # Convert to valid JSON
+        gr_satnogs_info = ''.join(gr_satnogs_info.partition('{')[1:])
+        gr_satnogs_info = ''.join(gr_satnogs_info.partition('}')[:2])
+        try:
+            gr_satnogs_info = json.loads(gr_satnogs_info)
+        except ValueError:
+            client_metadata['radio_version'] = 'invalid'
+        else:
+            if 'version' in gr_satnogs_info:
+                client_metadata['radio_version'] = gr_satnogs_info['version']
+            else:
+                client_metadata['radio_version'] = 'unknown'
+    return client_metadata
 
 
 def exec_gnuradio(observation_file, waterfall_file, freq, baud,

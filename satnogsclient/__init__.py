@@ -10,14 +10,15 @@ import time
 
 from validators.url import url
 
+import satnogsclient.config
 from satnogsclient.settings import (SATNOGS_API_TOKEN, DEFAULT_LOGGING, SATNOGS_STATION_ID,
                                     SATNOGS_STATION_LAT, SATNOGS_STATION_LON, SATNOGS_STATION_ELEV,
                                     SATNOGS_NETWORK_API_URL)
 from satnogsclient.scheduler.tasks import status_listener, exec_rigctld
 
-__author__ = "SatNOGS project"
-__email__ = "dev@satnogs.org"
-__version__ = "0.3"
+__author__ = satnogsclient.config.AUTHOR
+__email__ = satnogsclient.config.EMAIL
+__version__ = satnogsclient.config.VERSION
 
 LOGGER = logging.getLogger('satnogsclient')
 
