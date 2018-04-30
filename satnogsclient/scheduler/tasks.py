@@ -48,22 +48,21 @@ def spawn_observer(**kwargs):
     baud = 0
     if 'baud' in obj:
         baud = obj['baud']
-    else:
-        frequency = obj['frequency']
-        script_name = settings.GNURADIO_FM_SCRIPT_FILENAME
-        if 'mode' in obj:
-            if obj['mode'] == "CW":
-                script_name = settings.GNURADIO_CW_SCRIPT_FILENAME
-            elif obj['mode'] == "APT":
-                script_name = settings.GNURADIO_APT_SCRIPT_FILENAME
-            elif obj['mode'].startswith('BPSK'):
-                script_name = settings.GNURADIO_BPSK_SCRIPT_FILENAME
-            elif obj['mode'].endswith('FSK9k6'):
-                script_name = settings.GNURADIO_FSK9K6_SCRIPT_FILENAME
-            elif obj['mode'].endswith('AFSK1k2'):
-                script_name = settings.GNURADIO_FSK1K2_SCRIPT_FILENAME
-            elif obj['mode'].endswith('DUV'):
-                script_name = settings.GNURADIO_AMSAT_DUV_SCRIPT_FILENAME
+    frequency = obj['frequency']
+    script_name = settings.GNURADIO_FM_SCRIPT_FILENAME
+    if 'mode' in obj:
+        if obj['mode'] == "CW":
+            script_name = settings.GNURADIO_CW_SCRIPT_FILENAME
+        elif obj['mode'] == "APT":
+            script_name = settings.GNURADIO_APT_SCRIPT_FILENAME
+        elif obj['mode'].startswith('BPSK'):
+            script_name = settings.GNURADIO_BPSK_SCRIPT_FILENAME
+        elif obj['mode'].endswith('FSK9k6'):
+            script_name = settings.GNURADIO_FSK9K6_SCRIPT_FILENAME
+        elif obj['mode'].endswith('AFSK1k2'):
+            script_name = settings.GNURADIO_FSK1K2_SCRIPT_FILENAME
+        elif obj['mode'].endswith('DUV'):
+            script_name = settings.GNURADIO_AMSAT_DUV_SCRIPT_FILENAME
 
     setup_kwargs = {
         'observation_id': obj['id'],
