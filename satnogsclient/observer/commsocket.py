@@ -76,12 +76,12 @@ class Commsocket(object):
             self.connect()
         LOGGER.debug('Sending message: %s', message)
         try:
-            self.sock.send(message)
+            self.sock.send(message.encode('ascii'))
         except socket.error:
             LOGGER.error('Cannot send to socket %s:%s', self.ip_address,
                          self.port)
 
-        response = self.sock.recv(self._tasks_buffer_size)
+        response = self.sock.recv(self._tasks_buffer_size).decode('ascii')
         LOGGER.debug('Received message: %s', response)
         return response
 
@@ -89,7 +89,7 @@ class Commsocket(object):
         if not self.is_connected:
             self.connect()
         LOGGER.debug('Sending message: %s', message)
-        self.sock.send(message)
+        self.sock.send(message.encode('ascii'))
 
     def disconnect(self):
         LOGGER.info('Closing socket: %s', self.sock)
