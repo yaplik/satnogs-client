@@ -219,17 +219,17 @@ def exec_rigctld():
 
 def rigctld_subprocess():
     # Start rigctl daemon
-    rig_args = " "
+    rig_args = ["rigctld"]
     if settings.RIG_MODEL != "":
-        rig_args += "-m " + settings.RIG_MODEL + " "
+        rig_args += ["-m", settings.RIG_MODEL]
     if settings.RIG_FILE != "":
-        rig_args += "-r " + settings.RIG_FILE + " "
+        rig_args += ["-r", settings.RIG_FILE]
     if settings.RIG_PTT_FILE != "":
-        rig_args += "-p " + settings.RIG_PTT_FILE + " "
+        rig_args += ["-p", settings.RIG_PTT_FILE]
     if settings.RIG_PTT_TYPE != "":
-        rig_args += "-P " + settings.RIG_PTT_TYPE + " "
+        rig_args += ["-P", settings.RIG_PTT_TYPE]
     if settings.RIG_SERIAL_SPEED != "":
-        rig_args += "-s " + settings.RIG_SERIAL_SPEED + " "
-    rig_args += "-t " + str(settings.SATNOGS_RIG_PORT)
+        rig_args += ["-s", settings.RIG_SERIAL_SPEED]
+    rig_args += ["-t", str(settings.SATNOGS_RIG_PORT)]
     LOGGER.info('Starting rigctl daemon')
-    os.system("rigctld" + rig_args)
+    subprocess.call(rig_args)

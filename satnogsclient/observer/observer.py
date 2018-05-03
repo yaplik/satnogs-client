@@ -9,10 +9,12 @@ except ImportError:
 from datetime import datetime
 from time import sleep
 import json
-import requests
+import shlex
+import subprocess
 
 import numpy as np
 import matplotlib.pyplot as plt
+import requests
 
 import satnogsclient.config
 from satnogsclient import settings
@@ -111,14 +113,19 @@ class Observer(object):
         """Starts threads for rotcrl and rigctl."""
         if settings.SATNOGS_PRE_OBSERVATION_SCRIPT is not None:
             LOGGER.info('Executing pre-observation script.')
-            pre_script = settings.SATNOGS_PRE_OBSERVATION_SCRIPT
-            pre_script = pre_script.replace("{{FREQ}}", str(self.frequency))
-            pre_script = pre_script.replace("{{TLE}}", json.dumps(self.tle))
-            pre_script = pre_script.replace("{{ID}}", str(self.observation_id))
-            pre_script = pre_script.replace("{{BAUD}}", str(self.baud))
-            pre_script = pre_script.replace("{{SCRIPT_NAME}}",
-                                            self.script_name)
-            os.system(pre_script)
+            replacements = [
+                ("{{FREQ}}", str(self.frequency)),
+                ("{{TLE}}", json.dumps(self.tle)),
+                ("{{ID}}", str(self.observation_id)),
+                ("{{BAUD}}", str(self.baud)),
+                ("{{SCRIPT_NAME}}", self.script_name),
+            ]
+            pre_script = []
+            for arg in shlex.split(settings.SATNOGS_PRE_OBSERVATION_SCRIPT):
+                for key, val in replacements:
+                    arg = arg.replace(key, val)
+                pre_script.append(arg)
+            subprocess.call(pre_script)
 
         # if it is APT we want to save with a prefix until the observation
         # is complete, then rename.
@@ -214,15 +221,19 @@ class Observer(object):
         LOGGER.info('Observation Finished')
         LOGGER.info('Executing post-observation script.')
         if settings.SATNOGS_POST_OBSERVATION_SCRIPT is not None:
-            post_script = settings.SATNOGS_POST_OBSERVATION_SCRIPT
-            post_script = post_script.replace("{{FREQ}}", str(self.frequency))
-            post_script = post_script.replace("{{TLE}}", json.dumps(self.tle))
-            post_script = post_script.replace("{{ID}}",
-                                              str(self.observation_id))
-            post_script = post_script.replace("{{BAUD}}", str(self.baud))
-            post_script = post_script.replace("{{SCRIPT_NAME}}",
-                                              self.script_name)
-            os.system(post_script)
+            replacements = [
+                ("{{FREQ}}", str(self.frequency)),
+                ("{{TLE}}", json.dumps(self.tle)),
+                ("{{ID}}", str(self.observation_id)),
+                ("{{BAUD}}", str(self.baud)),
+                ("{{SCRIPT_NAME}}", self.script_name),
+            ]
+            post_script = []
+            for arg in shlex.split(settings.SATNOGS_POST_OBSERVATION_SCRIPT):
+                for key, val in replacements:
+                    arg = arg.replace(key, val)
+                post_script.append(arg)
+            subprocess.call(post_script)
 
     def rename_ogg_file(self):
         if os.path.isfile(self.observation_raw_file):
