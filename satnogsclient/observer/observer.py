@@ -2,7 +2,10 @@ from __future__ import absolute_import, division, print_function
 
 import logging
 import os
-from urlparse import urljoin
+try:
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin
 from datetime import datetime
 from time import sleep
 import json
