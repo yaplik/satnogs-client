@@ -1,7 +1,7 @@
 """
 SatNOGS Client settings file
 """
-from __future__ import division
+from __future__ import absolute_import, division
 
 import os
 from os import environ, path
