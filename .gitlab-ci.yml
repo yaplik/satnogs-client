@@ -1,5 +1,11 @@
-image: python:2.7
-test:
+Python 2.7:
+  image: python:2.7
   script:
     - pip install tox
-    - tox
+    - tox -e flake8,yapf,pylint,robot_lint,py27
+
+Python 3.6:
+  image: python:3.6
+  script:
+    - pip install tox
+    - tox -e py36
