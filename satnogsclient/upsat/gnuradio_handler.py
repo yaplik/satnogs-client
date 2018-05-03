@@ -47,30 +47,18 @@ def get_gnuradio_info():
 
 def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name,
                   decoded_data):
-    arguments = {
-        'filename': observation_file,
-        'waterfall': waterfall_file,
-        'rx_device': client_settings.SATNOGS_RX_DEVICE,
-        'center_freq': str(freq),
-        'script_name': script_name,
-        'decoded_data': decoded_data
-    }
-    scriptname = arguments['script_name']
     arg_string = ' '
-    if not scriptname:
-        scriptname = client_settings.GNURADIO_SCRIPT_FILENAME
-    rx_freq = arguments['center_freq']
+    if not script_name:
+        script_name = client_settings.GNURADIO_SCRIPT_FILENAME
     device = client_settings.SATNOGS_RX_DEVICE
-    file_path = arguments['filename']
-    waterfall_file_path = arguments['waterfall']
     arg_string += '--rx-sdr-device=' + device + ' '
-    arg_string += '--rx-freq=' + rx_freq + ' '
-    arg_string += '--file-path=' + file_path + ' '
-    if arguments['waterfall'] != "":
-        arg_string += '--waterfall-file-path=' + waterfall_file_path + ' '
+    arg_string += '--rx-freq=' + str(freq) + ' '
+    arg_string += '--file-path=' + observation_file + ' '
+    if waterfall_file != "":
+        arg_string += '--waterfall-file-path=' + waterfall_file + ' '
 
     # If this is a CW observation pass the WPM parameter
-    if scriptname == client_settings.GNURADIO_CW_SCRIPT_FILENAME and baud > 0:
+    if script_name == client_settings.GNURADIO_CW_SCRIPT_FILENAME and baud > 0:
         arg_string += '--wpm=' + str(int(baud)) + ' '
     # If this is a BPSK observation pass the baudrate parameter
     if scriptname == client_settings.GNURADIO_BPSK_SCRIPT_FILENAME and baud > 0:
@@ -104,9 +92,9 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name,
     if client_settings.IQ_DUMP_FILENAME and "--iq-file-path" not in arg_string:
         arg_string += '--iq-file-path=' + client_settings.IQ_DUMP_FILENAME + ' '
     if not client_settings.DISABLE_DECODED_DATA and "--decoded-data-file-path" not in arg_string:
-        arg_string += '--decoded-data-file-path=' + arguments['decoded_data'] + ' '
+        arg_string += '--decoded-data-file-path=' + decoded_data + ' '
 
     LOGGER.info('Starting GNUradio python script')
     proc = subprocess.Popen(
-        [scriptname + " " + arg_string], shell=True, preexec_fn=os.setsid)
+        [script_name + " " + arg_string], shell=True, preexec_fn=os.setsid)
     return proc
