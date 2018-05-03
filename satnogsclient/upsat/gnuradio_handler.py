@@ -61,37 +61,34 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name,
     if script_name == client_settings.GNURADIO_CW_SCRIPT_FILENAME and baud > 0:
         arg_string += '--wpm=' + str(int(baud)) + ' '
     # If this is a BPSK observation pass the baudrate parameter
-    if scriptname == client_settings.GNURADIO_BPSK_SCRIPT_FILENAME and baud > 0:
+    if script_name == client_settings.GNURADIO_BPSK_SCRIPT_FILENAME and baud > 0:
         arg_string += '--baudrate=' + str(int(baud)) + ' '
-    if client_settings.SATNOGS_RX_DEVICE and "--rx-sdr-device" not in arg_string:
-        arg_string += '--rx-sdr-device=' + client_settings.SATNOGS_RX_DEVICE + ' '
-    if (client_settings.SATNOGS_DOPPLER_CORR_PER_SEC
-            and "--doppler-correction-per-sec" not in arg_string):
+    if client_settings.SATNOGS_DOPPLER_CORR_PER_SEC:
         arg_string += ('--doppler-correction-per-sec=' +
                        client_settings.SATNOGS_DOPPLER_CORR_PER_SEC + ' ')
-    if client_settings.SATNOGS_LO_OFFSET and "--lo-offset" not in arg_string:
+    if client_settings.SATNOGS_LO_OFFSET:
         arg_string += '--lo-offset=' + client_settings.SATNOGS_LO_OFFSET + ' '
-    if client_settings.SATNOGS_RIG_PORT and "--rigctl-port" not in arg_string:
+    if client_settings.SATNOGS_RIG_PORT:
         arg_string += '--rigctl-port=' + str(
             client_settings.SATNOGS_RIG_PORT) + ' '
-    if client_settings.SATNOGS_PPM_ERROR and "--ppm" not in arg_string:
+    if client_settings.SATNOGS_PPM_ERROR:
         arg_string += '--ppm=' + client_settings.SATNOGS_PPM_ERROR + ' '
-    if client_settings.SATNOGS_IF_GAIN and "--if-gain" not in arg_string:
+    if client_settings.SATNOGS_IF_GAIN:
         arg_string += '--if-gain=' + client_settings.SATNOGS_IF_GAIN + ' '
-    if client_settings.SATNOGS_RF_GAIN and "--rf-gain" not in arg_string:
+    if client_settings.SATNOGS_RF_GAIN:
         arg_string += '--rf-gain=' + client_settings.SATNOGS_RF_GAIN + ' '
-    if client_settings.SATNOGS_BB_GAIN and "--bb-gain" not in arg_string:
+    if client_settings.SATNOGS_BB_GAIN:
         arg_string += '--bb-gain=' + client_settings.SATNOGS_BB_GAIN + ' '
-    if client_settings.SATNOGS_ANTENNA and "--antenna" not in arg_string:
+    if client_settings.SATNOGS_ANTENNA:
         arg_string += '--antenna=' + client_settings.SATNOGS_ANTENNA + ' '
-    if client_settings.SATNOGS_DEV_ARGS and "--dev-args" not in arg_string:
+    if client_settings.SATNOGS_DEV_ARGS:
         arg_string += '--dev-args=' + client_settings.SATNOGS_DEV_ARGS + ' '
-    if client_settings.ENABLE_IQ_DUMP and "--enable-iq-dump" not in arg_string:
+    if client_settings.ENABLE_IQ_DUMP:
         arg_string += '--enable-iq-dump=' + str(
             int(client_settings.ENABLE_IQ_DUMP is True)) + ' '
-    if client_settings.IQ_DUMP_FILENAME and "--iq-file-path" not in arg_string:
+    if client_settings.IQ_DUMP_FILENAME:
         arg_string += '--iq-file-path=' + client_settings.IQ_DUMP_FILENAME + ' '
-    if not client_settings.DISABLE_DECODED_DATA and "--decoded-data-file-path" not in arg_string:
+    if not client_settings.DISABLE_DECODED_DATA:
         arg_string += '--decoded-data-file-path=' + decoded_data + ' '
 
     LOGGER.info('Starting GNUradio python script')
