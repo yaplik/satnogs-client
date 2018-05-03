@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='satnogsclient',
-    version='0.5',
+    version='1.0-pre',
     url='https://gitlab.com/librespacefoundation/satnogs/satnogs-client',
     author='SatNOGS project',
     author_email='dev@satnogs.org',
