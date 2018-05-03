@@ -1,6 +1,8 @@
 """
 SatNOGS Client settings file
 """
+from __future__ import division
+
 import os
 from os import environ, path
 from distutils.util import strtobool  # pylint: disable=E0401,E0611

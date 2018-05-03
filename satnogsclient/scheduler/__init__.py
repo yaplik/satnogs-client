@@ -1,3 +1,5 @@
+from __future__ import division
+
 from pytz import utc
 
 from apscheduler.executors.pool import ThreadPoolExecutor
