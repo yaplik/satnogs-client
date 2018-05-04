@@ -12,7 +12,17 @@ def get_gnuradio_info():
     process = subprocess.Popen(['python', '-m', 'satnogs.satnogs_info'],
                                stdout=subprocess.PIPE)
     gr_satnogs_info, _ = process.communicate()  # pylint: disable=W0612
-    client_metadata = {'radio': 'gr-satnogs'}
+    client_metadata = {
+        'radio': {
+            'name': 'gr-satnogs',
+            'rx_dexvice': client_settings.SATNOGS_RX_DEVICE,
+            'ppm_error': client_settings.SATNOGS_PPM_ERROR,
+            'if_gain': client_settings.SATNOGS_IF_GAIN,
+            'rf_gain': client_settings.SATNOGS_RF_GAIN,
+            'bb_gain': client_settings.SATNOGS_BB_GAIN,
+            'antenna': client_settings.SATNOGS_ANTENNA,
+        }
+    }
     if process.returncode == 0:
         # Convert to valid JSON
         gr_satnogs_info = ''.join(gr_satnogs_info.partition('{')[1:])
@@ -20,12 +30,12 @@ def get_gnuradio_info():
         try:
             gr_satnogs_info = json.loads(gr_satnogs_info)
         except ValueError:
-            client_metadata['radio_version'] = 'invalid'
+            client_metadata['radio']['version'] = 'invalid'
         else:
             if 'version' in gr_satnogs_info:
-                client_metadata['radio_version'] = gr_satnogs_info['version']
+                client_metadata['radio']['version'] = gr_satnogs_info['version']
             else:
-                client_metadata['radio_version'] = 'unknown'
+                client_metadata['radio']['oversion'] = 'unknown'
     return client_metadata
 
 
