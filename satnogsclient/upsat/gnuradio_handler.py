@@ -15,6 +15,7 @@ def get_gnuradio_info():
     client_metadata = {
         'radio': {
             'name': 'gr-satnogs',
+            'version': None,
             'rx_dexvice': client_settings.SATNOGS_RX_DEVICE,
             'ppm_error': client_settings.SATNOGS_PPM_ERROR,
             'if_gain': client_settings.SATNOGS_IF_GAIN,
@@ -35,7 +36,7 @@ def get_gnuradio_info():
             if 'version' in gr_satnogs_info:
                 client_metadata['radio']['version'] = gr_satnogs_info['version']
             else:
-                client_metadata['radio']['oversion'] = 'unknown'
+                client_metadata['radio']['version'] = 'unknown'
     return client_metadata
 
 
