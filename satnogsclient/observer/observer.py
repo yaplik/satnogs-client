@@ -154,7 +154,7 @@ class Observer(object):
             url += '/'
         client_metadata = gnuradio_handler.get_gnuradio_info()
         client_metadata['latitude'] = settings.SATNOGS_STATION_LAT
-        client_metadata['longtitude'] = settings.SATNOGS_STATION_LON
+        client_metadata['longitude'] = settings.SATNOGS_STATION_LON
         client_metadata['elevation'] = settings.SATNOGS_STATION_ELEV
         resp = requests.put(
             url, headers=headers,
