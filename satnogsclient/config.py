@@ -1,3 +1,7 @@
+from ._version import get_versions
+
 AUTHOR = "SatNOGS project"
 EMAIL = "dev@satnogs.org"
-VERSION = "1.0-pre"
+VERSION = get_versions()['version']
+
+del get_versions
