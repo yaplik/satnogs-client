@@ -150,6 +150,13 @@ class Observer(object):
         # Polling gnuradio process status
         self.poll_gnu_proc_status()
 
+        if "satnogs_generic_iq_receiver.py" not in settings.GNURADIO_SCRIPT_FILENAME:
+            LOGGER.info('Rename encoded files for uploading.')
+            self.rename_ogg_file()
+            self.rename_data_file()
+            LOGGER.info('Creating waterfall plot.')
+            self.plot_waterfall()
+
         # PUT client version and metadata
         base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
         headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
@@ -160,13 +167,6 @@ class Observer(object):
         client_metadata['latitude'] = settings.SATNOGS_STATION_LAT
         client_metadata['longitude'] = settings.SATNOGS_STATION_LON
         client_metadata['elevation'] = settings.SATNOGS_STATION_ELEV
-
-        if "satnogs_generic_iq_receiver.py" not in settings.GNURADIO_SCRIPT_FILENAME:
-            LOGGER.info('Rename encoded files for uploading.')
-            self.rename_ogg_file()
-            self.rename_data_file()
-            LOGGER.info('Creating waterfall plot.')
-            self.plot_waterfall()
 
         try:
             resp = requests.put(
@@ -180,6 +180,8 @@ class Observer(object):
             LOGGER.error('%s: Connection Refused', url)
         except requests.exceptions.Timeout:
             LOGGER.error('%s: Connection Timeout - no metadata uploaded', url)
+        except requests.exceptions.RequestException as err:
+            LOGGER.error('%s: Unexpected error: %s', url, err)
 
         if resp.status_code == 200:
             LOGGER.info('Success: status code 200')
