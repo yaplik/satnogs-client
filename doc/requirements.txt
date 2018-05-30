@@ -24,3 +24,5 @@ pyopenssl
 pyserial
 flask-socketio
 redis
+numpy
+matplotlib
