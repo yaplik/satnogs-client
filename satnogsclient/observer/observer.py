@@ -48,7 +48,8 @@ class Observer(object):
         self.tracker_rot = None
         self.script_name = None
 
-    def setup(self, observation_id, tle, observation_end, frequency, baud, script_name):
+    def setup(self, observation_id, tle, observation_end, frequency, baud,
+              script_name):
         """
         Sets up required internal variables.
         * returns True if setup is ok
@@ -74,51 +75,32 @@ class Observer(object):
         encoded_file_extension = 'ogg'
         waterfall_file_extension = 'dat'
         self.observation_raw_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH,
-            not_completed_prefix,
-            self.observation_id,
-            timestamp, raw_file_extension)
+            settings.SATNOGS_OUTPUT_PATH, not_completed_prefix,
+            self.observation_id, timestamp, raw_file_extension)
         self.observation_ogg_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH,
-            completed_prefix,
-            self.observation_id,
-            timestamp,
-            encoded_file_extension)
+            settings.SATNOGS_OUTPUT_PATH, completed_prefix,
+            self.observation_id, timestamp, encoded_file_extension)
         self.observation_waterfall_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH,
-            receiving_waterfall_prefix,
-            self.observation_id,
-            timestamp,
-            waterfall_file_extension)
+            settings.SATNOGS_OUTPUT_PATH, receiving_waterfall_prefix,
+            self.observation_id, timestamp, waterfall_file_extension)
         self.observation_waterfall_png = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH,
-            waterfall_prefix,
-            self.observation_id,
-            timestamp,
-            'png')
+            settings.SATNOGS_OUTPUT_PATH, waterfall_prefix,
+            self.observation_id, timestamp, 'png')
         self.observation_receiving_decoded_data = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH,
-            receiving_decoded_data_prefix,
-            self.observation_id,
-            timestamp,
-            'png')
+            settings.SATNOGS_OUTPUT_PATH, receiving_decoded_data_prefix,
+            self.observation_id, timestamp, 'png')
         self.observation_done_decoded_data = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH,
-            decoded_data_prefix,
-            self.observation_id,
-            timestamp,
-            'png')
+            settings.SATNOGS_OUTPUT_PATH, decoded_data_prefix,
+            self.observation_id, timestamp, 'png')
         self.observation_decoded_data = '{0}/{1}_{2}'.format(
-            settings.SATNOGS_OUTPUT_PATH,
-            decoded_data_prefix,
+            settings.SATNOGS_OUTPUT_PATH, decoded_data_prefix,
             self.observation_id)
-        return all([self.observation_id, self.tle,
-                    self.observation_end, self.frequency,
-                    self.observation_raw_file,
-                    self.observation_ogg_file,
-                    self.observation_waterfall_file,
-                    self.observation_waterfall_png,
-                    self.observation_decoded_data])
+        return all([
+            self.observation_id, self.tle, self.observation_end,
+            self.frequency, self.observation_raw_file,
+            self.observation_ogg_file, self.observation_waterfall_file,
+            self.observation_waterfall_png, self.observation_decoded_data
+        ])
 
     def observe(self):
         """Starts threads for rotcrl and rigctl."""
@@ -129,7 +111,8 @@ class Observer(object):
             pre_script = pre_script.replace("{{TLE}}", json.dumps(self.tle))
             pre_script = pre_script.replace("{{ID}}", str(self.observation_id))
             pre_script = pre_script.replace("{{BAUD}}", str(self.baud))
-            pre_script = pre_script.replace("{{SCRIPT_NAME}}", self.script_name)
+            pre_script = pre_script.replace("{{SCRIPT_NAME}}",
+                                            self.script_name)
             os.system(pre_script)
 
         # if it is APT we want to save with a prefix until the observation
@@ -141,11 +124,8 @@ class Observer(object):
         # start thread for rotctl
         LOGGER.info('Start gnuradio thread.')
         self._gnu_proc = gnuradio_handler.exec_gnuradio(
-            self.observation_raw_file,
-            self.observation_waterfall_file,
-            self.frequency,
-            self.baud,
-            self.script_name,
+            self.observation_raw_file, self.observation_waterfall_file,
+            self.frequency, self.baud, self.script_name,
             self.observation_decoded_data)
         LOGGER.info('Start rotctrl thread.')
         self.run_rot()
@@ -164,7 +144,9 @@ class Observer(object):
 
         # PUT client version and metadata
         base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
-        headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
+        headers = {
+            'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)
+        }
         url = urljoin(base_url, str(self.observation_id))
         if not url.endswith('/'):
             url += '/'
@@ -175,9 +157,12 @@ class Observer(object):
 
         try:
             resp = requests.put(
-                url, headers=headers,
-                data={'client_version': satnogsclient.config.VERSION,
-                      'client_metadata': json.dumps(client_metadata)},
+                url,
+                headers=headers,
+                data={
+                    'client_version': satnogsclient.config.VERSION,
+                    'client_metadata': json.dumps(client_metadata)
+                },
                 verify=settings.SATNOGS_VERIFY_SSL,
                 stream=True,
                 timeout=45)
@@ -194,23 +179,25 @@ class Observer(object):
             LOGGER.error('Bad status code: %s', resp.status_code)
 
     def run_rot(self):
-        self.tracker_rot = WorkerTrack(ip=self.rot_ip,
-                                       port=self.rot_port,
-                                       frequency=self.frequency,
-                                       time_to_stop=self.observation_end,
-                                       proc=self._gnu_proc,
-                                       sleep_time=3)
+        self.tracker_rot = WorkerTrack(
+            ip=self.rot_ip,
+            port=self.rot_port,
+            frequency=self.frequency,
+            time_to_stop=self.observation_end,
+            proc=self._gnu_proc,
+            sleep_time=3)
         LOGGER.debug('TLE: %s', self.tle)
         LOGGER.debug('Observation end: %s', self.observation_end)
         self.tracker_rot.trackobject(self.location, self.tle)
         self.tracker_rot.trackstart()
 
     def run_rig(self):
-        self.tracker_freq = WorkerFreq(ip=self.rig_ip,
-                                       port=self.rig_port,
-                                       frequency=self.frequency,
-                                       time_to_stop=self.observation_end,
-                                       proc=self._gnu_proc)
+        self.tracker_freq = WorkerFreq(
+            ip=self.rig_ip,
+            port=self.rig_port,
+            frequency=self.frequency,
+            time_to_stop=self.observation_end,
+            proc=self._gnu_proc)
         LOGGER.debug('Rig Frequency %s', self.frequency)
         LOGGER.debug('Observation end: %s', self.observation_end)
         self.tracker_freq.trackobject(self.location, self.tle)
@@ -225,15 +212,16 @@ class Observer(object):
             post_script = settings.SATNOGS_POST_OBSERVATION_SCRIPT
             post_script = post_script.replace("{{FREQ}}", str(self.frequency))
             post_script = post_script.replace("{{TLE}}", json.dumps(self.tle))
-            post_script = post_script.replace("{{ID}}", str(self.observation_id))
+            post_script = post_script.replace("{{ID}}",
+                                              str(self.observation_id))
             post_script = post_script.replace("{{BAUD}}", str(self.baud))
-            post_script = post_script.replace("{{SCRIPT_NAME}}", self.script_name)
+            post_script = post_script.replace("{{SCRIPT_NAME}}",
+                                              self.script_name)
             os.system(post_script)
 
     def rename_ogg_file(self):
         if os.path.isfile(self.observation_raw_file):
-            os.rename(self.observation_raw_file,
-                      self.observation_ogg_file)
+            os.rename(self.observation_raw_file, self.observation_ogg_file)
         LOGGER.info('Rename encoded file for uploading finished')
 
     def rename_data_file(self):
@@ -247,29 +235,30 @@ class Observer(object):
             LOGGER.info('Read waterfall file')
             wf_file = open(self.observation_waterfall_file)
             nchan = int(np.fromfile(wf_file, dtype='float32', count=1)[0])
-            freq = np.fromfile(wf_file, dtype='float32', count=nchan)/1000.0
-            data = np.fromfile(wf_file, dtype='float32').reshape(-1, nchan+1)
+            freq = np.fromfile(wf_file, dtype='float32', count=nchan) / 1000.0
+            data = np.fromfile(wf_file, dtype='float32').reshape(-1, nchan + 1)
             wf_file.close()
             t_idx, spec = data[:, :1], data[:, 1:]
             tmin, tmax = np.min(t_idx), np.max(t_idx)
             fmin, fmax = np.min(freq), np.max(freq)
             c_idx = spec > -200.0
             if np.sum(c_idx) > 100:
-                vmin = np.mean(spec[c_idx])-2.0*np.std(spec[c_idx])
-                vmax = np.mean(spec[c_idx])+6.0*np.std(spec[c_idx])
+                vmin = np.mean(spec[c_idx]) - 2.0 * np.std(spec[c_idx])
+                vmax = np.mean(spec[c_idx]) + 6.0 * np.std(spec[c_idx])
             else:
                 vmin = -100
                 vmax = -50
             LOGGER.info('Plot waterfall file')
             plt.figure(figsize=(10, 20))
-            plt.imshow(spec,
-                       origin='lower',
-                       aspect='auto',
-                       interpolation='None',
-                       extent=[fmin, fmax, tmin, tmax],
-                       vmin=vmin,
-                       vmax=vmax,
-                       cmap="viridis")
+            plt.imshow(
+                spec,
+                origin='lower',
+                aspect='auto',
+                interpolation='None',
+                extent=[fmin, fmax, tmin, tmax],
+                vmin=vmin,
+                vmax=vmax,
+                cmap="viridis")
             plt.xlabel("Frequency (kHz)")
             plt.ylabel("Time (seconds)")
             fig = plt.colorbar(aspect=50)

@@ -15,12 +15,10 @@ from satnogsclient.observer.orbital import pinpoint
 
 from satnogsclient import settings
 
-
 LOGGER = logging.getLogger('default')
 
 
 class Worker(object):
-
     """Class to facilitate as a worker for rotctl/rigctl."""
 
     # sleep time of loop (in seconds)
@@ -42,7 +40,12 @@ class Worker(object):
     observer_dict = {}
     satellite_dict = {}
 
-    def __init__(self, ip, port, time_to_stop=None, frequency=None, proc=None,
+    def __init__(self,
+                 ip,
+                 port,
+                 time_to_stop=None,
+                 frequency=None,
+                 proc=None,
                  sleep_time=None):
         """Initialize worker class."""
         self._ip = ip
@@ -132,7 +135,6 @@ class Worker(object):
 
 
 class WorkerTrack(Worker):
-
     def send_to_socket(self, pin, sock):
         # Read az/alt of sat and convert to radians
         azi = pin['az'].conjugate() * 180 / math.pi
@@ -143,15 +145,15 @@ class WorkerTrack(Worker):
         position = sock.send("p\n").split('\n')
         # if the need to move exceeds threshold, then do it
         if (position[0].startswith("RPRT") or
-                abs(azi - float(position[0])) > settings.SATNOGS_ROT_THRESHOLD or
-                abs(alt - float(position[1])) > settings.SATNOGS_ROT_THRESHOLD):
+                abs(azi - float(position[0])) > settings.SATNOGS_ROT_THRESHOLD
+                or abs(alt - float(position[1])) >
+                settings.SATNOGS_ROT_THRESHOLD):
             msg = 'P {0} {1}\n'.format(azi, alt)
             LOGGER.debug('Rotctld msg: %s', msg)
             sock.send(msg)
 
 
 class WorkerFreq(Worker):
-
     def send_to_socket(self, pin, sock):
         doppler_calc_freq = self._frequency * (1 - (pin['rng_vlct'] / ephem.c))
         msg = 'F {0}\n'.format(int(doppler_calc_freq))

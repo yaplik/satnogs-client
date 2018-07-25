@@ -9,8 +9,10 @@ LOGGER = logging.getLogger('default')
 
 
 def get_gnuradio_info():
-    process = subprocess.Popen(['python', '-m', 'satnogs.satnogs_info'],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        ['python', '-m', 'satnogs.satnogs_info'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
     gr_satnogs_info, _ = process.communicate()  # pylint: disable=W0612
     client_metadata = {
         'radio': {
@@ -34,20 +36,23 @@ def get_gnuradio_info():
             client_metadata['radio']['version'] = 'invalid'
         else:
             if 'version' in gr_satnogs_info:
-                client_metadata['radio']['version'] = gr_satnogs_info['version']
+                client_metadata['radio']['version'] = gr_satnogs_info[
+                    'version']
             else:
                 client_metadata['radio']['version'] = 'unknown'
     return client_metadata
 
 
-def exec_gnuradio(observation_file, waterfall_file, freq, baud,
-                  script_name, decoded_data):
-    arguments = {'filename': observation_file,
-                 'waterfall': waterfall_file,
-                 'rx_device': client_settings.SATNOGS_RX_DEVICE,
-                 'center_freq': str(freq),
-                 'script_name': script_name,
-                 'decoded_data': decoded_data}
+def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name,
+                  decoded_data):
+    arguments = {
+        'filename': observation_file,
+        'waterfall': waterfall_file,
+        'rx_device': client_settings.SATNOGS_RX_DEVICE,
+        'center_freq': str(freq),
+        'script_name': script_name,
+        'decoded_data': decoded_data
+    }
     scriptname = arguments['script_name']
     arg_string = ' '
     if not scriptname:
@@ -70,11 +75,10 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud,
         arg_string += '--baudrate=' + str(int(baud)) + ' '
     if client_settings.SATNOGS_RX_DEVICE and "--rx-sdr-device" not in arg_string:
         arg_string += '--rx-sdr-device=' + client_settings.SATNOGS_RX_DEVICE + ' '
-    if (client_settings.SATNOGS_DOPPLER_CORR_PER_SEC and
-            "--doppler-correction-per-sec" not in arg_string):
+    if (client_settings.SATNOGS_DOPPLER_CORR_PER_SEC
+            and "--doppler-correction-per-sec" not in arg_string):
         arg_string += ('--doppler-correction-per-sec=' +
-                       client_settings.SATNOGS_DOPPLER_CORR_PER_SEC +
-                       ' ')
+                       client_settings.SATNOGS_DOPPLER_CORR_PER_SEC + ' ')
     if client_settings.SATNOGS_LO_OFFSET and "--lo-offset" not in arg_string:
         arg_string += '--lo-offset=' + client_settings.SATNOGS_LO_OFFSET + ' '
     if client_settings.SATNOGS_PPM_ERROR and "--ppm" not in arg_string:
@@ -90,13 +94,14 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud,
     if client_settings.SATNOGS_DEV_ARGS and "--dev-args" not in arg_string:
         arg_string += '--dev-args=' + client_settings.SATNOGS_DEV_ARGS + ' '
     if client_settings.ENABLE_IQ_DUMP and "--enable-iq-dump" not in arg_string:
-        arg_string += '--enable-iq-dump=' + str(int(client_settings.ENABLE_IQ_DUMP is True)) + ' '
+        arg_string += '--enable-iq-dump=' + str(
+            int(client_settings.ENABLE_IQ_DUMP is True)) + ' '
     if client_settings.IQ_DUMP_FILENAME and "--iq-file-path" not in arg_string:
         arg_string += '--iq-file-path=' + client_settings.IQ_DUMP_FILENAME + ' '
     if not client_settings.DISABLE_DECODED_DATA and "--decoded-data-file-path" not in arg_string:
         arg_string += '--decoded-data-file-path=' + arguments['decoded_data'] + ' '
 
     LOGGER.info('Starting GNUradio python script')
-    proc = subprocess.Popen([scriptname + " " + arg_string], shell=True,
-                            preexec_fn=os.setsid)
+    proc = subprocess.Popen(
+        [scriptname + " " + arg_string], shell=True, preexec_fn=os.setsid)
     return proc

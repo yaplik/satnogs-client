@@ -30,11 +30,7 @@ signal.signal(signal.SIGINT, signal_term_handler)
 
 def spawn_observer(**kwargs):
     obj = kwargs.pop('obj')
-    tle = {
-        'tle0': obj['tle0'],
-        'tle1': obj['tle1'],
-        'tle2': obj['tle2']
-    }
+    tle = {'tle0': obj['tle0'], 'tle1': obj['tle1'], 'tle2': obj['tle2']}
     end = parser.parse(obj['end'])
 
     observer = Observer()
@@ -91,10 +87,10 @@ def post_data():
 
     for fil in os.walk(settings.SATNOGS_OUTPUT_PATH).next()[2]:
         file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, fil])
-        if (fil.startswith('receiving_satnogs') or
-                fil.startswith('receiving_waterfall') or
-                fil.startswith('receiving_data') or
-                os.stat(file_path).st_size == 0):
+        if (fil.startswith('receiving_satnogs')
+                or fil.startswith('receiving_waterfall')
+                or fil.startswith('receiving_data')
+                or os.stat(file_path).st_size == 0):
             continue
         if fil.startswith('satnogs'):
             observation = {'payload': open(file_path, 'rb')}
@@ -108,8 +104,8 @@ def post_data():
         if '_' not in fil:
             continue
         observation_id = fil.split('_')[1]
-        LOGGER.info(
-            'Trying to PUT observation data for id: %s', observation_id)
+        LOGGER.info('Trying to PUT observation data for id: %s',
+                    observation_id)
         url = urljoin(base_url, observation_id)
         if not url.endswith('/'):
             url += '/'
@@ -117,22 +113,26 @@ def post_data():
         LOGGER.debug('URL: %s', url)
         LOGGER.debug('Headers: %s', headers)
         LOGGER.debug('Observation file: %s', observation)
-        response = requests.put(url, headers=headers,
-                                files=observation,
-                                verify=settings.SATNOGS_VERIFY_SSL,
-                                stream=True,
-                                timeout=45)
+        response = requests.put(
+            url,
+            headers=headers,
+            files=observation,
+            verify=settings.SATNOGS_VERIFY_SSL,
+            stream=True,
+            timeout=45)
         if response.status_code == 200:
             LOGGER.info('Success: status code 200')
             if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
-                os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
-                          os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, fil))
+                os.rename(
+                    os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
+                    os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, fil))
             else:
                 os.remove(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil))
         elif response.status_code == 404:
             LOGGER.error('Bad status code: %s', response.status_code)
-            os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
-                      os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
+            os.rename(
+                os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
+                os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
         else:
             LOGGER.error('Bad status code: %s', response.status_code)
 
@@ -148,12 +148,15 @@ def get_jobs():
     LOGGER.debug('Headers: %s', headers)
     LOGGER.info('Trying to GET observation jobs from the network')
     response = requests.get(
-        url, params=params, headers=headers,
-        verify=settings.SATNOGS_VERIFY_SSL, timeout=45)
+        url,
+        params=params,
+        headers=headers,
+        verify=settings.SATNOGS_VERIFY_SSL,
+        timeout=45)
 
     if not response.status_code == 200:
-        raise Exception(
-            'Status code: {0} on request: {1}'.format(response.status_code, url))
+        raise Exception('Status code: {0} on request: {1}'.format(
+            response.status_code, url))
 
     for job in SCHEDULER.get_jobs():
         if job.name in [spawn_observer.__name__]:
@@ -167,11 +170,12 @@ def get_jobs():
         kwargs = {'obj': obj}
         LOGGER.info('Adding new job: %s', job_id)
         LOGGER.debug('Observation obj: %s', obj)
-        SCHEDULER.add_job(spawn_observer,
-                          'date',
-                          run_date=start,
-                          id='observer_{0}'.format(job_id),
-                          kwargs=kwargs)
+        SCHEDULER.add_job(
+            spawn_observer,
+            'date',
+            run_date=start,
+            id='observer_{0}'.format(job_id),
+            kwargs=kwargs)
     tasks.reverse()
 
 

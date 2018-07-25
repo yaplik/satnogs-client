@@ -6,7 +6,6 @@ from datetime import datetime
 import ephem
 import pytz
 
-
 LOGGER = logging.getLogger('default')
 
 

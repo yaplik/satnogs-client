@@ -15,12 +15,18 @@ def _cast_or_none(func, value):
 
 # Ground station information
 SATNOGS_API_TOKEN = environ.get('SATNOGS_API_TOKEN', None)
-SATNOGS_PRE_OBSERVATION_SCRIPT = environ.get('SATNOGS_PRE_OBSERVATION_SCRIPT', None)
-SATNOGS_POST_OBSERVATION_SCRIPT = environ.get('SATNOGS_POST_OBSERVATION_SCRIPT', None)
-SATNOGS_STATION_ID = _cast_or_none(int, environ.get('SATNOGS_STATION_ID', None))
-SATNOGS_STATION_LAT = _cast_or_none(float, environ.get('SATNOGS_STATION_LAT', None))
-SATNOGS_STATION_LON = _cast_or_none(float, environ.get('SATNOGS_STATION_LON', None))
-SATNOGS_STATION_ELEV = _cast_or_none(float, environ.get('SATNOGS_STATION_ELEV', None))
+SATNOGS_PRE_OBSERVATION_SCRIPT = environ.get('SATNOGS_PRE_OBSERVATION_SCRIPT',
+                                             None)
+SATNOGS_POST_OBSERVATION_SCRIPT = environ.get(
+    'SATNOGS_POST_OBSERVATION_SCRIPT', None)
+SATNOGS_STATION_ID = _cast_or_none(int, environ.get('SATNOGS_STATION_ID',
+                                                    None))
+SATNOGS_STATION_LAT = _cast_or_none(float,
+                                    environ.get('SATNOGS_STATION_LAT', None))
+SATNOGS_STATION_LON = _cast_or_none(float,
+                                    environ.get('SATNOGS_STATION_LON', None))
+SATNOGS_STATION_ELEV = _cast_or_none(float,
+                                     environ.get('SATNOGS_STATION_ELEV', None))
 
 # Output paths
 SATNOGS_APP_PATH = environ.get('SATNOGS_APP_PATH', '/tmp/.satnogs')
@@ -29,20 +35,23 @@ SATNOGS_COMPLETE_OUTPUT_PATH = environ.get('SATNOGS_COMPLETE_OUTPUT_PATH', '')
 SATNOGS_INCOMPLETE_OUTPUT_PATH = environ.get('SATNOGS_INCOMPLETE_OUTPUT_PATH',
                                              '/tmp/.satnogs/data/incomplete')
 
-for p in [SATNOGS_APP_PATH,
-          SATNOGS_OUTPUT_PATH,
-          SATNOGS_COMPLETE_OUTPUT_PATH,
-          SATNOGS_INCOMPLETE_OUTPUT_PATH]:
+for p in [
+        SATNOGS_APP_PATH, SATNOGS_OUTPUT_PATH, SATNOGS_COMPLETE_OUTPUT_PATH,
+        SATNOGS_INCOMPLETE_OUTPUT_PATH
+]:
     if p != "" and not os.path.exists(p):
         os.mkdir(p)
 
-SATNOGS_REMOVE_RAW_FILES = bool(strtobool(environ.get('SATNOGS_REMOVE_RAW_FILES', 'True')))
+SATNOGS_REMOVE_RAW_FILES = bool(
+    strtobool(environ.get('SATNOGS_REMOVE_RAW_FILES', 'True')))
 
 SATNOGS_VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
 DEFAULT_SQLITE_PATH = path.join(SATNOGS_APP_PATH, 'jobs.sqlite')
-SATNOGS_SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQLITE_PATH)
+SATNOGS_SQLITE_URL = environ.get('SATNOGS_SQLITE_URL',
+                                 'sqlite:///' + DEFAULT_SQLITE_PATH)
 
-SATNOGS_NETWORK_API_URL = environ.get('SATNOGS_NETWORK_API_URL', 'https://network.satnogs.org/api/')
+SATNOGS_NETWORK_API_URL = environ.get('SATNOGS_NETWORK_API_URL',
+                                      'https://network.satnogs.org/api/')
 SATNOGS_NETWORK_API_QUERY_INTERVAL = 1  # In minutes
 SATNOGS_NETWORK_API_POST_INTERVAL = 2  # In minutes
 GNURADIO_UDP_PORT = 16886
@@ -73,7 +82,8 @@ RIG_SERIAL_SPEED = ""
 
 # Common script parameters
 
-SATNOGS_DOPPLER_CORR_PER_SEC = environ.get('SATNOGS_DOPPLER_CORR_PER_SEC', None)
+SATNOGS_DOPPLER_CORR_PER_SEC = environ.get('SATNOGS_DOPPLER_CORR_PER_SEC',
+                                           None)
 SATNOGS_LO_OFFSET = environ.get('SATNOGS_LO_OFFSET', None)
 SATNOGS_PPM_ERROR = environ.get('SATNOGS_PPM_ERROR', None)
 SATNOGS_IF_GAIN = environ.get('SATNOGS_IF_GAIN', None)
@@ -83,7 +93,8 @@ SATNOGS_ANTENNA = environ.get('SATNOGS_ANTENNA', None)
 SATNOGS_DEV_ARGS = environ.get('SATNOGS_DEV_ARGS', None)
 ENABLE_IQ_DUMP = bool(strtobool(environ.get('ENABLE_IQ_DUMP', 'False')))
 IQ_DUMP_FILENAME = environ.get('IQ_DUMP_FILENAME', None)
-DISABLE_DECODED_DATA = bool(strtobool(environ.get('DISABLE_DECODED_DATA', 'False')))
+DISABLE_DECODED_DATA = bool(
+    strtobool(environ.get('DISABLE_DECODED_DATA', 'False')))
 
 # Logging configuration
 DEFAULT_LOGGING = {
