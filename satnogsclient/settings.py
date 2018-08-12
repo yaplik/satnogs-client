@@ -63,9 +63,10 @@ GNURADIO_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
 GNURADIO_FM_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
 GNURADIO_CW_SCRIPT_FILENAME = 'satnogs_cw_decoder.py'
 GNURADIO_APT_SCRIPT_FILENAME = 'satnogs_noaa_apt_decoder.py'
-GNURADIO_BPSK_SCRIPT_FILENAME = 'satnogs_bpsk_decoder.py'
-GNURADIO_FSK9K6_SCRIPT_FILENAME = 'satnogs_fsk9600_g3ruh_ax25.py'
-GNURADIO_FSK1K2_SCRIPT_FILENAME = 'satnogs_afsk1200_ax25.py'
+GNURADIO_BPSK_SCRIPT_FILENAME = 'satnogs_bpsk_ax25.py'
+GNURADIO_FSK_SCRIPT_FILENAME = 'satnogs_fsk_ax25.py'
+GNURADIO_MSK_SCRIPT_FILENAME = 'satnogs_msk_ax25.py'
+GNURADIO_AFSK1K2_SCRIPT_FILENAME = 'satnogs_afsk1200_ax25.py'
 GNURADIO_AMSAT_DUV_SCRIPT_FILENAME = 'satnogs_amsat_fox_duv_decoder.py'
 SATNOGS_RX_DEVICE = environ.get('SATNOGS_RX_DEVICE', 'rtlsdr')
 
