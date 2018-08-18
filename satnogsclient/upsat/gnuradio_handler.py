@@ -84,7 +84,7 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name,
     if client_settings.SATNOGS_LO_OFFSET and "--lo-offset" not in arg_string:
         arg_string += '--lo-offset=' + client_settings.SATNOGS_LO_OFFSET + ' '
     if client_settings.SATNOGS_RIG_PORT and "--rigctl-port" not in arg_string:
-	arg_string += '--rigctl-port=' + str(client_settings.SATNOGS_RIG_PORT) + ' '    
+        arg_string += '--rigctl-port=' + str(client_settings.SATNOGS_RIG_PORT) + ' '    
     if client_settings.SATNOGS_PPM_ERROR and "--ppm" not in arg_string:
         arg_string += '--ppm=' + client_settings.SATNOGS_PPM_ERROR + ' '
     if client_settings.SATNOGS_IF_GAIN and "--if-gain" not in arg_string:
