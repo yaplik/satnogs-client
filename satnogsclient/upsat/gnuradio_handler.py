@@ -20,7 +20,7 @@ def get_gnuradio_info():
         'radio': {
             'name': 'gr-satnogs',
             'version': None,
-            'rx_dexvice': client_settings.SATNOGS_RX_DEVICE,
+            'rx_device': client_settings.SATNOGS_RX_DEVICE,
             'ppm_error': client_settings.SATNOGS_PPM_ERROR,
             'if_gain': client_settings.SATNOGS_IF_GAIN,
             'rf_gain': client_settings.SATNOGS_RF_GAIN,
