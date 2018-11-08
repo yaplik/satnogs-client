@@ -5,6 +5,7 @@ ignore=_version.py
 disable=
     C0111,
     C0412,
+    R0801,
     R0902,
     R0912,
     R0913,
