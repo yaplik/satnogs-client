@@ -261,12 +261,16 @@ class Observer(object):
             tmin, tmax = np.min(t_idx), np.max(t_idx)
             fmin, fmax = np.min(freq), np.max(freq)
             c_idx = spec > -200.0
-            if np.sum(c_idx) > 100:
-                vmin = np.mean(spec[c_idx]) - 2.0 * np.std(spec[c_idx])
-                vmax = np.mean(spec[c_idx]) + 6.0 * np.std(spec[c_idx])
+            if settings.SATNOGS_WATERFALL_AUTORANGE:
+                if np.sum(c_idx) > 100:
+                    vmin = np.mean(spec[c_idx]) - 2.0 * np.std(spec[c_idx])
+                    vmax = np.mean(spec[c_idx]) + 6.0 * np.std(spec[c_idx])
+                else:
+                    vmin = -100
+                    vmax = -50
             else:
-                vmin = -100
-                vmax = -50
+                vmin = settings.SATNOGS_WATERFALL_MIN_VALUE
+                vmax = settings.SATNOGS_WATERFALL_MAX_VALUE
             LOGGER.info('Plot waterfall file')
             plt.figure(figsize=(10, 20))
             plt.imshow(
