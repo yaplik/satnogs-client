@@ -41,6 +41,7 @@ class Observer(object):
         self.rig_port = settings.SATNOGS_RIG_PORT
         self.observation_id = None
         self.tle = None
+        self.timestamp = None
         self.observation_end = None
         self.frequency = None
         self.observation_raw_file = None
@@ -77,33 +78,33 @@ class Observer(object):
         waterfall_prefix = 'waterfall'
         receiving_decoded_data_prefix = 'receiving_data'
         decoded_data_prefix = 'data'
-        timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S%z')
+        self.timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S%z')
         raw_file_extension = 'out'
         encoded_file_extension = 'ogg'
         waterfall_file_extension = 'dat'
         self.observation_raw_file = '{0}/{1}_{2}_{3}.{4}'.format(
             settings.SATNOGS_OUTPUT_PATH, not_completed_prefix,
-            self.observation_id, timestamp, raw_file_extension)
+            self.observation_id, self.timestamp, raw_file_extension)
         self.observation_ogg_file = '{0}/{1}_{2}_{3}.{4}'.format(
             settings.SATNOGS_OUTPUT_PATH, completed_prefix,
-            self.observation_id, timestamp, encoded_file_extension)
+            self.observation_id, self.timestamp, encoded_file_extension)
         self.observation_waterfall_file = '{0}/{1}_{2}_{3}.{4}'.format(
             settings.SATNOGS_OUTPUT_PATH, receiving_waterfall_prefix,
-            self.observation_id, timestamp, waterfall_file_extension)
+            self.observation_id, self.timestamp, waterfall_file_extension)
         self.observation_waterfall_png = '{0}/{1}_{2}_{3}.{4}'.format(
             settings.SATNOGS_OUTPUT_PATH, waterfall_prefix,
-            self.observation_id, timestamp, 'png')
+            self.observation_id, self.timestamp, 'png')
         self.observation_receiving_decoded_data = '{0}/{1}_{2}_{3}.{4}'.format(
             settings.SATNOGS_OUTPUT_PATH, receiving_decoded_data_prefix,
-            self.observation_id, timestamp, 'png')
+            self.observation_id, self.timestamp, 'png')
         self.observation_done_decoded_data = '{0}/{1}_{2}_{3}.{4}'.format(
             settings.SATNOGS_OUTPUT_PATH, decoded_data_prefix,
-            self.observation_id, timestamp, 'png')
+            self.observation_id, self.timestamp, 'png')
         self.observation_decoded_data = '{0}/{1}_{2}'.format(
             settings.SATNOGS_OUTPUT_PATH, decoded_data_prefix,
             self.observation_id)
         return all([
-            self.observation_id, self.tle, self.observation_end,
+            self.observation_id, self.tle, self.timestamp, self.observation_end,
             self.frequency, self.observation_raw_file,
             self.observation_ogg_file, self.observation_waterfall_file,
             self.observation_waterfall_png, self.observation_decoded_data
@@ -116,6 +117,7 @@ class Observer(object):
             replacements = [
                 ("{{FREQ}}", str(self.frequency)),
                 ("{{TLE}}", json.dumps(self.tle)),
+                ("{{TIMESTAMP}}", self.timestamp),
                 ("{{ID}}", str(self.observation_id)),
                 ("{{BAUD}}", str(self.baud)),
                 ("{{SCRIPT_NAME}}", self.script_name),
@@ -224,6 +226,7 @@ class Observer(object):
             replacements = [
                 ("{{FREQ}}", str(self.frequency)),
                 ("{{TLE}}", json.dumps(self.tle)),
+                ("{{TIMESTAMP}}", self.timestamp),
                 ("{{ID}}", str(self.observation_id)),
                 ("{{BAUD}}", str(self.baud)),
                 ("{{SCRIPT_NAME}}", self.script_name),
