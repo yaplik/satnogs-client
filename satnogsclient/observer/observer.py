@@ -104,8 +104,8 @@ class Observer(object):
             settings.SATNOGS_OUTPUT_PATH, decoded_data_prefix,
             self.observation_id)
         return all([
-            self.observation_id, self.tle, self.timestamp, self.observation_end,
-            self.frequency, self.observation_raw_file,
+            self.observation_id, self.tle, self.timestamp,
+            self.observation_end, self.frequency, self.observation_raw_file,
             self.observation_ogg_file, self.observation_waterfall_file,
             self.observation_waterfall_png, self.observation_decoded_data
         ])
