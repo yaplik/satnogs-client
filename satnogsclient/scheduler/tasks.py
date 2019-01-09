@@ -58,6 +58,8 @@ def spawn_observer(**kwargs):
             script_name = settings.GNURADIO_APT_SCRIPT_FILENAME
         elif obj['mode'].startswith('BPSK'):
             script_name = settings.GNURADIO_BPSK_SCRIPT_FILENAME
+        elif obj['mode'] == 'GFSK Rktr':
+            script_name = settings.GNURADIO_GFSK_RKTR_SCRIPT_FILENAME
         elif obj['mode'].startswith('FSK') or obj['mode'].startswith('GFSK'):
             script_name = settings.GNURADIO_FSK_SCRIPT_FILENAME
         elif obj['mode'].startswith('MSK') or obj['mode'].startswith('GMSK'):

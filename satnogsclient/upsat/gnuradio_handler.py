@@ -62,6 +62,7 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name,
     # If this is a BPSK/FSK/MSK observation pass the baudrate parameter
     if script_name in [
             client_settings.GNURADIO_BPSK_SCRIPT_FILENAME,
+            client_settings.GNURADIO_GFSK_RKTR_SCRIPT_FILENAME,
             client_settings.GNURADIO_FSK_SCRIPT_FILENAME,
             client_settings.GNURADIO_MSK_SCRIPT_FILENAME
     ] and baud > 0:
