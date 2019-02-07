@@ -27,8 +27,9 @@ SATNOGS_STATION_LAT = _cast_or_none(float,
                                     environ.get('SATNOGS_STATION_LAT', None))
 SATNOGS_STATION_LON = _cast_or_none(float,
                                     environ.get('SATNOGS_STATION_LON', None))
-SATNOGS_STATION_ELEV = _cast_or_none(float,
+SATNOGS_STATION_ELEV = _cast_or_none(int,
                                      environ.get('SATNOGS_STATION_ELEV', None))
+GPSD_ENABLED = _cast_or_none(bool, environ.get('GPSD_ENABLED', None))
 
 # Output paths
 SATNOGS_APP_PATH = environ.get('SATNOGS_APP_PATH', '/tmp/.satnogs')
