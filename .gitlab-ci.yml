@@ -1,17 +1,57 @@
 stages:
+  - static
+  - build
   - test
   - deploy
-Python 2.7:
-  stage: test
+static_python:
+  stage: static
+  image: python:2.7
+  before_script:
+    - pip install tox
+  script:
+    - tox -e flake8,yapf,pylint
+static_robot:
+  stage: static
+  image: python:2.7
+  before_script:
+    - pip install tox
+  script:
+    - tox -e robot_lint
+build:
+  stage: build
   image: python:2.7
   script:
-    - pip install tox
-    - tox -e flake8,yapf,pylint,robot_lint,py27
-Python 3.6:
-  stage: test
+    - rm -rf dist
+    - python setup.py sdist bdist_wheel
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - dist
+build3:
+  stage: build
   image: python:3.6
   script:
+    - rm -rf dist
+    - python setup.py sdist bdist_wheel
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - dist
+test:
+  stage: test
+  image: python:2.7
+  before_script:
     - pip install tox
+  script:
+    - tox -e py27
+test3:
+  stage: test
+  image: python:3.6
+  before_script:
+    - pip install tox
+  script:
     - tox -e py36
 deploy:
   stage: deploy
