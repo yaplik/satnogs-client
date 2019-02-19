@@ -77,6 +77,8 @@ SATNOGS_ROT_PORT = int(environ.get('SATNOGS_ROT_PORT', 4533))
 SATNOGS_RIG_IP = environ.get('SATNOGS_RIG_IP', '127.0.0.1')
 SATNOGS_RIG_PORT = int(environ.get('SATNOGS_RIG_PORT', 4532))
 SATNOGS_ROT_THRESHOLD = int(environ.get('SATNOGS_ROT_THRESHOLD', 4))
+SATNOGS_ROT_FLIP = bool(strtobool(environ.get('SATNOGS_ROT_FLIP', 'False')))
+SATNOGS_ROT_FLIP_ANGLE = int(environ.get('SATNOGS_ROT_FLIP_ANGLE', 75))
 
 # Rigctld settings
 RIG_MODEL = ""

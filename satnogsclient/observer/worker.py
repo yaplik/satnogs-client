@@ -7,7 +7,7 @@ import time
 import os
 import signal
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import ephem
 import pytz
@@ -137,10 +137,70 @@ class Worker(object):
 
 
 class WorkerTrack(Worker):
+    _midpoint = None
+    _flip = False
+
+    @staticmethod
+    def find_midpoint(observer_dict, satellite_dict, start):
+        # Workaround for https://github.com/brandon-rhodes/pyephem/issues/105
+        start -= timedelta(minutes=1)
+
+        observer = ephem.Observer()
+        observer.lon = str(observer_dict["lon"])
+        observer.lat = str(observer_dict["lat"])
+        observer.elevation = observer_dict["elev"]
+        observer.date = ephem.Date(start)
+
+        satellite = ephem.readtle(satellite_dict["tle0"],
+                                  satellite_dict["tle1"],
+                                  satellite_dict["tle2"])
+
+        timestamp_max = ephem.Date(observer.next_pass(satellite)[2]).datetime()
+        pin = pinpoint(observer_dict, satellite_dict, timestamp_max)
+        azi_max = pin["az"].conjugate() * 180 / math.pi
+        alt_max = pin["alt"].conjugate() * 180 / math.pi
+
+        return (azi_max, alt_max, timestamp_max)
+
+    @staticmethod
+    def normalize_angle(num, lower=0, upper=360):
+        res = num
+        if num > upper or num == lower:
+            num = lower + abs(num + upper) % (abs(lower) + abs(upper))
+        if num < lower or num == upper:
+            num = upper - abs(num - lower) % (abs(lower) + abs(upper))
+        res = lower if num == upper else num
+        return res
+
+    @staticmethod
+    def flip_coordinates(azi, alt, timestamp, midpoint):
+        midpoint_azi, midpoint_alt, midpoint_timestamp = midpoint
+        if timestamp >= midpoint_timestamp:
+            azi = midpoint_azi + (midpoint_azi - azi)
+            alt = midpoint_alt + (midpoint_alt - alt)
+            return (WorkerTrack.normalize_angle(azi),
+                    WorkerTrack.normalize_angle(alt))
+        return (azi, alt)
+
+    def trackobject(self, observer_dict, satellite_dict):
+        super(WorkerTrack, self).trackobject(observer_dict, satellite_dict)
+
+        if settings.SATNOGS_ROT_FLIP and settings.SATNOGS_ROT_FLIP_ANGLE:
+            self._midpoint = WorkerTrack.find_midpoint(observer_dict,
+                                                       satellite_dict,
+                                                       datetime.now(pytz.utc))
+            LOGGER.info("Antenna midpoint: AZ%.2f EL%.2f %s", *self._midpoint)
+            self._flip = (self._midpoint[1] >= settings.SATNOGS_ROT_FLIP_ANGLE)
+            LOGGER.info("Antenna flip: %s", self._flip)
+
     def send_to_socket(self, pin, sock):
         # Read az/alt of sat and convert to radians
         azi = pin['az'].conjugate() * 180 / math.pi
         alt = pin['alt'].conjugate() * 180 / math.pi
+        if self._flip:
+            azi, alt = WorkerTrack.flip_coordinates(azi, alt,
+                                                    datetime.now(pytz.utc),
+                                                    self._midpoint)
         self._azimuth = azi
         self._altitude = alt
         # read current position of rotator, [0] az and [1] el
