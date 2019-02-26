@@ -1,14 +1,5 @@
 *.pyc
 *~
-*.sqlite
-*.egg-info
-build/
-dist/
-env.sh
-*.pickle
-_build/
-.idea/
-.cproject
-.project
-.pydevproject
-.settings/*
+/*.egg-info
+/build/
+/dist/
