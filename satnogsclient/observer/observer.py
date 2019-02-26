@@ -13,13 +13,13 @@ import shlex
 import subprocess
 import requests
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 import satnogsclient.config
 from satnogsclient import settings
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
 from satnogsclient.upsat import gnuradio_handler
-
-import numpy as np
-import matplotlib.pyplot as plt
 
 plt.switch_backend('Agg')
 

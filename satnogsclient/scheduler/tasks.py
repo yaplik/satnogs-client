@@ -10,13 +10,13 @@ except ImportError:
 from multiprocessing import Process
 import subprocess
 
+import requests
+
 from dateutil import parser
 from satnogsclient.scheduler import SCHEDULER
 from satnogsclient import settings
 from satnogsclient.observer.observer import Observer
 from satnogsclient.locator import locator
-
-import requests
 
 LOGGER = logging.getLogger('default')
 LOG_PATH = settings.SATNOGS_OUTPUT_PATH + "/files/"

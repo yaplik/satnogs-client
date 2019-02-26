@@ -1,8 +1,8 @@
 import time
 import logging
 import logging.config
-from satnogsclient import settings
 import gps
+from satnogsclient import settings
 
 LOGGER = logging.getLogger('satnogsclient')
 
