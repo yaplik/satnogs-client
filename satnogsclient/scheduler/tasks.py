@@ -176,13 +176,13 @@ def get_jobs():
         raise Exception('Status code: {0} on request: {1}'.format(
             response.status_code, url))
 
+    latest_jobs = [str(job['id']) for job in response.json()]
     for job in SCHEDULER.get_jobs():
-        if job.name in [spawn_observer.__name__]:
-            job.remove()
+        if job.name == spawn_observer.__name__:
+            if job.id not in latest_jobs:
+                job.remove()
 
-    tasks = []
     for obj in response.json():
-        tasks.append(obj)
         start = parser.parse(obj['start'])
         job_id = str(obj['id'])
         kwargs = {'obj': obj}
@@ -192,9 +192,9 @@ def get_jobs():
             spawn_observer,
             'date',
             run_date=start,
-            id='observer_{0}'.format(job_id),
-            kwargs=kwargs)
-    tasks.reverse()
+            id='{0}'.format(job_id),
+            kwargs=kwargs,
+            replace_existing=True)
 
 
 def status_listener():
