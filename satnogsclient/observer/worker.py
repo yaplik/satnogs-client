@@ -158,7 +158,8 @@ class WorkerTrack(Worker):
             str(satellite_dict["tle0"]), str(satellite_dict["tle1"]),
             str(satellite_dict["tle2"]))
 
-        timestamp_max = ephem.Date(observer.next_pass(satellite)[2]).datetime()
+        timestamp_max = pytz.utc.localize(
+            ephem.Date(observer.next_pass(satellite)[2]).datetime())
         pin = pinpoint(observer_dict, satellite_dict, timestamp_max)
         azi_max = pin["az"].conjugate() * 180 / math.pi
         alt_max = pin["alt"].conjugate() * 180 / math.pi
