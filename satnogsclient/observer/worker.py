@@ -154,9 +154,9 @@ class WorkerTrack(Worker):
         observer.elevation = observer_dict["elev"]
         observer.date = ephem.Date(start)
 
-        satellite = ephem.readtle(satellite_dict["tle0"],
-                                  satellite_dict["tle1"],
-                                  satellite_dict["tle2"])
+        satellite = ephem.readtle(
+            str(satellite_dict["tle0"]), str(satellite_dict["tle1"]),
+            str(satellite_dict["tle2"]))
 
         timestamp_max = ephem.Date(observer.next_pass(satellite)[2]).datetime()
         pin = pinpoint(observer_dict, satellite_dict, timestamp_max)
