@@ -21,7 +21,6 @@ class Locator(object):
         print('climb       ', gpsd.fix.climb)
         print('hdop        ', gpsd.hdop)
         print('timeout     ', self.timeout)
-        print gpsd
 
     def update_location(self):
         if settings.GPSD_ENABLED is not True:
