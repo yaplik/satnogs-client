@@ -143,6 +143,9 @@ class WorkerTrack(Worker):
     @staticmethod
     def find_midpoint(observer_dict, satellite_dict, start):
         # Workaround for https://github.com/brandon-rhodes/pyephem/issues/105
+        # pylint: disable=assigning-non-slot
+        # Disable until pylint 2.4 is released, see
+        # https://github.com/PyCQA/pylint/issues/2807
         start -= timedelta(minutes=1)
 
         observer = ephem.Observer()

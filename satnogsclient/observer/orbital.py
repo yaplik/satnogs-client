@@ -23,6 +23,9 @@ def pinpoint(observer_dict, satellite_dict, timestamp=None):
         returns:
             Dictionary containing azimuth, altitude and "ok" for error detection.
     """
+    # pylint: disable=assigning-non-slot
+    # Disable until pylint 2.4 is released, see
+    # https://github.com/PyCQA/pylint/issues/2807
     # observer object
     if all(x in observer_dict for x in ['lat', 'lon', 'elev']):
         LOGGER.debug('Observer data: %s', observer_dict)
