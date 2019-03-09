@@ -95,7 +95,7 @@ def post_data():
     base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
     headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
 
-    for fil in os.walk(settings.SATNOGS_OUTPUT_PATH).next()[2]:
+    for fil in next(os.walk(settings.SATNOGS_OUTPUT_PATH))[2]:
         file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, fil])
         if (fil.startswith('receiving_satnogs')
                 or fil.startswith('receiving_waterfall')
