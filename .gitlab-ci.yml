@@ -16,7 +16,7 @@ static_python3:
   before_script:
     - pip install tox
   script:
-    - tox -e "py3-{flake8,yapf}"
+    - tox -e "py3-{flake8,yapf,pylint}"
 static_robot:
   stage: static
   image: python:2
