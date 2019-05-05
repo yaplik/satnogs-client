@@ -97,10 +97,8 @@ def post_data():
 
     for fil in next(os.walk(settings.SATNOGS_OUTPUT_PATH))[2]:
         file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, fil])
-        if (fil.startswith('receiving_satnogs')
-                or fil.startswith('receiving_waterfall')
-                or fil.startswith('receiving_data')
-                or os.stat(file_path).st_size == 0):
+        if (fil.startswith('receiving_satnogs') or fil.startswith('receiving_waterfall')
+                or fil.startswith('receiving_data') or os.stat(file_path).st_size == 0):
             continue
         if fil.startswith('satnogs'):
             observation = {'payload': open(file_path, 'rb')}
@@ -114,8 +112,7 @@ def post_data():
         if '_' not in fil:
             continue
         observation_id = fil.split('_')[1]
-        LOGGER.info('Trying to PUT observation data for id: %s',
-                    observation_id)
+        LOGGER.info('Trying to PUT observation data for id: %s', observation_id)
         url = urljoin(base_url, observation_id)
         if not url.endswith('/'):
             url += '/'
@@ -132,24 +129,21 @@ def post_data():
         if response.status_code == 200:
             LOGGER.info('Success: status code 200')
             if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
-                os.rename(
-                    os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
-                    os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, fil))
+                os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
+                          os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, fil))
             else:
                 os.remove(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil))
         elif response.status_code == 404:
             LOGGER.error('Bad status code: %s', response.status_code)
-            os.rename(
-                os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
-                os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
+            os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
+                      os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
         else:
             LOGGER.error('Bad status code: %s', response.status_code)
 
 
 def get_jobs():
     """Query SatNOGS Network API to GET jobs."""
-    gps_locator = locator.Locator(settings.SATNOGS_NETWORK_API_QUERY_INTERVAL *
-                                  60)
+    gps_locator = locator.Locator(settings.SATNOGS_NETWORK_API_QUERY_INTERVAL * 60)
     gps_locator.update_location()
     LOGGER.info('Get jobs started')
     url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'jobs/')
@@ -171,8 +165,7 @@ def get_jobs():
                             timeout=45)
 
     if not response.status_code == 200:
-        raise Exception('Status code: {0} on request: {1}'.format(
-            response.status_code, url))
+        raise Exception('Status code: {0} on request: {1}'.format(response.status_code, url))
 
     latest_jobs = [str(job['id']) for job in response.json()]
     for job in SCHEDULER.get_jobs():
@@ -200,12 +193,10 @@ def status_listener():
     SCHEDULER.remove_all_jobs()
     interval = settings.SATNOGS_NETWORK_API_QUERY_INTERVAL
     SCHEDULER.add_job(get_jobs, 'interval', minutes=interval)
-    msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(
-        interval)
+    msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
     LOGGER.info(msg)
     interval = settings.SATNOGS_NETWORK_API_POST_INTERVAL
-    msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(
-        interval)
+    msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
     LOGGER.info(msg)
     SCHEDULER.add_job(post_data, 'interval', minutes=interval)
     os.environ['GNURADIO_SCRIPT_PID'] = '0'

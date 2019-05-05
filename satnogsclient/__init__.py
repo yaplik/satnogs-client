@@ -11,9 +11,8 @@ import time
 from validators.url import url
 
 import satnogsclient.config
-from satnogsclient.settings import (SATNOGS_API_TOKEN, DEFAULT_LOGGING,
-                                    SATNOGS_STATION_ID, SATNOGS_STATION_LAT,
-                                    SATNOGS_STATION_LON, SATNOGS_STATION_ELEV,
+from satnogsclient.settings import (SATNOGS_API_TOKEN, DEFAULT_LOGGING, SATNOGS_STATION_ID,
+                                    SATNOGS_STATION_LAT, SATNOGS_STATION_LON, SATNOGS_STATION_ELEV,
                                     SATNOGS_NETWORK_API_URL, GPSD_ENABLED)
 from satnogsclient.scheduler.tasks import status_listener, exec_rigctld
 from satnogsclient.locator import locator
@@ -32,8 +31,7 @@ def main():
     try:
         url(SATNOGS_NETWORK_API_URL)
     except ValueError:
-        raise Exception('Invalid SATNOGS_NETWORK_API_URL: {0}'.format(
-            SATNOGS_NETWORK_API_URL))
+        raise Exception('Invalid SATNOGS_NETWORK_API_URL: {0}'.format(SATNOGS_NETWORK_API_URL))
 
     if not SATNOGS_STATION_ID:
         raise Exception('SATNOGS_STATION_ID not configured.')

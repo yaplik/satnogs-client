@@ -56,8 +56,7 @@ class Observer(object):
         self.tracker_rot = None
         self.script_name = None
 
-    def setup(self, observation_id, tle, observation_end, frequency, baud,
-              script_name):
+    def setup(self, observation_id, tle, observation_end, frequency, baud, script_name):
         """
         Sets up required internal variables.
         * returns True if setup is ok
@@ -82,31 +81,34 @@ class Observer(object):
         raw_file_extension = 'out'
         encoded_file_extension = 'ogg'
         waterfall_file_extension = 'dat'
-        self.observation_raw_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH, not_completed_prefix,
-            self.observation_id, self.timestamp, raw_file_extension)
-        self.observation_ogg_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH, completed_prefix,
-            self.observation_id, self.timestamp, encoded_file_extension)
+        self.observation_raw_file = '{0}/{1}_{2}_{3}.{4}'.format(settings.SATNOGS_OUTPUT_PATH,
+                                                                 not_completed_prefix,
+                                                                 self.observation_id,
+                                                                 self.timestamp,
+                                                                 raw_file_extension)
+        self.observation_ogg_file = '{0}/{1}_{2}_{3}.{4}'.format(settings.SATNOGS_OUTPUT_PATH,
+                                                                 completed_prefix,
+                                                                 self.observation_id,
+                                                                 self.timestamp,
+                                                                 encoded_file_extension)
         self.observation_waterfall_file = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH, receiving_waterfall_prefix,
-            self.observation_id, self.timestamp, waterfall_file_extension)
+            settings.SATNOGS_OUTPUT_PATH, receiving_waterfall_prefix, self.observation_id,
+            self.timestamp, waterfall_file_extension)
         self.observation_waterfall_png = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH, waterfall_prefix,
-            self.observation_id, self.timestamp, 'png')
+            settings.SATNOGS_OUTPUT_PATH, waterfall_prefix, self.observation_id, self.timestamp,
+            'png')
         self.observation_receiving_decoded_data = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH, receiving_decoded_data_prefix,
-            self.observation_id, self.timestamp, 'png')
+            settings.SATNOGS_OUTPUT_PATH, receiving_decoded_data_prefix, self.observation_id,
+            self.timestamp, 'png')
         self.observation_done_decoded_data = '{0}/{1}_{2}_{3}.{4}'.format(
-            settings.SATNOGS_OUTPUT_PATH, decoded_data_prefix,
-            self.observation_id, self.timestamp, 'png')
-        self.observation_decoded_data = '{0}/{1}_{2}'.format(
-            settings.SATNOGS_OUTPUT_PATH, decoded_data_prefix,
-            self.observation_id)
+            settings.SATNOGS_OUTPUT_PATH, decoded_data_prefix, self.observation_id, self.timestamp,
+            'png')
+        self.observation_decoded_data = '{0}/{1}_{2}'.format(settings.SATNOGS_OUTPUT_PATH,
+                                                             decoded_data_prefix,
+                                                             self.observation_id)
         return all([
-            self.observation_id, self.tle, self.timestamp,
-            self.observation_end, self.frequency, self.observation_raw_file,
-            self.observation_ogg_file, self.observation_waterfall_file,
+            self.observation_id, self.tle, self.timestamp, self.observation_end, self.frequency,
+            self.observation_raw_file, self.observation_ogg_file, self.observation_waterfall_file,
             self.observation_waterfall_png, self.observation_decoded_data
         ])
 
@@ -137,10 +139,11 @@ class Observer(object):
 
         # start thread for rotctl
         LOGGER.info('Start gnuradio thread.')
-        self._gnu_proc = gnuradio_handler.exec_gnuradio(
-            self.observation_raw_file, self.observation_waterfall_file,
-            self.frequency, self.baud, self.script_name,
-            self.observation_decoded_data)
+        self._gnu_proc = gnuradio_handler.exec_gnuradio(self.observation_raw_file,
+                                                        self.observation_waterfall_file,
+                                                        self.frequency, self.baud,
+                                                        self.script_name,
+                                                        self.observation_decoded_data)
         LOGGER.info('Start rotctrl thread.')
         self.run_rot()
         # start thread for rigctl
@@ -158,9 +161,7 @@ class Observer(object):
 
         # PUT client version and metadata
         base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
-        headers = {
-            'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)
-        }
+        headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
         url = urljoin(base_url, str(self.observation_id))
         if not url.endswith('/'):
             url += '/'
@@ -174,10 +175,8 @@ class Observer(object):
             resp = requests.put(url,
                                 headers=headers,
                                 data={
-                                    'client_version':
-                                    satnogsclient.config.VERSION,
-                                    'client_metadata':
-                                    json.dumps(client_metadata)
+                                    'client_version': satnogsclient.config.VERSION,
+                                    'client_metadata': json.dumps(client_metadata)
                                 },
                                 verify=settings.SATNOGS_VERIFY_SSL,
                                 stream=True,
@@ -245,8 +244,7 @@ class Observer(object):
 
     def rename_data_file(self):
         if os.path.isfile(self.observation_receiving_decoded_data):
-            os.rename(self.observation_receiving_decoded_data,
-                      self.observation_done_decoded_data)
+            os.rename(self.observation_receiving_decoded_data, self.observation_done_decoded_data)
         LOGGER.info('Rename data file for uploading finished')
 
     def plot_waterfall(self):

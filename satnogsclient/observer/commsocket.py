@@ -61,13 +61,11 @@ class Commsocket(object):
 
     def connect(self):
         try:
-            LOGGER.debug('Opening TCP socket: %s:%s', self.ip_address,
-                         self.port)
+            LOGGER.debug('Opening TCP socket: %s:%s', self.ip_address, self.port)
             self.sock.connect((self.ip_address, self.port))
             self._connected = True
         except socket.error:
-            LOGGER.error('Cannot connect to socket %s:%s', self.ip_address,
-                         self.port)
+            LOGGER.error('Cannot connect to socket %s:%s', self.ip_address, self.port)
             self._connected = False
         return self.is_connected
 
@@ -78,8 +76,7 @@ class Commsocket(object):
         try:
             self.sock.send(message.encode('ascii'))
         except socket.error:
-            LOGGER.error('Cannot send to socket %s:%s', self.ip_address,
-                         self.port)
+            LOGGER.error('Cannot send to socket %s:%s', self.ip_address, self.port)
 
         response = self.sock.recv(self._tasks_buffer_size).decode('ascii')
         LOGGER.debug('Received message: %s', response)
@@ -111,8 +108,7 @@ class Commsocket(object):
         try:
             self.sock.bind((self._tcp_ip, self._tcp_port))
         except socket.error:
-            LOGGER.error('Cannot bind socket %s:%s', self.ip_address,
-                         self.port)
+            LOGGER.error('Cannot bind socket %s:%s', self.ip_address, self.port)
             self.sock.close()
             self._connected = False
             self.bind()
