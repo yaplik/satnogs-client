@@ -171,16 +171,17 @@ class Observer(object):
         client_metadata['frequency'] = self.frequency
 
         try:
-            resp = requests.put(
-                url,
-                headers=headers,
-                data={
-                    'client_version': satnogsclient.config.VERSION,
-                    'client_metadata': json.dumps(client_metadata)
-                },
-                verify=settings.SATNOGS_VERIFY_SSL,
-                stream=True,
-                timeout=45)
+            resp = requests.put(url,
+                                headers=headers,
+                                data={
+                                    'client_version':
+                                    satnogsclient.config.VERSION,
+                                    'client_metadata':
+                                    json.dumps(client_metadata)
+                                },
+                                verify=settings.SATNOGS_VERIFY_SSL,
+                                stream=True,
+                                timeout=45)
         except requests.exceptions.ConnectionError:
             LOGGER.error('%s: Connection Refused', url)
         except requests.exceptions.Timeout:
@@ -194,25 +195,23 @@ class Observer(object):
             LOGGER.error('Bad status code: %s', resp.status_code)
 
     def run_rot(self):
-        self.tracker_rot = WorkerTrack(
-            ip=self.rot_ip,
-            port=self.rot_port,
-            frequency=self.frequency,
-            time_to_stop=self.observation_end,
-            proc=self._gnu_proc,
-            sleep_time=3)
+        self.tracker_rot = WorkerTrack(ip=self.rot_ip,
+                                       port=self.rot_port,
+                                       frequency=self.frequency,
+                                       time_to_stop=self.observation_end,
+                                       proc=self._gnu_proc,
+                                       sleep_time=3)
         LOGGER.debug('TLE: %s', self.tle)
         LOGGER.debug('Observation end: %s', self.observation_end)
         self.tracker_rot.trackobject(self.location, self.tle)
         self.tracker_rot.trackstart()
 
     def run_rig(self):
-        self.tracker_freq = WorkerFreq(
-            ip=self.rig_ip,
-            port=self.rig_port,
-            frequency=self.frequency,
-            time_to_stop=self.observation_end,
-            proc=self._gnu_proc)
+        self.tracker_freq = WorkerFreq(ip=self.rig_ip,
+                                       port=self.rig_port,
+                                       frequency=self.frequency,
+                                       time_to_stop=self.observation_end,
+                                       proc=self._gnu_proc)
         LOGGER.debug('Rig Frequency %s', self.frequency)
         LOGGER.debug('Observation end: %s', self.observation_end)
         self.tracker_freq.trackobject(self.location, self.tle)
@@ -274,15 +273,14 @@ class Observer(object):
                 vmax = settings.SATNOGS_WATERFALL_MAX_VALUE
             LOGGER.info('Plot waterfall file')
             plt.figure(figsize=(10, 20))
-            plt.imshow(
-                spec,
-                origin='lower',
-                aspect='auto',
-                interpolation='None',
-                extent=[fmin, fmax, tmin, tmax],
-                vmin=vmin,
-                vmax=vmax,
-                cmap="viridis")
+            plt.imshow(spec,
+                       origin='lower',
+                       aspect='auto',
+                       interpolation='None',
+                       extent=[fmin, fmax, tmin, tmax],
+                       vmin=vmin,
+                       vmax=vmax,
+                       cmap="viridis")
             plt.xlabel("Frequency (kHz)")
             plt.ylabel("Time (seconds)")
             fig = plt.colorbar(aspect=50)

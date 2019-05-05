@@ -32,9 +32,10 @@ class Locator(object):
             no_timeout = True
             LOGGER.info('No default coordinates, GPS timeout disabled')
         else:
-            LOGGER.info(
-                'Last coordinates %f %f %d', settings.SATNOGS_STATION_LAT,
-                settings.SATNOGS_STATION_LON, settings.SATNOGS_STATION_ELEV)
+            LOGGER.info('Last coordinates %f %f %d',
+                        settings.SATNOGS_STATION_LAT,
+                        settings.SATNOGS_STATION_LON,
+                        settings.SATNOGS_STATION_ELEV)
         end_time = time.time() + self.timeout
 
         try:
@@ -53,8 +54,9 @@ class Locator(object):
             settings.SATNOGS_STATION_LAT = gpsd.fix.latitude
             settings.SATNOGS_STATION_LON = gpsd.fix.longitude
             settings.SATNOGS_STATION_ELEV = gpsd.fix.altitude
-            LOGGER.info(
-                'Updating coordinates %f %f %d', settings.SATNOGS_STATION_LAT,
-                settings.SATNOGS_STATION_LON, settings.SATNOGS_STATION_ELEV)
+            LOGGER.info('Updating coordinates %f %f %d',
+                        settings.SATNOGS_STATION_LAT,
+                        settings.SATNOGS_STATION_LON,
+                        settings.SATNOGS_STATION_ELEV)
         else:
             LOGGER.info("GPS timeout, using last known coordinates")

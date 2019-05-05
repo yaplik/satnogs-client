@@ -123,13 +123,12 @@ def post_data():
         LOGGER.debug('URL: %s', url)
         LOGGER.debug('Headers: %s', headers)
         LOGGER.debug('Observation file: %s', observation)
-        response = requests.put(
-            url,
-            headers=headers,
-            files=observation,
-            verify=settings.SATNOGS_VERIFY_SSL,
-            stream=True,
-            timeout=45)
+        response = requests.put(url,
+                                headers=headers,
+                                files=observation,
+                                verify=settings.SATNOGS_VERIFY_SSL,
+                                stream=True,
+                                timeout=45)
         if response.status_code == 200:
             LOGGER.info('Success: status code 200')
             if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
@@ -149,8 +148,8 @@ def post_data():
 
 def get_jobs():
     """Query SatNOGS Network API to GET jobs."""
-    gps_locator = locator.Locator(
-        settings.SATNOGS_NETWORK_API_QUERY_INTERVAL * 60)
+    gps_locator = locator.Locator(settings.SATNOGS_NETWORK_API_QUERY_INTERVAL *
+                                  60)
     gps_locator.update_location()
     LOGGER.info('Get jobs started')
     url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'jobs/')
@@ -165,12 +164,11 @@ def get_jobs():
     LOGGER.debug('Params: %s', params)
     LOGGER.debug('Headers: %s', headers)
     LOGGER.info('Trying to GET observation jobs from the network')
-    response = requests.get(
-        url,
-        params=params,
-        headers=headers,
-        verify=settings.SATNOGS_VERIFY_SSL,
-        timeout=45)
+    response = requests.get(url,
+                            params=params,
+                            headers=headers,
+                            verify=settings.SATNOGS_VERIFY_SSL,
+                            timeout=45)
 
     if not response.status_code == 200:
         raise Exception('Status code: {0} on request: {1}'.format(
@@ -188,13 +186,12 @@ def get_jobs():
         kwargs = {'obj': obj}
         LOGGER.info('Adding new job: %s', job_id)
         LOGGER.debug('Observation obj: %s', obj)
-        SCHEDULER.add_job(
-            spawn_observer,
-            'date',
-            run_date=start,
-            id='{0}'.format(job_id),
-            kwargs=kwargs,
-            replace_existing=True)
+        SCHEDULER.add_job(spawn_observer,
+                          'date',
+                          run_date=start,
+                          id='{0}'.format(job_id),
+                          kwargs=kwargs,
+                          replace_existing=True)
 
 
 def status_listener():

@@ -90,8 +90,8 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name,
         args += ['--dev-args=' + client_settings.SATNOGS_DEV_ARGS]
     if client_settings.ENABLE_IQ_DUMP:
         args += [
-            '--enable-iq-dump=' + str(
-                int(client_settings.ENABLE_IQ_DUMP is True))
+            '--enable-iq-dump=' +
+            str(int(client_settings.ENABLE_IQ_DUMP is True))
         ]
     if client_settings.IQ_DUMP_FILENAME:
         args += ['--iq-file-path=' + client_settings.IQ_DUMP_FILENAME]
