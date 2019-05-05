@@ -2,20 +2,18 @@ from __future__ import absolute_import, division, print_function
 
 import logging
 import math
-import threading
-import time
 import os
 import signal
-
+import threading
+import time
 from datetime import datetime, timedelta
 
 import ephem
 import pytz
 
+from satnogsclient import settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
-
-from satnogsclient import settings
 
 LOGGER = logging.getLogger('default')
 

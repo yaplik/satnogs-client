@@ -4,8 +4,8 @@ SatNOGS Client settings file
 from __future__ import absolute_import, division, print_function
 
 import os
-from os import environ, path
 from distutils.util import strtobool  # pylint: disable=E0401,E0611
+from os import environ, path
 
 
 def _cast_or_none(func, value):

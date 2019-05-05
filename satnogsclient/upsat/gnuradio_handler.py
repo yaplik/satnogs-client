@@ -1,9 +1,9 @@
 from __future__ import absolute_import, division, print_function
 
-import logging
-import subprocess
-import os
 import json
+import logging
+import os
+import subprocess
 
 from satnogsclient import settings as client_settings
 

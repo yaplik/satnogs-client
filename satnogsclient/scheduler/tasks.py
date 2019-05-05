@@ -3,20 +3,21 @@ from __future__ import absolute_import, division, print_function
 import logging
 import os
 import signal
+import subprocess
+from multiprocessing import Process
+
+import requests
+from dateutil import parser
+
+from satnogsclient import settings
+from satnogsclient.locator import locator
+from satnogsclient.observer.observer import Observer
+from satnogsclient.scheduler import SCHEDULER
+
 try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
-from multiprocessing import Process
-import subprocess
-
-import requests
-
-from dateutil import parser
-from satnogsclient.scheduler import SCHEDULER
-from satnogsclient import settings
-from satnogsclient.observer.observer import Observer
-from satnogsclient.locator import locator
 
 LOGGER = logging.getLogger('default')
 LOG_PATH = settings.SATNOGS_OUTPUT_PATH + "/files/"

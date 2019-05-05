@@ -1,25 +1,26 @@
 from __future__ import absolute_import, division, print_function
 
+import json
 import logging
 import os
-try:
-    from urllib.parse import urljoin
-except ImportError:
-    from urlparse import urljoin
-from datetime import datetime
-from time import sleep
-import json
 import shlex
 import subprocess
-import requests
+from datetime import datetime
+from time import sleep
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import requests
 
 import satnogsclient.config
 from satnogsclient import settings
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
 from satnogsclient.upsat import gnuradio_handler
+
+try:
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin
 
 plt.switch_backend('Agg')
 
