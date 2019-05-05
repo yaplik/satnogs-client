@@ -9,14 +9,14 @@ static_python:
   before_script:
     - pip install tox~=3.8.0
   script:
-    - tox -e "py2-{flake8,yapf,pylint}"
+    - tox -e "py2-flake8,yapf,py2-pylint"
 static_python3:
   stage: static
   image: python:3
   before_script:
     - pip install tox~=3.8.0
   script:
-    - tox -e "py3-{flake8,yapf,pylint}"
+    - tox -e "py3-{flake8,pylint}"
 static_robot:
   stage: static
   image: python:2
