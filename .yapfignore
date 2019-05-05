@@ -1,1 +1,5 @@
 satnogsclient/_version.py
+.tox
+build
+doc
+versioneer.py
