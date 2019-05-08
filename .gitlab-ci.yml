@@ -56,14 +56,26 @@ test:
   before_script:
     - pip install tox~=3.8.0
   script:
+    - rm -rf robot/output
     - tox -e py2
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - robot/output
 test3:
   stage: test
   image: python:3
   before_script:
     - pip install tox~=3.8.0
   script:
+    - rm -rf robot/output
     - tox -e py3
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - robot/output
 deploy:
   stage: deploy
   image: python:2
