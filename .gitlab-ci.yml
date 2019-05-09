@@ -9,7 +9,7 @@ static:
   before_script:
     - pip install tox~=3.8.0
   script:
-    - tox -e py2-flake8,yapf,py2-pylint,robot-lint
+    - tox -e py2-flake8,isort,yapf,py2-pylint,robot-lint
 static3:
   stage: static
   image: python:3
