@@ -53,7 +53,7 @@ def spawn_observer(**kwargs):
         baud = obj['baud']
     frequency = obj['frequency']
     script_name = settings.GNURADIO_FM_SCRIPT_FILENAME
-    if 'mode' in obj:
+    if 'mode' in obj and obj['mode']:
         if obj['mode'] == "CW":
             script_name = settings.GNURADIO_CW_SCRIPT_FILENAME
         elif obj['mode'] == "APT":
