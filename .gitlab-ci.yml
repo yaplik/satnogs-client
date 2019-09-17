@@ -22,6 +22,19 @@ static3:
     - pip install "$GITLAB_CI_PYPI_TOX"
   script:
     - tox -e "py3-{flake8,pylint}"
+docs:
+  stage: build
+  image: python:3
+  before_script:
+    - pip install sphinx_rtd_theme
+  script:
+    - cd doc
+    - make html SPHINXOPTS="-W"
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - doc/_build/html
 build:
   stage: build
   image: ${GITLAB_CI_IMAGE_PYTHON2}
@@ -90,3 +103,13 @@ deploy:
     variables:
       - $PYPI_USERNAME
       - $PYPI_PASSWORD
+pages:
+  stage: deploy
+  image: alpine
+  script:
+    - mv doc/_build/html/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - tags
