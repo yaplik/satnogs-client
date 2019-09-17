@@ -1,4 +1,5 @@
 variables:
+  GITLAB_CI_IMAGE_ALPINE: 'alpine:3.9'
   GITLAB_CI_IMAGE_PYTHON2: 'python:2'
   GITLAB_CI_IMAGE_PYTHON3: 'python:3'
   GITLAB_CI_PYPI_TOX: 'tox~=3.8.0'
@@ -24,7 +25,7 @@ static3:
     - tox -e "py3-{flake8,pylint}"
 docs:
   stage: build
-  image: python:3
+  image: ${GITLAB_CI_IMAGE_PYTHON3}
   before_script:
     - pip install sphinx_rtd_theme
   script:
@@ -63,7 +64,6 @@ build3:
       - dist
 test:
   stage: test
-  image: python:2
   image: ${GITLAB_CI_IMAGE_PYTHON2}
   before_script:
     - pip install "$GITLAB_CI_PYPI_TOX"
@@ -105,7 +105,7 @@ deploy:
       - $PYPI_PASSWORD
 pages:
   stage: deploy
-  image: alpine
+  image: ${GITLAB_CI_IMAGE_ALPINE}
   script:
     - mv doc/_build/html/ public/
   artifacts:
