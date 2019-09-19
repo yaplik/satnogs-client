@@ -72,13 +72,6 @@ SATNOGS_ROT_THRESHOLD = int(environ.get('SATNOGS_ROT_THRESHOLD', 4))
 SATNOGS_ROT_FLIP = bool(strtobool(environ.get('SATNOGS_ROT_FLIP', 'False')))
 SATNOGS_ROT_FLIP_ANGLE = int(environ.get('SATNOGS_ROT_FLIP_ANGLE', 75))
 
-# Rigctld settings
-RIG_MODEL = ""
-RIG_FILE = ""
-RIG_PTT_FILE = ""
-RIG_PTT_TYPE = ""
-RIG_SERIAL_SPEED = ""
-
 # Common script parameters
 
 SATNOGS_DOPPLER_CORR_PER_SEC = environ.get('SATNOGS_DOPPLER_CORR_PER_SEC', None)

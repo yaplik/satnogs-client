@@ -12,7 +12,7 @@ from validators.url import url
 
 import satnogsclient.config
 from satnogsclient.locator import locator
-from satnogsclient.scheduler.tasks import exec_rigctld, status_listener
+from satnogsclient.scheduler.tasks import status_listener
 from satnogsclient.settings import GPSD_ENABLED, LOG_FORMAT, LOG_LEVEL, \
     SATNOGS_API_TOKEN, SATNOGS_NETWORK_API_URL, SATNOGS_STATION_ELEV, \
     SATNOGS_STATION_ID, SATNOGS_STATION_LAT, SATNOGS_STATION_LON
@@ -55,7 +55,6 @@ def main():
     ser = threading.Thread(target=status_listener, args=())
     ser.daemon = True
     ser.start()
-    exec_rigctld()
     LOGGER.info('Press Ctrl+C to exit SatNOGS poller')
     while True:
         time.sleep(10)
