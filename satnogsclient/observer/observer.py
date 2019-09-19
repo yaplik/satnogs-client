@@ -24,7 +24,7 @@ except ImportError:
 
 plt.switch_backend('Agg')
 
-LOGGER = logging.getLogger('default')
+LOGGER = logging.getLogger(__name__)
 
 
 class Observer(object):

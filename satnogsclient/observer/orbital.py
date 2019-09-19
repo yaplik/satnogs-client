@@ -7,7 +7,7 @@ from datetime import datetime
 import ephem
 import pytz
 
-LOGGER = logging.getLogger('default')
+LOGGER = logging.getLogger(__name__)
 
 
 def pinpoint(observer_dict, satellite_dict, timestamp=None):

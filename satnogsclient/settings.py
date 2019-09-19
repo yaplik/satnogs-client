@@ -99,27 +99,5 @@ SATNOGS_WATERFALL_MIN_VALUE = environ.get('SATNOGS_WATERFALL_MIN_VALUE', -100)
 SATNOGS_WATERFALL_MAX_VALUE = environ.get('SATNOGS_WATERFALL_MAX_VALUE', -50)
 
 # Logging configuration
-DEFAULT_LOGGING = {
-    'version': 1,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'clientFormatter'
-        }
-    },
-    'loggers': {
-        'satnogsclient': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-        'apscheduler.executors.default': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        }
-    },
-    'formatters': {
-        'clientFormatter': {
-            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        }
-    }
-}
+LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+LOG_LEVEL = environ.get('SATNOGS_LOG_LEVEL', 'WARNING')

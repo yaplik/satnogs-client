@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function
 import logging
 import socket
 
-LOGGER = logging.getLogger('satnogsclient')
+LOGGER = logging.getLogger(__name__)
 
 
 class Commsocket(object):

@@ -6,7 +6,7 @@ import gps
 
 from satnogsclient import settings
 
-LOGGER = logging.getLogger('satnogsclient')
+LOGGER = logging.getLogger(__name__)
 
 
 class Locator(object):

@@ -7,7 +7,7 @@ import subprocess
 
 from satnogsclient import settings as client_settings
 
-LOGGER = logging.getLogger('default')
+LOGGER = logging.getLogger(__name__)
 
 
 def get_gnuradio_info():

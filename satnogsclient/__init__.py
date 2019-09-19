@@ -13,7 +13,7 @@ from validators.url import url
 import satnogsclient.config
 from satnogsclient.locator import locator
 from satnogsclient.scheduler.tasks import exec_rigctld, status_listener
-from satnogsclient.settings import DEFAULT_LOGGING, GPSD_ENABLED, \
+from satnogsclient.settings import GPSD_ENABLED, LOG_FORMAT, LOG_LEVEL, \
     SATNOGS_API_TOKEN, SATNOGS_NETWORK_API_URL, SATNOGS_STATION_ELEV, \
     SATNOGS_STATION_ID, SATNOGS_STATION_LAT, SATNOGS_STATION_LON
 
@@ -21,7 +21,8 @@ __author__ = satnogsclient.config.AUTHOR
 __email__ = satnogsclient.config.EMAIL
 __version__ = satnogsclient.config.VERSION
 
-LOGGER = logging.getLogger('satnogsclient')
+logging.basicConfig(format=LOG_FORMAT, level=getattr(logging, LOG_LEVEL))
+LOGGER = logging.getLogger(__name__)
 
 
 def main():
@@ -48,7 +49,6 @@ def main():
     if not SATNOGS_API_TOKEN:
         raise Exception('SATNOGS_API_TOKEN not configured')
 
-    logging.config.dictConfig(DEFAULT_LOGGING)
     LOGGER.info('Starting status listener thread...')
     gps_locator = locator.Locator(120)
     gps_locator.update_location()

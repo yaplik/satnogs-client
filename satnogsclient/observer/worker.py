@@ -15,7 +15,7 @@ from satnogsclient import settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 
-LOGGER = logging.getLogger('default')
+LOGGER = logging.getLogger(__name__)
 
 
 class Worker(object):
