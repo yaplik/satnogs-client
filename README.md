@@ -17,7 +17,7 @@ To get the latest development version:
   $ pip install -e .
 ```
 
-For more information see our [documentation](http://docs.satnogs.org/en/stable/satnogs-client/doc/index.html).
+For more information see our [documentation](https://docs.satnogs.org/projects/satnogs-client).
 
 The main repository lives on [Gitlab](https://gitlab.com/librespacefoundation/satnogs/satnogs-client) and all Merge Request should happen there.
 
