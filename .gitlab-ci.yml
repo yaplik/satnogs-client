@@ -4,6 +4,7 @@ variables:
   GITLAB_CI_IMAGE_PYTHON3: 'python:3'
   GITLAB_CI_PYPI_TOX: 'tox~=3.8.0'
   GITLAB_CI_PYPI_TWINE: 'twine~=1.13.0'
+  GITLAB_CI_PYPI_SPHINX_RTD_THEME: 'sphinx_rtd_theme~=0.4.0'
 stages:
   - static
   - build
@@ -27,7 +28,7 @@ docs:
   stage: build
   image: ${GITLAB_CI_IMAGE_PYTHON3}
   before_script:
-    - pip install sphinx_rtd_theme
+    - pip install "$GITLAB_CI_PYPI_SPHINX_RTD_THEME" .
   script:
     - cd doc
     - make html SPHINXOPTS="-W"
