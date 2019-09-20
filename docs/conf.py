@@ -20,6 +20,7 @@ import time
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
+import satnogsclient
 
 # -- Project information -----------------------------------------------------
 
@@ -28,9 +29,9 @@ copyright = u'2016-{}, Libre Space Foundation'.format(time.strftime('%Y'))
 author = u'SatNOGS'
 
 # The short X.Y version
-version = u''
+version = satnogsclient.__version__
 # The full version, including alpha/beta/rc tags
-release = u''
+release = satnogsclient.__version__
 
 
 # -- General configuration ---------------------------------------------------
