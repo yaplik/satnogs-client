@@ -189,10 +189,10 @@ class Observer(object):
         except requests.exceptions.RequestException as err:
             LOGGER.error('%s: Unexpected error: %s', url, err)
 
-        if resp.status_code == 200:
-            LOGGER.info('Success: status code 200')
-        else:
-            LOGGER.error('Bad status code: %s', resp.status_code)
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError as http_error:
+            LOGGER.error(http_error)
 
     def run_rot(self):
         self.tracker_rot = WorkerTrack(ip=self.rot_ip,

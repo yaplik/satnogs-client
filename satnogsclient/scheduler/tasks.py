@@ -164,8 +164,11 @@ def get_jobs():
                             verify=settings.SATNOGS_VERIFY_SSL,
                             timeout=45)
 
-    if not response.status_code == 200:
-        raise Exception('Status code: {0} on request: {1}'.format(response.status_code, url))
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as http_error:
+        LOGGER.error(http_error)
+        return
 
     latest_jobs = [str(job['id']) for job in response.json()]
     for job in SCHEDULER.get_jobs():
