@@ -7,6 +7,8 @@ import os
 from distutils.util import strtobool  # pylint: disable=E0401,E0611
 from os import environ, path
 
+from dotenv import load_dotenv
+
 
 def _cast_or_none(func, value):
     try:
@@ -14,6 +16,8 @@ def _cast_or_none(func, value):
     except (ValueError, TypeError):
         return None
 
+
+load_dotenv()
 
 # Ground station information
 SATNOGS_API_TOKEN = environ.get('SATNOGS_API_TOKEN', None)
