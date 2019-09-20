@@ -27,3 +27,11 @@ Requirements: You will need python, python-virtualenvwrapper, pip and git
    Install local development requirements::
 
      $ pip install .
+
+#. **Run the client**
+
+   Create an ``.env`` file on the project root and configure the client environment variables.
+
+   Run ``satnogs-client``::
+
+     $ satnogs-client
