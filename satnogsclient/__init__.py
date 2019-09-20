@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, print_function
 
 import logging
 import logging.config
-import threading
 import time
 
 from validators.url import url
@@ -52,9 +51,7 @@ def main():
     LOGGER.info('Starting status listener thread...')
     gps_locator = locator.Locator(120)
     gps_locator.update_location()
-    ser = threading.Thread(target=status_listener, args=())
-    ser.daemon = True
-    ser.start()
+    status_listener()
     LOGGER.info('Press Ctrl+C to exit SatNOGS poller')
     while True:
         time.sleep(10)
