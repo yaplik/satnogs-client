@@ -1,7 +1,5 @@
-satnogs-client
-==============
-
-Contents:
+Welcome to SatNOGS Client's documentation!
+==========================================
 
 .. toctree::
    :maxdepth: 4
