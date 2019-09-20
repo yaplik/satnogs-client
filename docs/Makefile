@@ -4,7 +4,6 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = satnogs-client
 SOURCEDIR     = .
 BUILDDIR      = _build
 
