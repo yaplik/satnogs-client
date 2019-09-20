@@ -202,8 +202,6 @@ def status_listener():
     msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
     LOGGER.info(msg)
     SCHEDULER.add_job(post_data, 'interval', minutes=interval)
-    os.environ['GNURADIO_SCRIPT_PID'] = '0'
-    os.environ['SCHEDULER'] = 'ON'
 
 
 def get_observation_list():
