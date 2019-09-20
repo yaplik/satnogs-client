@@ -55,7 +55,7 @@ Given initial description of the observation (``tle``, ``start``, ``end``)
 * Implements orbital calculations using ``PyEphem``.
 * Provides ``pinpoint`` method the returns alt/az position of tracked object.
 
-===============
-``bin/scripts``
-===============
-* ``satnogs-client``: Run the scheduler queue in the background and fetch jobs from the network.
+==================
+``satnogs-client``
+==================
+* ``satnogs-client``: A console script which runs the scheduler queue in the background and fetch jobs from the network.
