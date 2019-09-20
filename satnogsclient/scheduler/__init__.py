@@ -1,13 +1,11 @@
 from __future__ import absolute_import, division, print_function
 
 from apscheduler.executors.pool import ThreadPoolExecutor
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import utc
 
-from satnogsclient import settings
-
-JOBSTORES = {'default': SQLAlchemyJobStore(url=settings.SATNOGS_SQLITE_URL)}
+JOBSTORES = {'default': MemoryJobStore()}
 
 EXECUTORS = {
     'default': ThreadPoolExecutor(20),

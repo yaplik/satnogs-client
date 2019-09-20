@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function
 
 import os
 from distutils.util import strtobool  # pylint: disable=E0401,E0611
-from os import environ, path
+from os import environ
 
 from dotenv import load_dotenv
 
@@ -46,8 +46,6 @@ for p in [
 SATNOGS_REMOVE_RAW_FILES = bool(strtobool(environ.get('SATNOGS_REMOVE_RAW_FILES', 'True')))
 
 SATNOGS_VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
-DEFAULT_SQLITE_PATH = path.join(SATNOGS_APP_PATH, 'jobs.sqlite')
-SATNOGS_SQLITE_URL = environ.get('SATNOGS_SQLITE_URL', 'sqlite:///' + DEFAULT_SQLITE_PATH)
 
 SATNOGS_NETWORK_API_URL = environ.get('SATNOGS_NETWORK_API_URL',
                                       'https://network.satnogs.org/api/')
