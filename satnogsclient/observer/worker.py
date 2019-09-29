@@ -197,8 +197,10 @@ class WorkerTrack(Worker):
         # read current position of rotator, [0] az and [1] el
         position = sock.send("p\n").split('\n')
         # if the need to move exceeds threshold, then do it
+        # Take the 360 modulus of the azimuth position, to handle rotators that report
+        # positions in overwind regions as values outside the range 0-360.
         if (position[0].startswith("RPRT")
-                or abs(azi - float(position[0])) > settings.SATNOGS_ROT_THRESHOLD
+                or abs(azi - float(position[0]) % 360.0) > settings.SATNOGS_ROT_THRESHOLD
                 or abs(alt - float(position[1])) > settings.SATNOGS_ROT_THRESHOLD):
             msg = 'P {0} {1}\n'.format(azi, alt)
             LOGGER.debug('Rotctld msg: %s', msg)
