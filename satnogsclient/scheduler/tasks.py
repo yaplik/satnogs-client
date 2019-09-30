@@ -19,7 +19,6 @@ except ImportError:
     from urlparse import urljoin
 
 LOGGER = logging.getLogger(__name__)
-LOG_PATH = settings.SATNOGS_OUTPUT_PATH + "/files/"
 
 
 def signal_term_handler():
