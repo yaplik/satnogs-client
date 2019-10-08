@@ -17,7 +17,8 @@ def plot_waterfall(waterfall_file, waterfall_png):
     wf_file = open(waterfall_file)
     nchan = int(np.fromfile(wf_file, dtype='float32', count=1)[0])
     freq = np.fromfile(wf_file, dtype='float32', count=nchan) / 1000.0
-    data = np.fromfile(wf_file, dtype='float32').reshape(-1, nchan + 1)
+    data = np.fromfile(wf_file, dtype='float32')
+    data.resize((data.size // (nchan + 1), nchan + 1))
     wf_file.close()
     t_idx, spec = data[:, :1], data[:, 1:]
     tmin, tmax = np.min(t_idx), np.max(t_idx)
