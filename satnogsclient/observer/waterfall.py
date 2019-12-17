@@ -14,13 +14,20 @@ plt.switch_backend('Agg')
 
 def plot_waterfall(waterfall_file, waterfall_png):
     LOGGER.info('Read waterfall file')
+
     wf_file = open(waterfall_file)
-    nchan = int(np.fromfile(wf_file, dtype='float32', count=1)[0])
-    freq = np.fromfile(wf_file, dtype='float32', count=nchan) / 1000.0
-    data = np.fromfile(wf_file, dtype='float32')
-    data.resize((data.size // (nchan + 1), nchan + 1))
+    _ = np.fromfile(wf_file, dtype="|S32", count=1)[0]
+    nchan = np.fromfile(wf_file, dtype='>i4', count=1)[0]
+    samp_rate = np.fromfile(wf_file, dtype='>i4', count=1)[0]
+    _ = np.fromfile(wf_file, dtype='>i4', count=1)[0]
+    _ = np.fromfile(wf_file, dtype='>f4', count=1)[0]
+    _ = np.fromfile(wf_file, dtype='>i4', count=1)[0]
+    data_dtypes = np.dtype([('tabs', 'int64'), ('spec', 'float32', (nchan, ))])
+    data = np.fromfile(wf_file, dtype=data_dtypes)
     wf_file.close()
-    t_idx, spec = data[:, :1], data[:, 1:]
+    t_idx = data['tabs'] / 1000000.0
+    freq = np.linspace(-0.5 * samp_rate, 0.5 * samp_rate, nchan, endpoint=False) / 1000.0
+    spec = data['spec']
     tmin, tmax = np.min(t_idx), np.max(t_idx)
     fmin, fmax = np.min(freq), np.max(freq)
     c_idx = spec > -200.0
