@@ -9,11 +9,13 @@ import time
 from datetime import datetime, timedelta
 
 import ephem
+import Hamlib
 import pytz
 
 from satnogsclient import settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
+from satnogsclient.radio import Radio
 
 LOGGER = logging.getLogger(__name__)
 
@@ -208,9 +210,31 @@ class WorkerTrack(Worker):
 
 
 class WorkerFreq(Worker):
+    def _communicate_tracking_info(self):
+        """
+        Runs as a daemon thread, communicating tracking info to remote socket.
+        Uses observer and satellite objects set by trackobject().
+        Will exit when observation_end timestamp is reached.
+        """
+        radio = Radio(Hamlib.RIG_MODEL_NETRIGCTL, "{}:{}".format(self._ip, self._port))
+        radio.open()
+
+        # track satellite
+        while self.is_alive:
+
+            # check if we need to exit
+            self.check_observation_end_reached()
+
+            pin = pinpoint(self.observer_dict, self.satellite_dict)
+            if pin['ok']:
+                self.send_to_socket(pin, radio)
+                time.sleep(self._sleep_time)
+
+        radio.close()
+
     def send_to_socket(self, pin, sock):
         doppler_calc_freq = self._frequency * (1 - (pin['rng_vlct'] / ephem.c))
-        msg = 'F {0}\n'.format(int(doppler_calc_freq))
+        msg = int(doppler_calc_freq)
         LOGGER.debug('Initial frequency: %s', self._frequency)
         LOGGER.debug('Rigctld msg: %s', msg)
-        sock.send(msg)
+        sock.frequency = msg
