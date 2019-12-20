@@ -50,7 +50,7 @@ def spawn_observer(**kwargs):
     if 'baud' in obj:
         baud = obj['baud']
     frequency = obj['frequency']
-    script_name = settings.GNURADIO_FM_SCRIPT_FILENAME
+    script_name = settings.GNURADIO_SCRIPT_FILENAME
     if 'mode' in obj and obj['mode']:
         if obj['mode'] == "CW":
             script_name = settings.GNURADIO_CW_SCRIPT_FILENAME
@@ -60,10 +60,10 @@ def spawn_observer(**kwargs):
             script_name = settings.GNURADIO_BPSK_SCRIPT_FILENAME
         elif obj['mode'] == 'GFSK Rktr':
             script_name = settings.GNURADIO_GFSK_RKTR_SCRIPT_FILENAME
-        elif obj['mode'].startswith('FSK') or obj['mode'].startswith('GFSK'):
+        # FSK and MSK share the same flowgraph
+        elif (obj['mode'].startswith('FSK') or obj['mode'].startswith('GFSK')
+              or obj['mode'].startswith('MSK') or obj['mode'].startswith('GMSK')):
             script_name = settings.GNURADIO_FSK_SCRIPT_FILENAME
-        elif obj['mode'].startswith('MSK') or obj['mode'].startswith('GMSK'):
-            script_name = settings.GNURADIO_MSK_SCRIPT_FILENAME
         elif obj['mode'].endswith('AFSK1k2'):
             script_name = settings.GNURADIO_AFSK1K2_SCRIPT_FILENAME
         elif obj['mode'].endswith('DUV'):

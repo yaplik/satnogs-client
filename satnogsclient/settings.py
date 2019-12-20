@@ -54,17 +54,14 @@ SATNOGS_NETWORK_API_POST_INTERVAL = 2  # In minutes
 GNURADIO_UDP_PORT = 16886
 GNURADIO_IP = '127.0.0.1'
 GNURADIO_SCRIPT_PATH = ['/usr/bin', '/usr/local/bin']
-GNURADIO_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
-GNURADIO_FM_SCRIPT_FILENAME = 'satnogs_fm_demod.py'
+GNURADIO_SCRIPT_FILENAME = 'satnogs_fsk_ax25.py'
 GNURADIO_CW_SCRIPT_FILENAME = 'satnogs_cw_decoder.py'
 GNURADIO_APT_SCRIPT_FILENAME = 'satnogs_noaa_apt_decoder.py'
 GNURADIO_BPSK_SCRIPT_FILENAME = 'satnogs_bpsk_ax25.py'
 GNURADIO_GFSK_RKTR_SCRIPT_FILENAME = 'satnogs_reaktor_hello_world_fsk9600_decoder.py'
 GNURADIO_FSK_SCRIPT_FILENAME = 'satnogs_fsk_ax25.py'
-GNURADIO_MSK_SCRIPT_FILENAME = 'satnogs_msk_ax25.py'
 GNURADIO_AFSK1K2_SCRIPT_FILENAME = 'satnogs_afsk1200_ax25.py'
 GNURADIO_AMSAT_DUV_SCRIPT_FILENAME = 'satnogs_amsat_fox_duv_decoder.py'
-SATNOGS_RX_DEVICE = environ.get('SATNOGS_RX_DEVICE', 'rtlsdr')
 
 SATNOGS_ROT_IP = environ.get('SATNOGS_ROT_IP', '127.0.0.1')
 SATNOGS_ROT_PORT = int(environ.get('SATNOGS_ROT_PORT', 4533))
@@ -75,13 +72,12 @@ SATNOGS_ROT_FLIP = bool(strtobool(environ.get('SATNOGS_ROT_FLIP', 'False')))
 SATNOGS_ROT_FLIP_ANGLE = int(environ.get('SATNOGS_ROT_FLIP_ANGLE', 75))
 
 # Common script parameters
-
+SATNOGS_SOAPY_RX_DEVICE = environ.get('SATNOGS_SOAPY_RX_DEVICE', None)
+SATNOGS_RX_SAMP_RATE = environ.get('SATNOGS_RX_SAMP_RATE', None)
+SATNOGS_RX_BANDWIDTH = environ.get('SATNOGS_RX_BANDWIDTH', None)
 SATNOGS_DOPPLER_CORR_PER_SEC = environ.get('SATNOGS_DOPPLER_CORR_PER_SEC', None)
 SATNOGS_LO_OFFSET = environ.get('SATNOGS_LO_OFFSET', None)
-SATNOGS_PPM_ERROR = environ.get('SATNOGS_PPM_ERROR', None)
-SATNOGS_IF_GAIN = environ.get('SATNOGS_IF_GAIN', None)
 SATNOGS_RF_GAIN = environ.get('SATNOGS_RF_GAIN', None)
-SATNOGS_BB_GAIN = environ.get('SATNOGS_BB_GAIN', None)
 SATNOGS_ANTENNA = environ.get('SATNOGS_ANTENNA', None)
 SATNOGS_DEV_ARGS = environ.get('SATNOGS_DEV_ARGS', None)
 ENABLE_IQ_DUMP = bool(strtobool(environ.get('ENABLE_IQ_DUMP', 'False')))
