@@ -15,6 +15,7 @@ from satnogsclient import settings
 from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 from satnogsclient.radio import Radio
+from satnogsclient.rotator import Rotator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -134,6 +135,29 @@ class WorkerTrack(Worker):
     _midpoint = None
     _flip = False
 
+    def _communicate_tracking_info(self):
+        """
+        Runs as a daemon thread, communicating tracking info to remote socket.
+        Uses observer and satellite objects set by trackobject().
+        Will exit when observation_end timestamp is reached.
+        """
+        rotator = Rotator(settings.SATNOGS_ROT_MODEL, settings.SATNOGS_ROT_BAUD,
+                          settings.SATNOGS_ROT_PORT)
+        rotator.open()
+
+        # track satellite
+        while self.is_alive:
+
+            # check if we need to exit
+            self.check_observation_end_reached()
+
+            pin = pinpoint(self.observer_dict, self.satellite_dict)
+            if pin['ok']:
+                self.send_to_socket(pin, rotator)
+                time.sleep(self._sleep_time)
+
+        rotator.close()
+
     @staticmethod
     def find_midpoint(observer_dict, satellite_dict, start):
         # Workaround for https://github.com/brandon-rhodes/pyephem/issues/105
@@ -188,7 +212,7 @@ class WorkerTrack(Worker):
             LOGGER.info("Antenna flip: %s", self._flip)
 
     def send_to_socket(self, pin, sock):
-        # Read az/alt of sat and convert to radians
+        # Read az/alt of sat and convert to degrees
         azi = pin['az'].conjugate() * 180 / math.pi
         alt = pin['alt'].conjugate() * 180 / math.pi
         if self._flip:
@@ -196,17 +220,16 @@ class WorkerTrack(Worker):
                                                     self._midpoint)
         self._azimuth = azi
         self._altitude = alt
-        # read current position of rotator, [0] az and [1] el
-        position = sock.send("p\n").split('\n')
+        # read current position of rotator in degrees
+        (cur_azi, cur_alt) = sock.position
         # if the need to move exceeds threshold, then do it
         # Take the 360 modulus of the azimuth position, to handle rotators that report
         # positions in overwind regions as values outside the range 0-360.
-        if (position[0].startswith("RPRT")
-                or abs(azi - float(position[0]) % 360.0) > settings.SATNOGS_ROT_THRESHOLD
-                or abs(alt - float(position[1])) > settings.SATNOGS_ROT_THRESHOLD):
-            msg = 'P {0} {1}\n'.format(azi, alt)
+        if (abs(azi - cur_azi % 360.0) > settings.SATNOGS_ROT_THRESHOLD
+                or abs(alt - cur_alt) > settings.SATNOGS_ROT_THRESHOLD):
+            msg = (azi, alt)
             LOGGER.debug('Rotctld msg: %s', msg)
-            sock.send(msg)
+            sock.position = msg
 
 
 class WorkerFreq(Worker):
