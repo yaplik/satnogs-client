@@ -1,5 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
+import base64
+import json
 import logging
 import os
 import signal
@@ -104,7 +106,9 @@ def post_data():
         elif fil.startswith('waterfall'):
             observation = {'waterfall': open(file_path, 'rb')}
         elif fil.startswith('data'):
-            observation = {'demoddata': open(file_path, 'rb')}
+            with open(file_path, 'r') as json_string:
+                data = json.load(json_string)
+            observation = {'demoddata': (fil, base64.b64decode(data['pdu']))}
         else:
             LOGGER.debug('Ignore file: %s', fil)
             continue
