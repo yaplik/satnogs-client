@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, print_function
 
 import logging
 import math
-import os
 import signal
 import threading
 import time
@@ -123,7 +122,8 @@ class Worker(object):
         LOGGER.info('Tracking stopped.')
         self.is_alive = False
         if self._gnu_proc:
-            os.killpg(os.getpgid(self._gnu_proc.pid), signal.SIGINT)
+            self._gnu_proc.send_signal(signal.SIGINT)
+            _, _ = self._gnu_proc.communicate()
 
     def check_observation_end_reached(self):
         if datetime.now(pytz.utc) > self._observation_end:
