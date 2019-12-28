@@ -11,6 +11,7 @@ Run SatNOGS Client
     Set Environment Variable    SATNOGS_STATION_ID    123
     Set Environment Variable    SATNOGS_STATION_LAT    10
     Set Environment Variable    SATNOGS_STATION_LON    20
+    Set Environment Variable    SATNOGS_LOG_LEVEL    DEBUG
     Start Process    satnogs-client    shell=True
     ${Result} =    Wait For Process    timeout=10 seconds    on_timeout=terminate
     Wait Until Keyword Succeeds    10 seconds    1 second    Process Should Be Stopped
