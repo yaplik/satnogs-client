@@ -106,9 +106,12 @@ def post_data():
         elif fil.startswith('waterfall'):
             observation = {'waterfall': open(file_path, 'rb')}
         elif fil.startswith('data'):
-            with open(file_path, 'r') as json_string:
-                data = json.load(json_string)
-            observation = {'demoddata': (fil, base64.b64decode(data['pdu']))}
+            try:
+                with open(file_path, 'r') as json_string:
+                    data = json.load(json_string)
+                observation = {'demoddata': (fil, base64.b64decode(data['pdu']))}
+            except ValueError:
+                observation = {'demoddata': open(file_path, 'rb')}
         else:
             LOGGER.debug('Ignore file: %s', fil)
             continue
