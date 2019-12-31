@@ -6,7 +6,7 @@ SatNOGS Ground Station Client software. This package automates the reception of 
 To install SatNOGS client, simply:
 
 ```
-  $ pip install satnogsclient
+  $ pip install satnogs-client
 ```
 
 To get the latest development version:
