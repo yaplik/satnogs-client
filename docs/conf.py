@@ -17,7 +17,11 @@ from __future__ import absolute_import, division, print_function
 # sys.path.insert(0, os.path.abspath('.'))
 import time
 
-import satnogsclient
+from satnogsclient._version import get_versions
+
+__version__ = get_versions()['version']
+
+del get_versions
 
 # -- Project information -----------------------------------------------------
 
@@ -26,9 +30,9 @@ copyright = u'2016-{}, Libre Space Foundation'.format(time.strftime('%Y'))
 author = u'SatNOGS'
 
 # The short X.Y version
-version = satnogsclient.__version__
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = satnogsclient.__version__
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 
