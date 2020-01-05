@@ -11,7 +11,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def get_gnuradio_info():
-    process = subprocess.Popen(['python', '-m', 'satnogs.satnogs_info'],
+    process = subprocess.Popen(['python3', '-m', 'satnogs.satnogs_info'],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     gr_satnogs_info, _ = process.communicate()  # pylint: disable=W0612
