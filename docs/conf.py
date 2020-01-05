@@ -15,13 +15,17 @@ from __future__ import absolute_import, division, print_function
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
 import time
 
-from satnogsclient._version import get_versions
+sys.path.insert(0, os.path.abspath('.'))
 
-__version__ = get_versions()['version']
+import versioneer
 
-del get_versions
+__version__ = versioneer.get_versions()['version']
+
+del versioneer
 
 # -- Project information -----------------------------------------------------
 
