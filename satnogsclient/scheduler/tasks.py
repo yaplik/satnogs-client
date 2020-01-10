@@ -4,8 +4,6 @@ import base64
 import json
 import logging
 import os
-import signal
-import subprocess
 
 import requests
 from dateutil import parser
@@ -21,18 +19,6 @@ except ImportError:
     from urlparse import urljoin
 
 LOGGER = logging.getLogger(__name__)
-
-
-def signal_term_handler():
-    process = subprocess.Popen(['ps', '-ef'], stdout=subprocess.PIPE)
-    out, err = process.communicate()  # pylint: disable=W0612
-    for line in out.decode().splitlines():
-        if 'satnogs-client' in line:
-            pid = int(line.split(None, 2)[1])
-            os.kill(pid, signal.SIGKILL)
-
-
-signal.signal(signal.SIGINT, signal_term_handler)
 
 
 def spawn_observer(**kwargs):
