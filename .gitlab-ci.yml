@@ -3,18 +3,6 @@ variables:
   GITLAB_CI_IMAGE_DEBIAN: 'debian'
   GITLAB_CI_APT_PACKAGES: >-
     tox
-    python-requests
-    python-dateutil
-    python-ephem
-    python-tz
-    python-matplotlib
-    python-numpy
-    python-gps
-    python-typing
-    python-concurrent.futures
-    python-decorator
-    python-funcsigs
-    python-libhamlib2
     python3-requests
     python3-dateutil
     python3-ephem
@@ -36,15 +24,7 @@ static:
     - apt-get -y update
     - apt-get -y install $GITLAB_CI_APT_PACKAGES
   script:
-    - tox -e "py2-flake8,isort,yapf,py2-pylint,robot-lint"
-static3:
-  stage: static
-  image: ${GITLAB_CI_IMAGE_DEBIAN}
-  before_script:
-    - apt-get -y update
-    - apt-get -y install $GITLAB_CI_APT_PACKAGES
-  script:
-    - tox -e "py3-{flake8,pylint}"
+    - tox -e "flake8,isort,yapf,pylint,robot-lint"
 docs:
   stage: build
   image: ${GITLAB_CI_IMAGE_DEBIAN}
@@ -67,21 +47,7 @@ build:
     - apt-get -y install $GITLAB_CI_APT_PACKAGES
   script:
     - rm -rf dist
-    - tox -e "py2-build"
-  artifacts:
-    expire_in: 1 week
-    when: always
-    paths:
-      - dist
-build3:
-  stage: build
-  image: ${GITLAB_CI_IMAGE_DEBIAN}
-  before_script:
-    - apt-get -y update
-    - apt-get -y install $GITLAB_CI_APT_PACKAGES
-  script:
-    - rm -rf dist
-    - tox -e "py3-build"
+    - tox -e "build"
   artifacts:
     expire_in: 1 week
     when: always
@@ -95,21 +61,7 @@ test:
     - apt-get -y install $GITLAB_CI_APT_PACKAGES
   script:
     - rm -rf robot/output
-    - tox -e "py2-robot"
-  artifacts:
-    expire_in: 1 week
-    when: always
-    paths:
-      - robot/output
-test3:
-  stage: test
-  image: ${GITLAB_CI_IMAGE_DEBIAN}
-  before_script:
-    - apt-get -y update
-    - apt-get -y install $GITLAB_CI_APT_PACKAGES
-  script:
-    - rm -rf robot/output
-    - tox -e "py3-robot"
+    - tox -e "robot"
   artifacts:
     expire_in: 1 week
     when: always

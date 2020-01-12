@@ -18,7 +18,6 @@ class Radio(object):
     :param debug: Hamlib rig debug level
     :type debug: int, optional
     """
-
     def __init__(self, model=Hamlib.RIG_MODEL_DUMMY, path="", debug=Hamlib.RIG_DEBUG_WARN):
         """
         Class constructor
