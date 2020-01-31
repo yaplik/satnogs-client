@@ -123,7 +123,8 @@ class Worker(object):
         LOGGER.info('Tracking stopped.')
         self.is_alive = False
         if self._gnu_proc:
-            self._gnu_proc.send_signal(signal.SIGINT)
+            if self._gnu_proc.poll() is None:
+                self._gnu_proc.send_signal(signal.SIGINT)
             _, _ = self._gnu_proc.communicate()
 
     def check_observation_end_reached(self):
