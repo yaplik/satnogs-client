@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, print_function
 
 import json
 import logging
-import os
 import subprocess
 
 from satnogsclient import settings as client_settings
@@ -88,5 +87,5 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name, dec
         args += ['--decoded-data-file-path=' + decoded_data]
 
     LOGGER.info('Starting GNUradio python script')
-    proc = subprocess.Popen(args, preexec_fn=os.setsid)
+    proc = subprocess.Popen(args)
     return proc
