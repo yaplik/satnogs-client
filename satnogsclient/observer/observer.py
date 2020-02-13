@@ -4,10 +4,12 @@ import json
 import logging
 import os
 import shlex
+import signal
 import subprocess
 from datetime import datetime
 from time import sleep
 
+import pytz
 import requests
 
 import satnogsclient.config
@@ -217,7 +219,15 @@ class Observer(object):
 
     def poll_gnu_proc_status(self):
         while self._gnu_proc.poll() is None:
-            sleep(30)
+            if datetime.now(pytz.utc) > self.observation_end:
+                LOGGER.info('Tracking stopped.')
+                if self._gnu_proc:
+                    if self._gnu_proc.poll() is None:
+                        self._gnu_proc.send_signal(signal.SIGINT)
+                    _, _ = self._gnu_proc.communicate()
+                self.tracker_freq.trackstop()
+                self.tracker_rot.trackstop()
+            sleep(1)
         LOGGER.info('Observation Finished')
         LOGGER.info('Executing post-observation script.')
         if settings.SATNOGS_POST_OBSERVATION_SCRIPT is not None:

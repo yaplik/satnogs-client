@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, print_function
 
 import logging
 import math
-import signal
 import threading
 import time
 from datetime import datetime, timedelta
@@ -106,9 +105,6 @@ class Worker(object):
         # track satellite
         while self.is_alive:
 
-            # check if we need to exit
-            self.check_observation_end_reached()
-
             pin = pinpoint(self.observer_dict, self.satellite_dict)
             if pin['ok']:
                 self.send_to_socket(pin, sock)
@@ -122,14 +118,6 @@ class Worker(object):
         """
         LOGGER.info('Tracking stopped.')
         self.is_alive = False
-        if self._gnu_proc:
-            if self._gnu_proc.poll() is None:
-                self._gnu_proc.send_signal(signal.SIGINT)
-            _, _ = self._gnu_proc.communicate()
-
-    def check_observation_end_reached(self):
-        if datetime.now(pytz.utc) > self._observation_end:
-            self.trackstop()
 
 
 class WorkerTrack(Worker):
@@ -148,9 +136,6 @@ class WorkerTrack(Worker):
 
         # track satellite
         while self.is_alive:
-
-            # check if we need to exit
-            self.check_observation_end_reached()
 
             pin = pinpoint(self.observer_dict, self.satellite_dict)
             if pin['ok']:
@@ -245,9 +230,6 @@ class WorkerFreq(Worker):
 
         # track satellite
         while self.is_alive:
-
-            # check if we need to exit
-            self.check_observation_end_reached()
 
             pin = pinpoint(self.observer_dict, self.satellite_dict)
             if pin['ok']:
