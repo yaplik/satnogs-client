@@ -9,6 +9,11 @@ Installation
 
 Requirements: You will need python, python-virtualenvwrapper, pip and git
 
+#. **Install the dependencies**
+
+   SatNOGS client depends on `libhamlib2` Python bindings.
+   In Debian, these bindings are provided by installing `python3-libhamlib2` package.
+
 #. **Build the environment**
 
    Clone source code from the `repository <https://gitlab.com/librespacefoundation/satnogs/satnogs-client>`_::
@@ -18,7 +23,7 @@ Requirements: You will need python, python-virtualenvwrapper, pip and git
    Set up the virtual environment. On first run you should create it and link it to your project path.::
 
      $ cd satnogs-client
-     $ mkvirtualenv satnogs-client -a .
+     $ mkvirtualenv --system-site-packages satnogs-client -a .
 
    Activate your python virtual environment::
 
@@ -26,7 +31,7 @@ Requirements: You will need python, python-virtualenvwrapper, pip and git
 
    Install local development requirements::
 
-     $ pip install .
+     $ pip install -e .
 
 #. **Run the client**
 
