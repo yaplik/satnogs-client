@@ -97,3 +97,4 @@ SATNOGS_WATERFALL_MAX_VALUE = environ.get('SATNOGS_WATERFALL_MAX_VALUE', -50)
 # Logging configuration
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 LOG_LEVEL = environ.get('SATNOGS_LOG_LEVEL', 'WARNING')
+SCHEDULER_LOG_LEVEL = environ.get('SATNOGS_SCHEDULER_LOG_LEVEL', 'WARNING')
