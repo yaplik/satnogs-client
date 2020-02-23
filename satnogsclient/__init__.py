@@ -13,7 +13,6 @@ from satnogsclient import config, settings
 from satnogsclient.locator import locator
 from satnogsclient.scheduler.tasks import status_listener
 
-
 __author__ = config.AUTHOR
 __email__ = config.EMAIL
 __version__ = config.VERSION
@@ -29,7 +28,9 @@ def main():
     """
     Main function
     """
-    settings.validate()
+
+    if not settings.validate(LOGGER):
+        raise Exception('Settings are invalid, exiting...')
 
     LOGGER.info('Starting status listener thread...')
     gps_locator = locator.Locator(120)

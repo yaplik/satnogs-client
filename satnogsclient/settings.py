@@ -103,24 +103,56 @@ SCHEDULER_LOG_LEVEL = environ.get('SATNOGS_SCHEDULER_LOG_LEVEL', 'WARNING')
 # Sentry
 SENTRY_DSN = environ.get('SENTRY_DSN', '')
 
+REQUIRED_VARIABLES = [
+    'SATNOGS_API_TOKEN',
+    'SATNOGS_STATION_ID',
+    'SATNOGS_STATION_LAT',
+    'SATNOGS_STATION_LON',
+    'SATNOGS_STATION_ELEV',
+    'SATNOGS_SOAPY_RX_DEVICE',
+    'SATNOGS_RX_SAMP_RATE',
+]
 
-def validate():
+
+def validate(logger):
+    """
+    Validate the provided settings:
+    - Check for the existance of all required variables
+    - Validate format of the provided value for some required variables
+
+    Since this module has to be loaded before the logger has been initialized,
+    this method requires a configured logger to be passed.
+
+    Arguments:
+    logger -- the output logger
+    """
+    settings_valid = True
+
+    # Get all variable in global scobe (this includes all global variables from this module)
+    settings = globals()
+
+    for variable_name in REQUIRED_VARIABLES:
+        # Check the value of the variable defined in settings
+        if not settings[variable_name]:
+            logger.error('%s not configured but required', variable_name)
+            settings_valid = False
+
     try:
         url(SATNOGS_NETWORK_API_URL)
     except ValueError:
-        raise Exception('Invalid SATNOGS_NETWORK_API_URL: {0}'.format(SATNOGS_NETWORK_API_URL))
-
-    if not SATNOGS_STATION_ID:
-        raise Exception('SATNOGS_STATION_ID not configured.')
+        logger.error('Invalid SATNOGS_NETWORK_API_URL: %s', SATNOGS_NETWORK_API_URL)
+        settings_valid = False
 
     if not (SATNOGS_STATION_LAT or GPSD_ENABLED):
-        raise Exception('SATNOGS_STATION_LAT not configured')
+        logger.error('SATNOGS_STATION_LAT not configured')
+        settings_valid = False
 
     if not (SATNOGS_STATION_LON or GPSD_ENABLED):
-        raise Exception('SATNOGS_STATION_LON not configured')
+        logger.error('SATNOGS_STATION_LON not configured')
+        settings_valid = False
 
     if SATNOGS_STATION_ELEV is None and GPSD_ENABLED is False:
-        raise Exception('SATNOGS_STATION_ELEV not configured')
+        logger.error('SATNOGS_STATION_ELEV not configured')
+        settings_valid = False
 
-    if not SATNOGS_API_TOKEN:
-        raise Exception('SATNOGS_API_TOKEN not configured')
+    return settings_valid
