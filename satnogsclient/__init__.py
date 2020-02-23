@@ -10,16 +10,17 @@ import time
 import sentry_sdk
 from validators.url import url
 
-import satnogsclient.config
+from satnogsclient import config
 from satnogsclient.locator import locator
 from satnogsclient.scheduler.tasks import status_listener
 from satnogsclient.settings import GPSD_ENABLED, LOG_FORMAT, LOG_LEVEL, \
     SATNOGS_API_TOKEN, SATNOGS_NETWORK_API_URL, SATNOGS_STATION_ELEV, \
     SATNOGS_STATION_ID, SATNOGS_STATION_LAT, SATNOGS_STATION_LON, SENTRY_DSN
 
-__author__ = satnogsclient.config.AUTHOR
-__email__ = satnogsclient.config.EMAIL
-__version__ = satnogsclient.config.VERSION
+
+__author__ = config.AUTHOR
+__email__ = config.EMAIL
+__version__ = config.VERSION
 
 logging.basicConfig(format=LOG_FORMAT, level=getattr(logging, LOG_LEVEL))
 LOGGER = logging.getLogger(__name__)
