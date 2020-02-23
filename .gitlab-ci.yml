@@ -13,6 +13,7 @@ variables:
     python3-decorator
     python3-funcsigs
     python3-libhamlib2
+# debian:buster --> tox~=3.7.0
 stages:
   - static
   - build
