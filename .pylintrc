@@ -3,12 +3,12 @@ ignore=_version.py
 
 [MESSAGES CONTROL]
 disable=
-    C0111,
-    C0412,
-    R0801,
-    R0902,
-    R0912,
-    R0913,
-    R0914,
-    R0205,
-    W1509
+    C0114, # missing-module-docstring
+    C0115, # missing-class-docstring
+    C0116, # missing-function-docstring
+    R0801, # duplicate-code
+    R0902, # too-many-instance-attributes
+    R0912, # too-many-branches
+    R0913, # too-many-arguments
+    R0914, # too-many-locals
+    R0205, # useless-object-inheritance
