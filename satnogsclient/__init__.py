@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function
 
 import logging
 import logging.config
+import sys
 import time
 
 import sentry_sdk
@@ -30,7 +31,8 @@ def main():
     """
 
     if not settings.validate(LOGGER):
-        raise Exception('Settings are invalid, exiting...')
+        LOGGER.error('Settings are invalid, exiting...')
+        sys.exit(-1)
 
     LOGGER.info('Starting status listener thread...')
     gps_locator = locator.Locator(120)
