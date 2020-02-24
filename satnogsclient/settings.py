@@ -8,6 +8,7 @@ from distutils.util import strtobool  # pylint: disable=E0401,E0611
 from os import environ
 
 from dotenv import load_dotenv
+from validators.url import url
 
 
 def _cast_or_none(func, value):
@@ -101,3 +102,25 @@ SCHEDULER_LOG_LEVEL = environ.get('SATNOGS_SCHEDULER_LOG_LEVEL', 'WARNING')
 
 # Sentry
 SENTRY_DSN = environ.get('SENTRY_DSN', '')
+
+
+def validate():
+    try:
+        url(SATNOGS_NETWORK_API_URL)
+    except ValueError:
+        raise Exception('Invalid SATNOGS_NETWORK_API_URL: {0}'.format(SATNOGS_NETWORK_API_URL))
+
+    if not SATNOGS_STATION_ID:
+        raise Exception('SATNOGS_STATION_ID not configured.')
+
+    if not (SATNOGS_STATION_LAT or GPSD_ENABLED):
+        raise Exception('SATNOGS_STATION_LAT not configured')
+
+    if not (SATNOGS_STATION_LON or GPSD_ENABLED):
+        raise Exception('SATNOGS_STATION_LON not configured')
+
+    if SATNOGS_STATION_ELEV is None and GPSD_ENABLED is False:
+        raise Exception('SATNOGS_STATION_ELEV not configured')
+
+    if not SATNOGS_API_TOKEN:
+        raise Exception('SATNOGS_API_TOKEN not configured')

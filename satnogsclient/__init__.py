@@ -8,7 +8,6 @@ import logging.config
 import time
 
 import sentry_sdk
-from validators.url import url
 
 from satnogsclient import config, settings
 from satnogsclient.locator import locator
@@ -30,25 +29,7 @@ def main():
     """
     Main function
     """
-    try:
-        url(settings.SATNOGS_NETWORK_API_URL)
-    except ValueError:
-        raise Exception('Invalid SATNOGS_NETWORK_API_URL: {0}'.format(settings.SATNOGS_NETWORK_API_URL))
-
-    if not settings.SATNOGS_STATION_ID:
-        raise Exception('SATNOGS_STATION_ID not configured.')
-
-    if not (settings.SATNOGS_STATION_LAT or settings.GPSD_ENABLED):
-        raise Exception('SATNOGS_STATION_LAT not configured')
-
-    if not (settings.SATNOGS_STATION_LON or settings.GPSD_ENABLED):
-        raise Exception('SATNOGS_STATION_LON not configured')
-
-    if settings.SATNOGS_STATION_ELEV is None and settings.settings.GPSD_ENABLED is False:
-        raise Exception('SATNOGS_STATION_ELEV not configured')
-
-    if not settings.SATNOGS_API_TOKEN:
-        raise Exception('SATNOGS_API_TOKEN not configured')
+    settings.validate()
 
     LOGGER.info('Starting status listener thread...')
     gps_locator = locator.Locator(120)
