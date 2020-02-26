@@ -28,9 +28,6 @@ def get_gnuradio_info():
         }
     }
     if process.returncode == 0:
-        # Convert to valid JSON
-        gr_satnogs_info = ''.join(gr_satnogs_info.partition('{')[1:])
-        gr_satnogs_info = ''.join(gr_satnogs_info.partition('}')[:2])
         try:
             gr_satnogs_info = json.loads(gr_satnogs_info)
         except ValueError:
