@@ -53,14 +53,14 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name, dec
         args += ['--waterfall-file-path=' + waterfall_file]
 
     # If this is a CW observation pass the WPM parameter
-    if script_name == client_settings.GNURADIO_CW_SCRIPT_FILENAME and baud > 0:
+    if script_name == client_settings.GNURADIO_CW_SCRIPT_FILENAME and baud:
         args += ['--wpm=' + str(int(baud))]
     # If this is a BPSK/FSK/MSK observation pass the baudrate parameter
     if script_name in [
             client_settings.GNURADIO_BPSK_SCRIPT_FILENAME,
             client_settings.GNURADIO_GFSK_RKTR_SCRIPT_FILENAME,
             client_settings.GNURADIO_FSK_SCRIPT_FILENAME,
-    ] and baud > 0:
+    ] and baud:
         args += ['--baudrate=' + str(int(baud))]
     if client_settings.SATNOGS_DOPPLER_CORR_PER_SEC:
         args += ['--doppler-correction-per-sec=' + client_settings.SATNOGS_DOPPLER_CORR_PER_SEC]
