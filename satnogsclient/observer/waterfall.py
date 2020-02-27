@@ -2,14 +2,14 @@ from __future__ import absolute_import, division, print_function
 
 import logging
 
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 
 from satnogsclient import settings
 
 LOGGER = logging.getLogger(__name__)
 
-matplotlib.use('Agg')
+plt.switch_backend('Agg')
 
 
 def plot_waterfall(waterfall_file, waterfall_png):
@@ -42,19 +42,19 @@ def plot_waterfall(waterfall_file, waterfall_png):
         vmin = settings.SATNOGS_WATERFALL_MIN_VALUE
         vmax = settings.SATNOGS_WATERFALL_MAX_VALUE
     LOGGER.info('Plot waterfall file')
-    matplotlib.pyplot.figure(figsize=(10, 20))
-    matplotlib.pyplot.imshow(spec,
-                             origin='lower',
-                             aspect='auto',
-                             interpolation='None',
-                             extent=[fmin, fmax, tmin, tmax],
-                             vmin=vmin,
-                             vmax=vmax,
-                             cmap="viridis")
-    matplotlib.pyplot.xlabel("Frequency (kHz)")
-    matplotlib.pyplot.ylabel("Time (seconds)")
-    fig = matplotlib.pyplot.colorbar(aspect=50)
+    plt.figure(figsize=(10, 20))
+    plt.imshow(spec,
+               origin='lower',
+               aspect='auto',
+               interpolation='None',
+               extent=[fmin, fmax, tmin, tmax],
+               vmin=vmin,
+               vmax=vmax,
+               cmap="viridis")
+    plt.xlabel("Frequency (kHz)")
+    plt.ylabel("Time (seconds)")
+    fig = plt.colorbar(aspect=50)
     fig.set_label("Power (dB)")
-    matplotlib.pyplot.savefig(waterfall_png, bbox_inches='tight')
-    matplotlib.pyplot.close()
+    plt.savefig(waterfall_png, bbox_inches='tight')
+    plt.close()
     LOGGER.info('Waterfall plot finished')
