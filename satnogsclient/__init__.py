@@ -22,7 +22,9 @@ logging.basicConfig(format=settings.LOG_FORMAT, level=getattr(logging, settings.
 LOGGER = logging.getLogger(__name__)
 
 if settings.SENTRY_DSN:
-    sentry_sdk.init(settings.SENTRY_DSN)
+    sentry_sdk.init(settings.SENTRY_DSN, release='satnogs-client@{}'.format(__version__))
+    with sentry_sdk.configure_scope() as scope:
+        scope.user = {'id': settings.SATNOGS_STATION_ID}
 
 
 def main():
