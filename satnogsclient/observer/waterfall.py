@@ -2,14 +2,15 @@ from __future__ import absolute_import, division, print_function
 
 import logging
 
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 
 from satnogsclient import settings
 
-LOGGER = logging.getLogger(__name__)
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt  # isort:skip # noqa: E402 # pylint: disable=C0411,C0412,C0413
 
-plt.switch_backend('Agg')
+LOGGER = logging.getLogger(__name__)
 
 
 def plot_waterfall(waterfall_file, waterfall_png):
