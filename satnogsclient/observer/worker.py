@@ -116,8 +116,9 @@ class Worker(object):
         """
         Sets object flag to false and stops the tracking thread.
         """
-        LOGGER.info('Tracking stopped.')
         self.is_alive = False
+        self.track.join()
+        LOGGER.info('Tracking stopped.')
 
 
 class WorkerTrack(Worker):
