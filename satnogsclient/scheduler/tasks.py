@@ -118,25 +118,39 @@ def post_data():
         LOGGER.debug('URL: %s', url)
         LOGGER.debug('Headers: %s', headers)
         LOGGER.debug('Observation file: %s', observation)
-        response = requests.put(url,
-                                headers=headers,
-                                files=observation,
-                                verify=settings.SATNOGS_VERIFY_SSL,
-                                stream=True,
-                                timeout=45)
-        if response.status_code == 200:
-            LOGGER.info('Success: status code 200')
+        try:
+            response = requests.put(url,
+                                    headers=headers,
+                                    files=observation,
+                                    verify=settings.SATNOGS_VERIFY_SSL,
+                                    stream=True,
+                                    timeout=45)
+            response.raise_for_status()
+
+            LOGGER.info('Upload successful.')
+
+            # If set, move uploaded file to `SATNOGS_COMPLETE_OUTPUT_PATH`,
+            # otherwise delete it
             if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
                 os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
                           os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, fil))
             else:
                 os.remove(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil))
-        elif response.status_code == 404:
-            LOGGER.error('Bad status code: %s', response.status_code)
-            os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
-                      os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
-        else:
-            LOGGER.error('Bad status code: %s', response.status_code)
+        except requests.exceptions.Timeout:
+            LOGGER.error('Upload of %s for observation %i failed '
+                         'due to timeout.', fil, observation_id)
+        except requests.exceptions.HTTPError:
+            if response.status_code == 404:
+                LOGGER.error(
+                    'Upload of %s for observation %i failed, %s doesn\'t exist (404).'
+                    'Probably the observation was deleted.', fil, observation_id, url)
+
+                # Move file to `SATNOGS_INCOMPLETE_OUTPUT_PATH`
+                os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
+                          os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
+            else:
+                LOGGER.error('Upload of %s for observation %i failed, '
+                             'response status code: %s', fil, observation_id, response.status_code)
 
 
 def get_jobs():
