@@ -124,7 +124,7 @@ def post_data():
                                     files=observation,
                                     verify=settings.SATNOGS_VERIFY_SSL,
                                     stream=True,
-                                    timeout=45)
+                                    timeout=settings.SATNOGS_NETWORK_API_TIMEOUT)
             response.raise_for_status()
 
             LOGGER.info('Upload successful.')

@@ -52,6 +52,7 @@ SATNOGS_NETWORK_API_URL = environ.get('SATNOGS_NETWORK_API_URL',
                                       'https://network.satnogs.org/api/')
 SATNOGS_NETWORK_API_QUERY_INTERVAL = 1  # In minutes
 SATNOGS_NETWORK_API_POST_INTERVAL = 2  # In minutes
+SATNOGS_NETWORK_API_TIMEOUT = 60  # In seconds
 GNURADIO_UDP_PORT = 16886
 GNURADIO_IP = '127.0.0.1'
 GNURADIO_SCRIPT_PATH = ['/usr/bin', '/usr/local/bin']
