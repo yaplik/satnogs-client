@@ -218,16 +218,13 @@ class Observer(object):
         self.tracker_freq.trackstart()
 
     def poll_gnu_proc_status(self):
-        while self._gnu_proc.poll() is None:
-            if datetime.now(pytz.utc) > self.observation_end:
-                LOGGER.info('Tracking stopped.')
-                if self._gnu_proc:
-                    if self._gnu_proc.poll() is None:
-                        self._gnu_proc.send_signal(signal.SIGINT)
-                    _, _ = self._gnu_proc.communicate()
-                self.tracker_freq.trackstop()
-                self.tracker_rot.trackstop()
+        while self._gnu_proc.poll() is None and datetime.now(pytz.utc) <= self.observation_end:
             sleep(1)
+        LOGGER.info('Tracking stopped.')
+        self._gnu_proc.send_signal(signal.SIGINT)
+        _, _ = self._gnu_proc.communicate()
+        self.tracker_freq.trackstop()
+        self.tracker_rot.trackstop()
         LOGGER.info('Observation Finished')
         LOGGER.info('Executing post-observation script.')
         if settings.SATNOGS_POST_OBSERVATION_SCRIPT is not None:
