@@ -155,7 +155,7 @@ def post_data():
 
 def get_jobs():
     """Query SatNOGS Network API to GET jobs."""
-    gps_locator = locator.Locator(settings.SATNOGS_NETWORK_API_QUERY_INTERVAL * 60)
+    gps_locator = locator.Locator()
     gps_locator.update_location()
     LOGGER.debug('Get jobs started')
     url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'jobs/')

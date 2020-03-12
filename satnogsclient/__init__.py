@@ -37,7 +37,7 @@ def main():
         sys.exit(-1)
 
     LOGGER.info('Starting status listener thread...')
-    gps_locator = locator.Locator(120)
+    gps_locator = locator.Locator()
     gps_locator.update_location()
     status_listener()
     LOGGER.info('Press Ctrl+C to exit SatNOGS poller')

@@ -28,7 +28,10 @@ SATNOGS_STATION_ID = _cast_or_none(int, environ.get('SATNOGS_STATION_ID', None))
 SATNOGS_STATION_LAT = _cast_or_none(float, environ.get('SATNOGS_STATION_LAT', None))
 SATNOGS_STATION_LON = _cast_or_none(float, environ.get('SATNOGS_STATION_LON', None))
 SATNOGS_STATION_ELEV = _cast_or_none(int, environ.get('SATNOGS_STATION_ELEV', None))
-GPSD_ENABLED = bool(strtobool(environ.get('GPSD_ENABLED', 'False')))
+SATNOGS_GPSD_CLIENT_ENABLED = bool(strtobool(environ.get('SATNOGS_GPSD_CLIENT_ENABLED', 'False')))
+SATNOGS_GPSD_HOST = environ.get('SATNOGS_GPSD_HOST', "127.0.0.1")
+SATNOGS_GPSD_PORT = _cast_or_none(int, environ.get('SATNOGS_GPSD_PORT', 2947))
+SATNOGS_GPSD_TIMEOUT = _cast_or_none(int, environ.get('SATNOGS_GPSD_TIMEOUT', 0))
 
 # Output paths
 SATNOGS_APP_PATH = environ.get('SATNOGS_APP_PATH', '/tmp/.satnogs')
@@ -144,15 +147,15 @@ def validate(logger):
         logger.error('Invalid SATNOGS_NETWORK_API_URL: %s', SATNOGS_NETWORK_API_URL)
         settings_valid = False
 
-    if not (SATNOGS_STATION_LAT or GPSD_ENABLED):
+    if not (SATNOGS_STATION_LAT or SATNOGS_GPSD_CLIENT_ENABLED):
         logger.error('SATNOGS_STATION_LAT not configured')
         settings_valid = False
 
-    if not (SATNOGS_STATION_LON or GPSD_ENABLED):
+    if not (SATNOGS_STATION_LON or SATNOGS_GPSD_CLIENT_ENABLED):
         logger.error('SATNOGS_STATION_LON not configured')
         settings_valid = False
 
-    if SATNOGS_STATION_ELEV is None and GPSD_ENABLED is False:
+    if SATNOGS_STATION_ELEV is None and SATNOGS_GPSD_CLIENT_ENABLED is False:
         logger.error('SATNOGS_STATION_ELEV not configured')
         settings_valid = False
 

@@ -10,22 +10,20 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Locator(object):
-    def __init__(self, timeout):
-        self.timeout = timeout
+    def __init__(self):
+        self.timeout = settings.SATNOGS_GPSD_TIMEOUT
 
-    def show_location(self, gpsd):
-        print('mode        ', gpsd.fix.mode)
-        print('status      ', gpsd.status)
-        print('eps         ', gpsd.fix.eps)
-        print('epx         ', gpsd.fix.epx)
-        print('epv         ', gpsd.fix.epv)
-        print('ept         ', gpsd.fix.ept)
-        print('climb       ', gpsd.fix.climb)
-        print('hdop        ', gpsd.hdop)
-        print('timeout     ', self.timeout)
+    @staticmethod
+    def show_location(gpsd):
+        LOGGER.debug('mode       %d ', gpsd.fix.mode)
+        LOGGER.debug('status     %d ', gpsd.status)
+        LOGGER.debug('latitude   %f', gpsd.fix.latitude)
+        LOGGER.debug('longitude  %f', gpsd.fix.longitude)
+        LOGGER.debug('altitude   %f', gpsd.fix.altitude)
+        LOGGER.debug('hdop       %d', gpsd.hdop)
 
     def update_location(self):
-        if settings.GPSD_ENABLED is not True:
+        if settings.SATNOGS_GPSD_CLIENT_ENABLED is not True:
             return
         no_timeout = (self.timeout == 0)
         if (settings.SATNOGS_STATION_LAT is None or settings.SATNOGS_STATION_LON is None
@@ -38,12 +36,15 @@ class Locator(object):
         end_time = time.time() + self.timeout
 
         try:
-            gpsd = gps.gps(mode=gps.WATCH_ENABLE)
+            LOGGER.info("Connecting to GPSD %s:%d", settings.SATNOGS_GPSD_HOST,
+                        settings.SATNOGS_GPSD_PORT)
+            gpsd = gps.gps(mode=gps.WATCH_ENABLE,
+                           host=settings.SATNOGS_GPSD_HOST,
+                           port=settings.SATNOGS_GPSD_PORT)
             gpsd.next()
-            LOGGER.info("Waiting for GPS")
+            LOGGER.info("Waiting for GPS (timeout %ds)", self.timeout)
             while gpsd.fix.mode != gps.MODE_3D and (time.time() < end_time or no_timeout):
-                # self.show_location(gpsd)
-                self.timeout -= 1
+                self.show_location(gpsd)
                 gpsd.next()
         except StopIteration:
             LOGGER.info('GPSD connection failed')
