@@ -25,6 +25,7 @@ def get_gnuradio_info():
             'rf_gain': client_settings.SATNOGS_RF_GAIN,
             'antenna': client_settings.SATNOGS_ANTENNA,
             'lo_offset': client_settings.SATNOGS_LO_OFFSET,
+            'ppm_error': client_settings.SATNOGS_PPM_ERROR,
         }
     }
     if process.returncode == 0:
@@ -66,6 +67,8 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name, dec
         args += ['--doppler-correction-per-sec=' + client_settings.SATNOGS_DOPPLER_CORR_PER_SEC]
     if client_settings.SATNOGS_LO_OFFSET:
         args += ['--lo-offset=' + client_settings.SATNOGS_LO_OFFSET]
+    if client_settings.SATNOGS_PPM_ERROR:
+        args += ['--ppm=' + client_settings.SATNOGS_PPM_ERROR]
     if client_settings.SATNOGS_RIG_PORT:
         args += ['--rigctl-port=' + str(client_settings.SATNOGS_RIG_PORT)]
     if client_settings.SATNOGS_RF_GAIN:
