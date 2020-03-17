@@ -82,6 +82,16 @@ def spawn_observer(**kwargs):
         raise RuntimeError('Error in observer setup.')
 
 
+def keep_or_remove_file(filename):
+    # If set, move uploaded file to `SATNOGS_COMPLETE_OUTPUT_PATH`,
+    # otherwise delete it
+    if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
+        os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, filename),
+                  os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, filename))
+    else:
+        os.remove(os.path.join(settings.SATNOGS_OUTPUT_PATH, filename))
+
+
 def post_data():
     """PUT observation data back to Network API."""
     LOGGER.info('Post data started')
@@ -129,13 +139,7 @@ def post_data():
 
             LOGGER.info('Upload successful.')
 
-            # If set, move uploaded file to `SATNOGS_COMPLETE_OUTPUT_PATH`,
-            # otherwise delete it
-            if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
-                os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
-                          os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, fil))
-            else:
-                os.remove(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil))
+            keep_or_remove_file(fil)
         except requests.exceptions.Timeout:
             LOGGER.error('Upload of %s for observation %i failed '
                          'due to timeout.', fil, observation_id)
@@ -148,6 +152,10 @@ def post_data():
                 # Move file to `SATNOGS_INCOMPLETE_OUTPUT_PATH`
                 os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
                           os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
+            if response.status_code == 403 and 'has already been uploaded' in response.text:
+                LOGGER.error('Upload of %s for observation %i is forbidden, %s\n URL: %s', fil,
+                             observation_id, response.text, url)
+                keep_or_remove_file(fil)
             else:
                 LOGGER.error('Upload of %s for observation %i failed, '
                              'response status code: %s', fil, observation_id, response.status_code)
