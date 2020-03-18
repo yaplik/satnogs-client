@@ -19,13 +19,19 @@ def get_gnuradio_info():
             'name': 'gr-satnogs',
             'version': None,
             'rx_device': client_settings.SATNOGS_SOAPY_RX_DEVICE,
-            'dev_args': client_settings.SATNOGS_DEV_ARGS,
             'samp_rate': client_settings.SATNOGS_RX_SAMP_RATE,
             'bandwidth': client_settings.SATNOGS_RX_BANDWIDTH,
+            'gain_mode': client_settings.SATNOGS_GAIN_MODE,
             'rf_gain': client_settings.SATNOGS_RF_GAIN,
             'antenna': client_settings.SATNOGS_ANTENNA,
             'lo_offset': client_settings.SATNOGS_LO_OFFSET,
             'ppm_error': client_settings.SATNOGS_PPM_ERROR,
+            'dev_args': client_settings.SATNOGS_DEV_ARGS,
+            'stream_args': client_settings.SATNOGS_STREAM_ARGS,
+            'tune_args': client_settings.SATNOGS_TUNE_ARGS,
+            'other_settings': client_settings.SATNOGS_OTHER_SETTINGS,
+            'dc_removal': client_settings.SATNOGS_DC_REMOVAL,
+            'bb_freq': client_settings.SATNOGS_BB_FREQ,
         }
     }
     if process.returncode == 0:
@@ -71,12 +77,24 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name, dec
         args += ['--ppm=' + client_settings.SATNOGS_PPM_ERROR]
     if client_settings.SATNOGS_RIG_PORT:
         args += ['--rigctl-port=' + str(client_settings.SATNOGS_RIG_PORT)]
+    if client_settings.SATNOGS_GAIN_MODE:
+        args += ['--gain-mode=' + client_settings.SATNOGS_GAIN_MODE]
     if client_settings.SATNOGS_RF_GAIN:
         args += ['--gain=' + client_settings.SATNOGS_RF_GAIN]
     if client_settings.SATNOGS_ANTENNA:
         args += ['--antenna=' + client_settings.SATNOGS_ANTENNA]
     if client_settings.SATNOGS_DEV_ARGS:
         args += ['--dev-args=' + client_settings.SATNOGS_DEV_ARGS]
+    if client_settings.SATNOGS_STREAM_ARGS:
+        args += ['--stream-args=' + client_settings.SATNOGS_STREAM_ARGS]
+    if client_settings.SATNOGS_TUNE_ARGS:
+        args += ['--tune-args=' + client_settings.SATNOGS_TUNE_ARGS]
+    if client_settings.SATNOGS_OTHER_SETTINGS:
+        args += ['--other-settings=' + client_settings.SATNOGS_OTHER_SETTINGS]
+    if client_settings.SATNOGS_DC_REMOVAL:
+        args += ['--dc-removal=' + client_settings.SATNOGS_DC_REMOVAL]
+    if client_settings.SATNOGS_BB_FREQ:
+        args += ['--bb-freq=' + client_settings.SATNOGS_BB_FREQ]
     if client_settings.SATNOGS_RX_BANDWIDTH:
         args += ['--bw=' + client_settings.SATNOGS_RX_BANDWIDTH]
     if client_settings.ENABLE_IQ_DUMP:

@@ -12,6 +12,12 @@ Run SatNOGS Client
     Set Environment Variable    SATNOGS_STATION_ELEV    123
     Set Environment Variable    SATNOGS_SOAPY_RX_DEVICE    driver=rtlsdr
     Set Environment Variable    SATNOGS_RX_SAMP_RATE    2.048e6
+    Set Environment Variable    SATNOGS_ANTENNA    RX
+    Set Environment Variable    SATNOGS_PPM_ERROR    4
+    Set Environment Variable    SATNOGS_DEV_ARGS    offset_tune=true
+    Set Environment Variable    SATNOGS_STREAM_ARGS    asyncBuffs=32
+    Set Environment Variable    SATNOGS_GAIN_MODE    Settings Field
+    Set Environment Variable    SATNOGS_OTHER_SETTINGS    TUNER=49.6
     Set Environment Variable    SATNOGS_LOG_LEVEL    DEBUG
     Start Process    satnogs-client    shell=True
     ${Result} =    Wait For Process    timeout=10 seconds    on_timeout=terminate
