@@ -96,9 +96,9 @@ IQ_DUMP_FILENAME = environ.get('IQ_DUMP_FILENAME', None)
 DISABLE_DECODED_DATA = bool(strtobool(environ.get('DISABLE_DECODED_DATA', 'False')))
 
 # Waterfall settings
-SATNOGS_WATERFALL_AUTORANGE = environ.get('SATNOGS_WATERFALL_AUTORANGE', True)
-SATNOGS_WATERFALL_MIN_VALUE = environ.get('SATNOGS_WATERFALL_MIN_VALUE', -100)
-SATNOGS_WATERFALL_MAX_VALUE = environ.get('SATNOGS_WATERFALL_MAX_VALUE', -50)
+SATNOGS_WATERFALL_AUTORANGE = bool(strtobool(environ.get('SATNOGS_WATERFALL_AUTORANGE', 'True')))
+SATNOGS_WATERFALL_MIN_VALUE = int(environ.get('SATNOGS_WATERFALL_MIN_VALUE', -100))
+SATNOGS_WATERFALL_MAX_VALUE = int(environ.get('SATNOGS_WATERFALL_MAX_VALUE', -50))
 
 # Logging configuration
 LOG_FORMAT = '%(name)s - %(levelname)s - %(message)s'
