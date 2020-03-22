@@ -8,10 +8,11 @@ In addition to that, SatNOGS Client can optionally control a Hamlib compatible r
 During the execution of an observation task, orbital calculations are performed to compensate for doppler shift and point the rotator to the correct direction.
 After the completion of an observation, the client gathers the observation artifacts and uploads them to SatNOGS Network.
 
+Table of Contents
+=================
 
 .. toctree::
    :maxdepth: 4
 
-   architecture
    satnogsclient
    installation
