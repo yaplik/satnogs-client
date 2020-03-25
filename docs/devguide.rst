@@ -30,8 +30,7 @@ Configuration
 
 This project uses ``python-dotenv``.
 Configuration of ``satnogsclient/settings.py`` can be overridden by setting the respective environment variables or an ``.env`` file placed on the project root directory.
-The format of each line in ``.env`` file is ``VARIABLE=VALUE``.
-
+Check :ref:`configuration` for a list of all configuration variables.
 
 Code Quality Assurance
 ----------------------
