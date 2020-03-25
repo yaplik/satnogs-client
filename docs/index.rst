@@ -14,5 +14,5 @@ Table of Contents
 .. toctree::
    :maxdepth: 4
 
-   satnogsclient
+   userguide
    installation
