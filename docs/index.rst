@@ -15,4 +15,4 @@ Table of Contents
    :maxdepth: 4
 
    userguide
-   installation
+   devguide
