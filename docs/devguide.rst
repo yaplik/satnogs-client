@@ -16,7 +16,7 @@ On the first time, create the virtualenv by running::
 
   $ mkvirtualenv --system-site-packages -a . satnogs-client
 
-Do activate the virtualenv after it is created run::
+To activate the virtualenv after it is created run::
 
   $ workon satnogs-client
 
