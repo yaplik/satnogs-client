@@ -471,7 +471,7 @@ ENABLE_IQ_DUMP
 
 
 IQ_DUMP_FILENAME
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 :Type: *boolean*
 :Default: *False*
 :Required: *No*
