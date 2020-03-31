@@ -41,6 +41,7 @@ The following code quality assurance tools are used in this project:
   * ``isort``
   * ``yapf``
   * ``pylint``
+  * ``robotframework``
 
 Testing
 -------
