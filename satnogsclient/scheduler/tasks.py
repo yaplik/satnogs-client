@@ -62,6 +62,8 @@ def spawn_observer(**kwargs):
             script_name = settings.GNURADIO_AMSAT_DUV_SCRIPT_FILENAME
         elif obj['mode'].endswith('SSTV'):
             script_name = settings.GNURADIO_SSTV_SCRIPT_FILENAME
+        elif obj['mode'].endswith('BPSK PMT-A3'):
+            script_name = settings.GNURADIO_ARGOS_BPSK_PMT_A3
 
     setup_kwargs = {
         'observation_id': obj['id'],

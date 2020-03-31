@@ -67,6 +67,7 @@ def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name, dec
             client_settings.GNURADIO_BPSK_SCRIPT_FILENAME,
             client_settings.GNURADIO_GFSK_RKTR_SCRIPT_FILENAME,
             client_settings.GNURADIO_FSK_SCRIPT_FILENAME,
+            client_settings.GNURADIO_ARGOS_BPSK_PMT_A3,
     ] and baud:
         args += ['--baudrate=' + str(int(baud))]
     if client_settings.SATNOGS_DOPPLER_CORR_PER_SEC:

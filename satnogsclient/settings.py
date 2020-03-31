@@ -70,6 +70,7 @@ GNURADIO_AFSK_SALSAT_SCRIPT_FILENAME = 'satnogs_afsk_salsat.py'
 GNURADIO_AFSK_SNET_SCRIPT_FILENAME = 'satnogs_afsk_snet.py'
 GNURADIO_AMSAT_DUV_SCRIPT_FILENAME = 'satnogs_amsat_fox_duv_decoder.py'
 GNURADIO_SSTV_SCRIPT_FILENAME = 'satnogs_sstv_pd120_demod.py'
+GNURADIO_ARGOS_BPSK_PMT_A3 = 'satnogs_argos_bpsk_ldr.py'
 
 SATNOGS_ROT_IP = environ.get('SATNOGS_ROT_IP', '127.0.0.1')
 SATNOGS_ROT_MODEL = environ.get('SATNOGS_ROT_MODEL', 'ROT_MODEL_DUMMY')
