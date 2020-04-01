@@ -18,7 +18,11 @@ def _cast_or_none(func, value):
         return None
 
 
-load_dotenv()
+try:
+    load_dotenv()
+except EnvironmentError:
+    # XXX: Workaround for readthedocs  # pylint: disable=fixme
+    pass
 
 # Ground station information
 SATNOGS_API_TOKEN = environ.get('SATNOGS_API_TOKEN', None)
