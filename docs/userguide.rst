@@ -548,11 +548,19 @@ SCHEDULER_LOG_LEVEL
 SENTRY_DSN
 ~~~~~~~~~~
 :Type: *string*
-:Default:
+:Default: d50342fb75aa8f3945e2f846b77a0cdb7c7d2275
 :Required: *No*
 :Description:
    Sentry Data Source Name used for sending events to application monitoring and error tracking server.
-   An empty value disables monitoring and error tracking.
+
+
+SENTRY_ENABLED
+~~~~~~~~~~~~~~
+:Type: *boolean*
+:Default: *False*
+:Required: *No*
+:Description:
+   Enable sending events to Sentry application monitoring and error tracking server.
 
 
 Usage
