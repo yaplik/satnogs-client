@@ -11,7 +11,6 @@ import Hamlib
 import pytz
 
 from satnogsclient import settings
-from satnogsclient.observer.commsocket import Commsocket
 from satnogsclient.observer.orbital import pinpoint
 from satnogsclient.radio import Radio
 from satnogsclient.rotator import Rotator
@@ -94,23 +93,7 @@ class Worker(object):
         raise NotImplementedError
 
     def _communicate_tracking_info(self):
-        """
-        Runs as a daemon thread, communicating tracking info to remote socket.
-        Uses observer and satellite objects set by trackobject().
-        Will exit when observation_end timestamp is reached.
-        """
-        sock = Commsocket(self._ip, self._port)
-        sock.connect()
-
-        # track satellite
-        while self.is_alive:
-
-            pin = pinpoint(self.observer_dict, self.satellite_dict)
-            if pin['ok']:
-                self.send_to_socket(pin, sock)
-                time.sleep(self._sleep_time)
-
-        sock.disconnect()
+        raise NotImplementedError
 
     def trackstop(self):
         """
