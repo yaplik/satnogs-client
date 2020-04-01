@@ -117,7 +117,8 @@ LOG_LEVEL = environ.get('SATNOGS_LOG_LEVEL', 'WARNING')
 SCHEDULER_LOG_LEVEL = environ.get('SATNOGS_SCHEDULER_LOG_LEVEL', 'WARNING')
 
 # Sentry
-SENTRY_DSN = environ.get('SENTRY_DSN', 'd50342fb75aa8f3945e2f846b77a0cdb7c7d2275')
+SENTRY_DSN = environ.get('SENTRY_DSN',
+                         'https://5e18316a65b1457c99fe81bf869e26d6@sentry.io/2818206')
 SENTRY_ENABLED = bool(strtobool(environ.get('SENTRY_ENABLED', 'False')))
 
 REQUIRED_VARIABLES = [
