@@ -9,8 +9,7 @@ class Rotator(object):
     """
     Communicate and interface with rotators
 
-    :param model: Model of rotator e.g. "ROT_MODEL_EASYCOMM3" or
-    "ROT_MODEL_DUMMY"
+    :param model: Model of rotator e.g. "ROT_MODEL_EASYCOMM3" or "ROT_MODEL_DUMMY"
     :type model: str
     :param baud: The baud rate of serial communication, e.g. 19200
     :type baud: int
@@ -87,8 +86,8 @@ class Rotator(object):
         """
         Move the rotator with speed (mdeg/s) to specific direction
 
-        :param direction: The direction of movent, e.g. ROT_MOVE_UP,
-        ROT_MOVE_DOWN, ROT_MOVE_LEFT, ROT_MOVE_RIGHT
+        :param direction: The direction of movent, e.g. ROT_MOVE_UP, ROT_MOVE_DOWN, ROT_MOVE_LEFT,
+                          ROT_MOVE_RIGHT
         :type direction: str
         :param speed: The velocity set point in mdeg/s
         :type speed: int
