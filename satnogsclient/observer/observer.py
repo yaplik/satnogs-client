@@ -35,7 +35,6 @@ class Observer(object):
 
     def __init__(self):
         self.location = None
-        self.rot_ip = settings.SATNOGS_ROT_IP
         self.rot_port = settings.SATNOGS_ROT_PORT
         self.rig_ip = settings.SATNOGS_RIG_IP
         self.rig_port = settings.SATNOGS_RIG_PORT
@@ -195,7 +194,7 @@ class Observer(object):
             LOGGER.error(http_error)
 
     def run_rot(self):
-        self.tracker_rot = WorkerTrack(ip=self.rot_ip,
+        self.tracker_rot = WorkerTrack(ip=None,
                                        port=self.rot_port,
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,

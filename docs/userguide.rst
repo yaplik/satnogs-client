@@ -231,16 +231,6 @@ SATNOGS_NETWORK_API_URL
    URL pointing to API of SatNOGS Network.
 
 
-SATNOGS_ROT_IP
-~~~~~~~~~~~~~~
-
-:Type: *host*
-:Default: ``127.0.0.1``
-:Required: *No*
-:Description:
-   Hostname or IP address of Hamlib rotctld.
-
-
 SATNOGS_ROT_MODEL
 ~~~~~~~~~~~~~~~~~
 
