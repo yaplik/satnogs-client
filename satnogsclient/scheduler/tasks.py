@@ -32,46 +32,19 @@ def spawn_observer(**kwargs):
         'lat': settings.SATNOGS_STATION_LAT,
         'elev': settings.SATNOGS_STATION_ELEV
     }
-    frequency = 100e6
+
     # Get the baudrate. In case of CW baudrate equals the WPM
     baud = 0
     if 'baud' in obj:
         baud = obj['baud']
-    frequency = obj['frequency']
-    script_name = settings.GNURADIO_SCRIPT_FILENAME
-    if 'mode' in obj and obj['mode']:
-        if obj['mode'] == "CW":
-            script_name = settings.GNURADIO_CW_SCRIPT_FILENAME
-        elif obj['mode'] == "APT":
-            script_name = settings.GNURADIO_APT_SCRIPT_FILENAME
-        elif obj['mode'].endswith('BPSK PMT-A3'):
-            script_name = settings.GNURADIO_ARGOS_BPSK_PMT_A3
-        elif obj['mode'].startswith('BPSK'):
-            script_name = settings.GNURADIO_BPSK_SCRIPT_FILENAME
-        elif obj['mode'] == 'GFSK Rktr':
-            script_name = settings.GNURADIO_GFSK_RKTR_SCRIPT_FILENAME
-        # FSK and MSK share the same flowgraph
-        elif (obj['mode'].startswith('FSK') or obj['mode'].startswith('GFSK')
-              or obj['mode'].startswith('MSK') or obj['mode'].startswith('GMSK')):
-            script_name = settings.GNURADIO_FSK_SCRIPT_FILENAME
-        elif obj['mode'].endswith('AFSK S-Net'):
-            script_name = settings.GNURADIO_AFSK_SNET_SCRIPT_FILENAME
-        elif obj['mode'].endswith('AFSK SALSAT'):
-            script_name = settings.GNURADIO_AFSK_SALSAT_SCRIPT_FILENAME
-        elif obj['mode'].endswith('AFSK1k2'):
-            script_name = settings.GNURADIO_AFSK1K2_SCRIPT_FILENAME
-        elif obj['mode'].endswith('DUV'):
-            script_name = settings.GNURADIO_AMSAT_DUV_SCRIPT_FILENAME
-        elif obj['mode'].endswith('SSTV'):
-            script_name = settings.GNURADIO_SSTV_SCRIPT_FILENAME
 
     setup_kwargs = {
         'observation_id': obj['id'],
         'tle': tle,
         'observation_end': end,
-        'frequency': frequency,
-        'baud': baud,
-        'script_name': script_name
+        'frequency': obj['frequency'],
+        'mode': obj['mode'],
+        'baud': baud
     }
 
     LOGGER.debug('Observer args: %s', setup_kwargs)

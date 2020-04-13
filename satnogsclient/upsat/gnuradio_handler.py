@@ -47,29 +47,41 @@ def get_gnuradio_info():
     return client_metadata
 
 
-def exec_gnuradio(observation_file, waterfall_file, freq, baud, script_name, decoded_data):
-    if not script_name:
-        script_name = client_settings.GNURADIO_SCRIPT_FILENAME
-    device = client_settings.SATNOGS_SOAPY_RX_DEVICE
-    samp_rate = client_settings.SATNOGS_RX_SAMP_RATE
+def get_flowgraph_script_name(mode=''):
+    """
+    Returns the GNU Radio flowgraph script name that will be executed based on the
+    given mode, or the default one if no mode is specified
+    """
+    if mode not in client_settings.SATNOGS_FLOWGRAPHS:
+        return client_settings.GNURADIO_DEFAULT_SCRIPT_FILENAME
+    return client_settings.SATNOGS_FLOWGRAPHS[mode]['script_name']
+
+
+def exec_gnuradio(observation_file, waterfall_file, freq, mode, baud, decoded_data):
     args = [
-        script_name, '--soapy-rx-device=' + device, '--samp-rate-rx=' + str(samp_rate),
-        '--rx-freq=' + str(freq), '--file-path=' + observation_file
+        get_flowgraph_script_name(mode),
+        '--soapy-rx-device=' + client_settings.SATNOGS_SOAPY_RX_DEVICE,
+        '--samp-rate-rx=' + str(client_settings.SATNOGS_RX_SAMP_RATE), '--rx-freq=' + str(freq),
+        '--file-path=' + observation_file
     ]
+
     if waterfall_file != "":
         args += ['--waterfall-file-path=' + waterfall_file]
 
-    # If this is a CW observation pass the WPM parameter
-    if script_name == client_settings.GNURADIO_CW_SCRIPT_FILENAME and baud:
-        args += ['--wpm=' + str(int(baud))]
-    # If this is a BPSK/FSK/MSK observation pass the baudrate parameter
-    if script_name in [
-            client_settings.GNURADIO_BPSK_SCRIPT_FILENAME,
-            client_settings.GNURADIO_GFSK_RKTR_SCRIPT_FILENAME,
-            client_settings.GNURADIO_FSK_SCRIPT_FILENAME,
-            client_settings.GNURADIO_ARGOS_BPSK_PMT_A3,
-    ] and baud:
-        args += ['--baudrate=' + str(int(baud))]
+    # Apply baudrate on the supported flowgraphs
+    if mode in client_settings.SATNOGS_FLOWGRAPHS:
+        if baud and client_settings.SATNOGS_FLOWGRAPHS[mode]['has_baudrate']:
+            # If this is a CW observation pass the WPM parameter
+            if mode == "CW":
+                args += ['--wpm=' + str(int(baud))]
+            else:
+                args += ['--baudrate=' + str(int(baud))]
+
+    # Apply framing mode
+    if mode in client_settings.SATNOGS_FLOWGRAPHS:
+        if client_settings.SATNOGS_FLOWGRAPHS[mode]['has_framing']:
+            args += ['--framing=' + client_settings.SATNOGS_FLOWGRAPHS[mode]['framing']]
+
     if client_settings.SATNOGS_DOPPLER_CORR_PER_SEC:
         args += ['--doppler-correction-per-sec=' + client_settings.SATNOGS_DOPPLER_CORR_PER_SEC]
     if client_settings.SATNOGS_LO_OFFSET:

@@ -43,19 +43,19 @@ class Observer(object):
         self.timestamp = None
         self.observation_end = None
         self.frequency = None
+        self.mode = None
+        self.baud = None
         self.observation_raw_file = None
         self.observation_ogg_file = None
         self.observation_waterfall_file = None
         self.observation_waterfall_png = None
         self.observation_receiving_decoded_data = None  # pylint: disable=C0103
         self.observation_decoded_data = None
-        self.baud = None
         self.observation_done_decoded_data = None
         self.tracker_freq = None
         self.tracker_rot = None
-        self.script_name = None
 
-    def setup(self, observation_id, tle, observation_end, frequency, baud, script_name):
+    def setup(self, observation_id, tle, observation_end, frequency, mode, baud):
         """
         Sets up required internal variables.
         * returns True if setup is ok
@@ -64,11 +64,11 @@ class Observer(object):
 
         # Set attributes
         self.observation_id = observation_id
-        self.script_name = script_name
         self.tle = tle
         self.observation_end = observation_end
         self.frequency = frequency
         self.baud = baud
+        self.mode = mode
 
         not_completed_prefix = 'receiving_satnogs'
         completed_prefix = 'satnogs'
@@ -121,7 +121,7 @@ class Observer(object):
                 ("{{TIMESTAMP}}", self.timestamp),
                 ("{{ID}}", str(self.observation_id)),
                 ("{{BAUD}}", str(self.baud)),
-                ("{{SCRIPT_NAME}}", self.script_name),
+                ("{{SCRIPT_NAME}}", gnuradio_handler.get_flowgraph_script_name(self.mode)),
             ]
             pre_script = []
             for arg in shlex.split(settings.SATNOGS_PRE_OBSERVATION_SCRIPT):
@@ -132,7 +132,7 @@ class Observer(object):
 
         # if it is APT we want to save with a prefix until the observation
         # is complete, then rename.
-        if settings.GNURADIO_APT_SCRIPT_FILENAME in self.script_name:
+        if self.mode == "APT":
             self.observation_decoded_data =\
                  self.observation_receiving_decoded_data
 
@@ -146,18 +146,16 @@ class Observer(object):
         LOGGER.info('Start gnuradio thread.')
         self._gnu_proc = gnuradio_handler.exec_gnuradio(self.observation_raw_file,
                                                         self.observation_waterfall_file,
-                                                        self.frequency, self.baud,
-                                                        self.script_name,
+                                                        self.frequency, self.mode, self.baud,
                                                         self.observation_decoded_data)
         # Polling gnuradio process status
         self.poll_gnu_proc_status()
 
-        if "satnogs_generic_iq_receiver.py" not in settings.GNURADIO_SCRIPT_FILENAME:
-            LOGGER.info('Rename encoded files for uploading.')
-            self.rename_ogg_file()
-            self.rename_data_file()
-            LOGGER.info('Creating waterfall plot.')
-            self.plot_waterfall()
+        # Rename files and create waterfall
+        self.rename_ogg_file()
+        self.rename_data_file()
+        LOGGER.info('Creating waterfall plot.')
+        self.plot_waterfall()
 
         # PUT client version and metadata
         base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
@@ -233,7 +231,7 @@ class Observer(object):
                 ("{{TIMESTAMP}}", self.timestamp),
                 ("{{ID}}", str(self.observation_id)),
                 ("{{BAUD}}", str(self.baud)),
-                ("{{SCRIPT_NAME}}", self.script_name),
+                ("{{SCRIPT_NAME}}", gnuradio_handler.get_flowgraph_script_name(self.mode)),
             ]
             post_script = []
             for arg in shlex.split(settings.SATNOGS_POST_OBSERVATION_SCRIPT):
@@ -243,25 +241,30 @@ class Observer(object):
             subprocess.call(post_script)
 
     def rename_ogg_file(self):
-        if os.path.isfile(self.observation_raw_file):
+        try:
             os.rename(self.observation_raw_file, self.observation_ogg_file)
-        LOGGER.info('Rename encoded file for uploading finished')
+            LOGGER.info('Rename encoded file for uploading finished')
+        except FileNotFoundError:
+            LOGGER.error('Failed to rename encoded file')
 
     def rename_data_file(self):
-        if os.path.isfile(self.observation_receiving_decoded_data):
+        try:
             os.rename(self.observation_receiving_decoded_data, self.observation_done_decoded_data)
-        LOGGER.info('Rename data file for uploading finished')
+            LOGGER.info('Rename data file for uploading finished')
+        except FileNotFoundError:
+            LOGGER.error('Failed to rename data file')
 
     def plot_waterfall(self):
-        if os.path.isfile(self.observation_waterfall_file):
+        try:
             plot_waterfall(waterfall_file=self.observation_waterfall_file,
                            waterfall_png=self.observation_waterfall_png)
-            if os.path.isfile(self.observation_waterfall_png) and \
-               settings.SATNOGS_REMOVE_RAW_FILES:
+            if settings.SATNOGS_REMOVE_RAW_FILES:
                 self.remove_waterfall_file()
-        else:
+        except FileNotFoundError:
             LOGGER.error('No waterfall data file found')
 
     def remove_waterfall_file(self):
-        if os.path.isfile(self.observation_waterfall_file):
+        try:
             os.remove(self.observation_waterfall_file)
+        except FileNotFoundError:
+            LOGGER.error('Failed to remove waterfall file')
