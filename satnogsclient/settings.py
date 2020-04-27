@@ -63,11 +63,12 @@ SATNOGS_NETWORK_API_TIMEOUT = 1800  # In seconds
 GNURADIO_UDP_PORT = 16886
 GNURADIO_IP = '127.0.0.1'
 GNURADIO_SCRIPT_PATH = ['/usr/bin', '/usr/local/bin']
-GNURADIO_DEFAULT_SCRIPT_FILENAME = 'satnogs_fsk.py'
+GNURADIO_DEFAULT_SCRIPT_FILENAME = 'satnogs_fm.py'
 GNURADIO_CW_SCRIPT_FILENAME = 'satnogs_cw_decoder.py'
 GNURADIO_APT_SCRIPT_FILENAME = 'satnogs_noaa_apt_decoder.py'
 GNURADIO_BPSK_SCRIPT_FILENAME = 'satnogs_bpsk.py'
 GNURADIO_GFSK_RKTR_SCRIPT_FILENAME = 'satnogs_reaktor_hello_world_fsk9600_decoder.py'
+GNURADIO_FM_SCRIPT_FILENAME = 'satnogs_fm.py'
 GNURADIO_FSK_SCRIPT_FILENAME = 'satnogs_fsk.py'
 GNURADIO_AFSK1K2_SCRIPT_FILENAME = 'satnogs_afsk1200_ax25.py'
 GNURADIO_AMSAT_DUV_SCRIPT_FILENAME = 'satnogs_amsat_fox_duv_decoder.py'
@@ -98,6 +99,11 @@ SATNOGS_FLOWGRAPHS = {
     },
     "DUV": {
         'script_name': GNURADIO_AMSAT_DUV_SCRIPT_FILENAME,
+        'has_baudrate': False,
+        'has_framing': False
+    },
+    "FM": {
+        'script_name': GNURADIO_FM_SCRIPT_FILENAME,
         'has_baudrate': False,
         'has_framing': False
     },
