@@ -87,6 +87,12 @@ SATNOGS_FLOWGRAPHS = {
         'has_baudrate': False,
         'has_framing': False,
     },
+    "BPSK": {
+        'script_name': GNURADIO_BPSK_SCRIPT_FILENAME,
+        'has_baudrate': True,
+        'has_framing': True,
+        'framing': 'ax25'
+    },
     "BPSK PMT-A3": {
         'script_name': GNURADIO_ARGOS_BPSK_PMT_A3,
         'has_baudrate': True,
