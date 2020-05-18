@@ -33,7 +33,7 @@ SATNOGS_STATION_LAT = _cast_or_none(float, environ.get('SATNOGS_STATION_LAT', No
 SATNOGS_STATION_LON = _cast_or_none(float, environ.get('SATNOGS_STATION_LON', None))
 SATNOGS_STATION_ELEV = _cast_or_none(int, environ.get('SATNOGS_STATION_ELEV', None))
 SATNOGS_GPSD_CLIENT_ENABLED = bool(strtobool(environ.get('SATNOGS_GPSD_CLIENT_ENABLED', 'False')))
-SATNOGS_GPSD_HOST = environ.get('SATNOGS_GPSD_HOST', "127.0.0.1")
+SATNOGS_GPSD_HOST = environ.get('SATNOGS_GPSD_HOST', '127.0.0.1')
 SATNOGS_GPSD_PORT = _cast_or_none(int, environ.get('SATNOGS_GPSD_PORT', 2947))
 SATNOGS_GPSD_TIMEOUT = _cast_or_none(int, environ.get('SATNOGS_GPSD_TIMEOUT', 0))
 
@@ -48,7 +48,7 @@ for p in [
         SATNOGS_APP_PATH, SATNOGS_OUTPUT_PATH, SATNOGS_COMPLETE_OUTPUT_PATH,
         SATNOGS_INCOMPLETE_OUTPUT_PATH
 ]:
-    if p != "" and not os.path.exists(p):
+    if p != '' and not os.path.exists(p):
         os.mkdir(p)
 
 SATNOGS_REMOVE_RAW_FILES = bool(strtobool(environ.get('SATNOGS_REMOVE_RAW_FILES', 'True')))
@@ -77,96 +77,96 @@ GNURADIO_ARGOS_BPSK_PMT_A3 = 'satnogs_argos_bpsk_ldr.py'
 
 # Dictionary with the modes from the SatNOGS network as keys
 SATNOGS_FLOWGRAPHS = {
-    "AFSK": {
+    'AFSK': {
         'script_name': GNURADIO_AFSK1K2_SCRIPT_FILENAME,
         'has_baudrate': False,
         'has_framing': False
     },
-    "APT": {
+    'APT': {
         'script_name': GNURADIO_APT_SCRIPT_FILENAME,
         'has_baudrate': False,
         'has_framing': False,
     },
-    "BPSK": {
+    'BPSK': {
         'script_name': GNURADIO_BPSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax25'
     },
-    "BPSK PMT-A3": {
+    'BPSK PMT-A3': {
         'script_name': GNURADIO_ARGOS_BPSK_PMT_A3,
         'has_baudrate': True,
         'has_framing': False
     },
-    "CW": {
+    'CW': {
         'script_name': GNURADIO_CW_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': False
     },
-    "DUV": {
+    'DUV': {
         'script_name': GNURADIO_AMSAT_DUV_SCRIPT_FILENAME,
         'has_baudrate': False,
         'has_framing': False
     },
-    "FM": {
+    'FM': {
         'script_name': GNURADIO_FM_SCRIPT_FILENAME,
         'has_baudrate': False,
         'has_framing': False
     },
-    "FSK": {
+    'FSK': {
         'script_name': GNURADIO_FSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax25'
     },
-    "FSK AX.100 Mode 5": {
+    'FSK AX.100 Mode 5': {
         'script_name': GNURADIO_FSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax100_mode5'
     },
-    "FSK AX.100 Mode 6": {
+    'FSK AX.100 Mode 6': {
         'script_name': GNURADIO_FSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax100_mode6'
     },
-    "GFSK": {
+    'GFSK': {
         'script_name': GNURADIO_FSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax25'
     },
-    "GFSK Rktr": {
+    'GFSK Rktr': {
         'script_name': GNURADIO_GFSK_RKTR_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': False
     },
-    "GMSK": {
+    'GMSK': {
         'script_name': GNURADIO_FSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax25'
     },
-    "MSK": {
+    'MSK': {
         'script_name': GNURADIO_FSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax25'
     },
-    "MSK AX.100 Mode 5": {
+    'MSK AX.100 Mode 5': {
         'script_name': GNURADIO_FSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax100_mode5'
     },
-    "MSK AX.100 Mode 6": {
+    'MSK AX.100 Mode 6': {
         'script_name': GNURADIO_FSK_SCRIPT_FILENAME,
         'has_baudrate': True,
         'has_framing': True,
         'framing': 'ax100_mode6'
     },
-    "SSTV": {
+    'SSTV': {
         'script_name': GNURADIO_SSTV_SCRIPT_FILENAME,
         'has_baudrate': False,
         'has_framing': False

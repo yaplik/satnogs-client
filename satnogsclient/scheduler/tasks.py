@@ -60,7 +60,7 @@ def spawn_observer(**kwargs):
 def keep_or_remove_file(filename):
     # If set, move uploaded file to `SATNOGS_COMPLETE_OUTPUT_PATH`,
     # otherwise delete it
-    if settings.SATNOGS_COMPLETE_OUTPUT_PATH != "":
+    if settings.SATNOGS_COMPLETE_OUTPUT_PATH != '':
         os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, filename),
                   os.path.join(settings.SATNOGS_COMPLETE_OUTPUT_PATH, filename))
     else:
@@ -121,7 +121,7 @@ def post_data():
         except requests.exceptions.HTTPError:
             if response.status_code == 404:
                 LOGGER.error(
-                    'Upload of %s for observation %i failed, %s doesn\'t exist (404).'
+                    "Upload of %s for observation %i failed, %s doesn't exist (404)."
                     'Probably the observation was deleted.', fil, observation_id, url)
 
                 # Move file to `SATNOGS_INCOMPLETE_OUTPUT_PATH`

@@ -17,7 +17,7 @@ def plot_waterfall(waterfall_file, waterfall_png):
     LOGGER.info('Read waterfall file')
 
     wf_file = open(waterfall_file)
-    _ = np.fromfile(wf_file, dtype="|S32", count=1)[0]
+    _ = np.fromfile(wf_file, dtype='|S32', count=1)[0]
     nchan = np.fromfile(wf_file, dtype='>i4', count=1)[0]
     samp_rate = np.fromfile(wf_file, dtype='>i4', count=1)[0]
     _ = np.fromfile(wf_file, dtype='>i4', count=1)[0]
@@ -51,11 +51,11 @@ def plot_waterfall(waterfall_file, waterfall_png):
                extent=[fmin, fmax, tmin, tmax],
                vmin=vmin,
                vmax=vmax,
-               cmap="viridis")
-    plt.xlabel("Frequency (kHz)")
-    plt.ylabel("Time (seconds)")
+               cmap='viridis')
+    plt.xlabel('Frequency (kHz)')
+    plt.ylabel('Time (seconds)')
     fig = plt.colorbar(aspect=50)
-    fig.set_label("Power (dB)")
+    fig.set_label('Power (dB)')
     plt.savefig(waterfall_png, bbox_inches='tight')
     plt.close()
     LOGGER.info('Waterfall plot finished')

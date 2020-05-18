@@ -36,13 +36,13 @@ class Locator(object):
         end_time = time.time() + self.timeout
 
         try:
-            LOGGER.info("Connecting to GPSD %s:%d", settings.SATNOGS_GPSD_HOST,
+            LOGGER.info('Connecting to GPSD %s:%d', settings.SATNOGS_GPSD_HOST,
                         settings.SATNOGS_GPSD_PORT)
             gpsd = gps.gps(mode=gps.WATCH_ENABLE,
                            host=settings.SATNOGS_GPSD_HOST,
                            port=settings.SATNOGS_GPSD_PORT)
             gpsd.next()
-            LOGGER.info("Waiting for GPS (timeout %ds)", self.timeout)
+            LOGGER.info('Waiting for GPS (timeout %ds)', self.timeout)
             while gpsd.fix.mode != gps.MODE_3D and (time.time() < end_time or no_timeout):
                 self.show_location(gpsd)
                 gpsd.next()
@@ -56,4 +56,4 @@ class Locator(object):
             LOGGER.info('Updating coordinates %f %f %d', settings.SATNOGS_STATION_LAT,
                         settings.SATNOGS_STATION_LON, settings.SATNOGS_STATION_ELEV)
         else:
-            LOGGER.info("GPS timeout, using last known coordinates")
+            LOGGER.info('GPS timeout, using last known coordinates')

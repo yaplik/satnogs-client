@@ -137,18 +137,18 @@ class WorkerTrack(Worker):
         start -= timedelta(minutes=1)
 
         observer = ephem.Observer()
-        observer.lon = str(observer_dict["lon"])
-        observer.lat = str(observer_dict["lat"])
-        observer.elevation = observer_dict["elev"]
+        observer.lon = str(observer_dict['lon'])
+        observer.lat = str(observer_dict['lat'])
+        observer.elevation = observer_dict['elev']
         observer.date = ephem.Date(start)
 
-        satellite = ephem.readtle(str(satellite_dict["tle0"]), str(satellite_dict["tle1"]),
-                                  str(satellite_dict["tle2"]))
+        satellite = ephem.readtle(str(satellite_dict['tle0']), str(satellite_dict['tle1']),
+                                  str(satellite_dict['tle2']))
 
         timestamp_max = pytz.utc.localize(ephem.Date(observer.next_pass(satellite)[2]).datetime())
         pin = pinpoint(observer_dict, satellite_dict, timestamp_max)
-        azi_max = pin["az"].conjugate() * 180 / math.pi
-        alt_max = pin["alt"].conjugate() * 180 / math.pi
+        azi_max = pin['az'].conjugate() * 180 / math.pi
+        alt_max = pin['alt'].conjugate() * 180 / math.pi
 
         return (azi_max, alt_max, timestamp_max)
 
@@ -177,9 +177,9 @@ class WorkerTrack(Worker):
         if settings.SATNOGS_ROT_FLIP and settings.SATNOGS_ROT_FLIP_ANGLE:
             self._midpoint = WorkerTrack.find_midpoint(observer_dict, satellite_dict,
                                                        datetime.now(pytz.utc))
-            LOGGER.info("Antenna midpoint: AZ%.2f EL%.2f %s", *self._midpoint)
+            LOGGER.info('Antenna midpoint: AZ%.2f EL%.2f %s', *self._midpoint)
             self._flip = (self._midpoint[1] >= settings.SATNOGS_ROT_FLIP_ANGLE)
-            LOGGER.info("Antenna flip: %s", self._flip)
+            LOGGER.info('Antenna flip: %s', self._flip)
 
     def send_to_socket(self, pin, sock):
         # Read az/alt of sat and convert to degrees
@@ -209,7 +209,7 @@ class WorkerFreq(Worker):
         Uses observer and satellite objects set by trackobject().
         Will exit when observation_end timestamp is reached.
         """
-        radio = Radio(Hamlib.RIG_MODEL_NETRIGCTL, "{}:{}".format(self._ip, self._port))
+        radio = Radio(Hamlib.RIG_MODEL_NETRIGCTL, '{}:{}'.format(self._ip, self._port))
         radio.open()
 
         # track satellite

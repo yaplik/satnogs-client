@@ -65,14 +65,14 @@ def exec_gnuradio(observation_file, waterfall_file, freq, mode, baud, decoded_da
         '--file-path=' + observation_file
     ]
 
-    if waterfall_file != "":
+    if waterfall_file != '':
         args += ['--waterfall-file-path=' + waterfall_file]
 
     # Apply baudrate on the supported flowgraphs
     if mode in client_settings.SATNOGS_FLOWGRAPHS:
         if baud and client_settings.SATNOGS_FLOWGRAPHS[mode]['has_baudrate']:
             # If this is a CW observation pass the WPM parameter
-            if mode == "CW":
+            if mode == 'CW':
                 args += ['--wpm=' + str(int(baud))]
             else:
                 args += ['--baudrate=' + str(int(baud))]

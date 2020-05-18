@@ -116,12 +116,12 @@ class Observer(object):
         if settings.SATNOGS_PRE_OBSERVATION_SCRIPT is not None:
             LOGGER.info('Executing pre-observation script.')
             replacements = [
-                ("{{FREQ}}", str(self.frequency)),
-                ("{{TLE}}", json.dumps(self.tle)),
-                ("{{TIMESTAMP}}", self.timestamp),
-                ("{{ID}}", str(self.observation_id)),
-                ("{{BAUD}}", str(self.baud)),
-                ("{{SCRIPT_NAME}}", gnuradio_handler.get_flowgraph_script_name(self.mode)),
+                ('{{FREQ}}', str(self.frequency)),
+                ('{{TLE}}', json.dumps(self.tle)),
+                ('{{TIMESTAMP}}', self.timestamp),
+                ('{{ID}}', str(self.observation_id)),
+                ('{{BAUD}}', str(self.baud)),
+                ('{{SCRIPT_NAME}}', gnuradio_handler.get_flowgraph_script_name(self.mode)),
             ]
             pre_script = []
             for arg in shlex.split(settings.SATNOGS_PRE_OBSERVATION_SCRIPT):
@@ -132,7 +132,7 @@ class Observer(object):
 
         # if it is APT we want to save with a prefix until the observation
         # is complete, then rename.
-        if self.mode == "APT":
+        if self.mode == 'APT':
             self.observation_decoded_data =\
                  self.observation_receiving_decoded_data
 
@@ -226,12 +226,12 @@ class Observer(object):
         LOGGER.info('Executing post-observation script.')
         if settings.SATNOGS_POST_OBSERVATION_SCRIPT is not None:
             replacements = [
-                ("{{FREQ}}", str(self.frequency)),
-                ("{{TLE}}", json.dumps(self.tle)),
-                ("{{TIMESTAMP}}", self.timestamp),
-                ("{{ID}}", str(self.observation_id)),
-                ("{{BAUD}}", str(self.baud)),
-                ("{{SCRIPT_NAME}}", gnuradio_handler.get_flowgraph_script_name(self.mode)),
+                ('{{FREQ}}', str(self.frequency)),
+                ('{{TLE}}', json.dumps(self.tle)),
+                ('{{TIMESTAMP}}', self.timestamp),
+                ('{{ID}}', str(self.observation_id)),
+                ('{{BAUD}}', str(self.baud)),
+                ('{{SCRIPT_NAME}}', gnuradio_handler.get_flowgraph_script_name(self.mode)),
             ]
             post_script = []
             for arg in shlex.split(settings.SATNOGS_POST_OBSERVATION_SCRIPT):
