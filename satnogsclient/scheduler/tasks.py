@@ -189,14 +189,12 @@ def status_listener():
     LOGGER.info('Starting scheduler...')
     SCHEDULER.start()
     SCHEDULER.remove_all_jobs()
-    interval = settings.SATNOGS_NETWORK_API_QUERY_INTERVAL
-    SCHEDULER.add_job(get_jobs, 'interval', minutes=interval)
-    msg = 'Registering `get_jobs` periodic task ({0} min. interval)'.format(interval)
-    LOGGER.info(msg)
-    interval = settings.SATNOGS_NETWORK_API_POST_INTERVAL
-    msg = 'Registering `post_data` periodic task ({0} min. interval)'.format(interval)
-    LOGGER.info(msg)
-    SCHEDULER.add_job(post_data, 'interval', minutes=interval)
+    LOGGER.info('Registering `get_jobs` periodic task (%d sec. interval)',
+                settings.SATNOGS_NETWORK_API_QUERY_INTERVAL)
+    SCHEDULER.add_job(get_jobs, 'interval', seconds=settings.SATNOGS_NETWORK_API_QUERY_INTERVAL)
+    LOGGER.info('Registering `post_data` periodic task (%d sec. interval)',
+                settings.SATNOGS_NETWORK_API_POST_INTERVAL)
+    SCHEDULER.add_job(post_data, 'interval', seconds=settings.SATNOGS_NETWORK_API_POST_INTERVAL)
 
 
 def get_observation_list():
