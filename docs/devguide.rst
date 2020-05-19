@@ -80,7 +80,8 @@ The following ``tox`` environments are available:
   * ``build`` - Build source and binary distributions
   * ``upload`` - Upload source and binary distributions to PyPI
   * ``docs`` - Build documentation
-  * ``robot-lint`` - Lint system test cases and suites 
+  * ``robot-lint`` - Lint system test cases and suites
+  * ``robot-tidy`` - Reformat system test cases and suites
   * ``robot`` - Execute system testing
 
 To execute a single environment run::
