@@ -231,6 +231,24 @@ SATNOGS_NETWORK_API_URL
    URL pointing to API of SatNOGS Network.
 
 
+SATNOGS_NETWORK_API_QUERY_INTERVAL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:Type: *integer*
+:Default: ``60``
+:Required: *No*
+:Description:
+   Interval (in seconds) for pulling jobs form SatNOGS Network API.
+
+
+SATNOGS_NETWORK_API_POST_INTERVAL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:Type: *integer*
+:Default: ``180``
+:Required: *No*
+:Description:
+   Interval (in seconds) for posting observation data to SatNOGS Network API.
+
+
 SATNOGS_ROT_MODEL
 ~~~~~~~~~~~~~~~~~
 

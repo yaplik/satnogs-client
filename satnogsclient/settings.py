@@ -57,8 +57,13 @@ SATNOGS_VERIFY_SSL = bool(strtobool(environ.get('SATNOGS_VERIFY_SSL', 'True')))
 
 SATNOGS_NETWORK_API_URL = environ.get('SATNOGS_NETWORK_API_URL',
                                       'https://network.satnogs.org/api/')
-SATNOGS_NETWORK_API_QUERY_INTERVAL = 60  # In seconds
-SATNOGS_NETWORK_API_POST_INTERVAL = 180  # In seconds
+SATNOGS_NETWORK_API_QUERY_INTERVAL = _cast_or_none(int,
+                                                   environ.get(
+                                                       'SATNOGS_NETWORK_API_QUERY_INTERVAL',
+                                                       60))  # In seconds
+SATNOGS_NETWORK_API_POST_INTERVAL = _cast_or_none(int,
+                                                  environ.get('SATNOGS_NETWORK_API_POST_INTERVAL',
+                                                              180))  # In seconds
 SATNOGS_NETWORK_API_TIMEOUT = 1800  # In seconds
 GNURADIO_UDP_PORT = 16886
 GNURADIO_IP = '127.0.0.1'
