@@ -69,18 +69,18 @@ def exec_gnuradio(observation_file, waterfall_file, freq, mode, baud, decoded_da
         args += ['--waterfall-file-path=' + waterfall_file]
 
     # Apply baudrate on the supported flowgraphs
-    if mode in client_settings.SATNOGS_FLOWGRAPHS:
-        if baud and client_settings.SATNOGS_FLOWGRAPHS[mode]['has_baudrate']:
-            # If this is a CW observation pass the WPM parameter
-            if mode == 'CW':
-                args += ['--wpm=' + str(int(baud))]
-            else:
-                args += ['--baudrate=' + str(int(baud))]
+    if mode in client_settings.SATNOGS_FLOWGRAPHS and baud and client_settings.SATNOGS_FLOWGRAPHS[
+            mode]['has_baudrate']:
+        # If this is a CW observation pass the WPM parameter
+        if mode == 'CW':
+            args += ['--wpm=' + str(int(baud))]
+        else:
+            args += ['--baudrate=' + str(int(baud))]
 
     # Apply framing mode
-    if mode in client_settings.SATNOGS_FLOWGRAPHS:
-        if client_settings.SATNOGS_FLOWGRAPHS[mode]['has_framing']:
-            args += ['--framing=' + client_settings.SATNOGS_FLOWGRAPHS[mode]['framing']]
+    if mode in client_settings.SATNOGS_FLOWGRAPHS and client_settings.SATNOGS_FLOWGRAPHS[mode][
+            'has_framing']:
+        args += ['--framing=' + client_settings.SATNOGS_FLOWGRAPHS[mode]['framing']]
 
     if client_settings.SATNOGS_DOPPLER_CORR_PER_SEC:
         args += ['--doppler-correction-per-sec=' + client_settings.SATNOGS_DOPPLER_CORR_PER_SEC]
@@ -118,5 +118,10 @@ def exec_gnuradio(observation_file, waterfall_file, freq, mode, baud, decoded_da
         args += ['--decoded-data-file-path=' + decoded_data]
 
     LOGGER.info('Starting GNUradio python script')
-    proc = subprocess.Popen(args)
-    return proc
+    try:
+        proc = subprocess.Popen(args)
+        return proc
+    except OSError:
+        LOGGER.exception('Could not start GNURadio python script')
+
+    return None

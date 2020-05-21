@@ -215,11 +215,12 @@ class Observer(object):
         self.tracker_freq.trackstart()
 
     def poll_gnu_proc_status(self):
-        while self._gnu_proc.poll() is None and datetime.now(pytz.utc) <= self.observation_end:
-            sleep(1)
+        if self._gnu_proc:
+            while self._gnu_proc.poll() is None and datetime.now(pytz.utc) <= self.observation_end:
+                sleep(1)
+            self._gnu_proc.send_signal(signal.SIGINT)
+            _, _ = self._gnu_proc.communicate()
         LOGGER.info('Tracking stopped.')
-        self._gnu_proc.send_signal(signal.SIGINT)
-        _, _ = self._gnu_proc.communicate()
         self.tracker_freq.trackstop()
         self.tracker_rot.trackstop()
         LOGGER.info('Observation Finished')
