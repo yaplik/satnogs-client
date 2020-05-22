@@ -179,17 +179,15 @@ class Observer(object):
                                 verify=settings.SATNOGS_VERIFY_SSL,
                                 stream=True,
                                 timeout=45)
+            resp.raise_for_status()
         except requests.exceptions.ConnectionError:
             LOGGER.error('%s: Connection Refused', url)
         except requests.exceptions.Timeout:
             LOGGER.error('%s: Connection Timeout - no metadata uploaded', url)
-        except requests.exceptions.RequestException as err:
-            LOGGER.error('%s: Unexpected error: %s', url, err)
-
-        try:
-            resp.raise_for_status()
         except requests.exceptions.HTTPError as http_error:
             LOGGER.error(http_error)
+        except requests.exceptions.RequestException as err:
+            LOGGER.error('%s: Unexpected error: %s', url, err)
 
     def run_rot(self):
         self.tracker_rot = WorkerTrack(ip=None,
