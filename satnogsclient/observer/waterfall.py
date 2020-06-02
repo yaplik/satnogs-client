@@ -13,22 +13,37 @@ import matplotlib.pyplot as plt  # isort:skip # noqa: E402 # pylint: disable=C04
 LOGGER = logging.getLogger(__name__)
 
 
-def plot_waterfall(waterfall_file, waterfall_png):
+def read_waterfall(waterfall_file):
     LOGGER.info('Read waterfall file')
 
     wf_file = open(waterfall_file)
-    _ = np.fromfile(wf_file, dtype='|S32', count=1)[0]
-    nchan = np.fromfile(wf_file, dtype='>i4', count=1)[0]
-    samp_rate = np.fromfile(wf_file, dtype='>i4', count=1)[0]
-    _ = np.fromfile(wf_file, dtype='>i4', count=1)[0]
-    _ = np.fromfile(wf_file, dtype='>f4', count=1)[0]
-    _ = np.fromfile(wf_file, dtype='>i4', count=1)[0]
-    data_dtypes = np.dtype([('tabs', 'int64'), ('spec', 'float32', (nchan, ))])
-    data = np.fromfile(wf_file, dtype=data_dtypes)
+
+    waterfall = {
+        'timestamp': np.fromfile(wf_file, dtype='|S32', count=1)[0],
+        'nchan': np.fromfile(wf_file, dtype='>i4', count=1)[0],
+        'samp_rate': np.fromfile(wf_file, dtype='>i4', count=1)[0],
+        'nfft_per_row': np.fromfile(wf_file, dtype='>i4', count=1)[0],
+        'center_freq': np.fromfile(wf_file, dtype='>f4', count=1)[0],
+        'endianess': np.fromfile(wf_file, dtype='>i4', count=1)[0],
+    }
+    waterfall['data_dtypes'] = np.dtype([('tabs', 'int64'),
+                                         ('spec', 'float32', (waterfall['nchan'], ))])
+    waterfall['data'] = np.fromfile(wf_file, dtype=waterfall['data_dtypes'])
     wf_file.close()
-    t_idx = data['tabs'] / 1000000.0
-    freq = np.linspace(-0.5 * samp_rate, 0.5 * samp_rate, nchan, endpoint=False) / 1000.0
-    spec = data['spec']
+
+    return waterfall
+
+
+def plot_waterfall(waterfall_file, waterfall_png):
+
+    waterfall = read_waterfall(waterfall_file)
+
+    t_idx = waterfall['data']['tabs'] / 1000000.0
+    freq = np.linspace(-0.5 * waterfall['samp_rate'],
+                       0.5 * waterfall['samp_rate'],
+                       waterfall['nchan'],
+                       endpoint=False) / 1000.0
+    spec = waterfall['data']['spec']
     tmin, tmax = np.min(t_idx), np.max(t_idx)
     fmin, fmax = np.min(freq), np.max(freq)
     c_idx = spec > -200.0
