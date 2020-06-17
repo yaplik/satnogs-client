@@ -12,7 +12,7 @@ import pytz
 
 from satnogsclient import settings
 from satnogsclient.observer.orbital import pinpoint
-from satnogsclient.radio import Radio
+from satnogsclient.rig import Rig
 from satnogsclient.rotator import Rotator
 
 LOGGER = logging.getLogger(__name__)
@@ -209,18 +209,18 @@ class WorkerFreq(Worker):
         Uses observer and satellite objects set by trackobject().
         Will exit when observation_end timestamp is reached.
         """
-        radio = Radio(Hamlib.RIG_MODEL_NETRIGCTL, '{}:{}'.format(self._ip, self._port))
-        radio.open()
+        rig = Rig(Hamlib.RIG_MODEL_NETRIGCTL, '{}:{}'.format(self._ip, self._port))
+        rig.open()
 
         # track satellite
         while self.is_alive:
 
             pin = pinpoint(self.observer_dict, self.satellite_dict)
             if pin['ok']:
-                self.send_to_socket(pin, radio)
+                self.send_to_socket(pin, rig)
                 time.sleep(self._sleep_time)
 
-        radio.close()
+        rig.close()
 
     def send_to_socket(self, pin, sock):
         doppler_calc_freq = self._frequency * (1 - (pin['rng_vlct'] / ephem.c))

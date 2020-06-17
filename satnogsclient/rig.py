@@ -7,13 +7,13 @@ import Hamlib
 LOGGER = logging.getLogger(__name__)
 
 
-class Radio(object):
+class Rig(object):
     """
-    Communicate and interface with radios
+    Communicate and interface with rigs
 
-    :param model: Model of Hamlib radio
+    :param model: Model of Hamlib rig
     :type mode: int, optional
-    :param path: Path or address to Hamlib radio device
+    :param path: Path or address to Hamlib rig device
     :type path: str, optional
     :param debug: Hamlib rig debug level
     :type debug: int, optional
@@ -28,16 +28,16 @@ class Radio(object):
 
     def open(self):
         """
-        Open Hamlib radio device
+        Open Hamlib rig device
         """
         self.rig.open()
 
     @property
     def frequency(self):
         """
-        Get radio frequency
+        Get rig frequency
 
-        :return: Radio frequency
+        :return: Rig frequency
         :rtype: float
         """
         return self.rig.get_freq()
@@ -45,9 +45,9 @@ class Radio(object):
     @frequency.setter
     def frequency(self, frequency):
         """
-        Set radio frequency
+        Set rig frequency
 
-        :param frequency: Radio frequency
+        :param frequency: Rig frequency
         :type frequency: float
         """
         self.rig.set_freq(self.vfo, frequency)
@@ -74,6 +74,6 @@ class Radio(object):
 
     def close(self):
         """
-        Close Hamlib radio device
+        Close Hamlib rig device
         """
         self.rig.close()
