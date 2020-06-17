@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import shlex
-import signal
 import subprocess
 from datetime import datetime
 from time import sleep
@@ -13,10 +12,10 @@ import pytz
 import requests
 
 import satnogsclient.config
+import satnogsclient.radio.flowgraphs as flowgraphs
 from satnogsclient import settings
 from satnogsclient.observer.waterfall import plot_waterfall
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
-from satnogsclient.upsat import gnuradio_handler
 
 try:
     from urllib.parse import urljoin
@@ -115,13 +114,19 @@ class Observer(object):
         """Starts threads for rotcrl and rigctl."""
         if settings.SATNOGS_PRE_OBSERVATION_SCRIPT is not None:
             LOGGER.info('Executing pre-observation script.')
+
+            script_name = flowgraphs.SATNOGS_FLOWGRAPH_MODES[
+                flowgraphs.SATNOGS_FLOWGRAPH_MODE_DEFAULT]['script_name']
+            if self.mode in flowgraphs.SATNOGS_FLOWGRAPH_MODES:
+                script_name = flowgraphs.SATNOGS_FLOWGRAPH_MODES[self.mode]['script_name']
+
             replacements = [
                 ('{{FREQ}}', str(self.frequency)),
                 ('{{TLE}}', json.dumps(self.tle)),
                 ('{{TIMESTAMP}}', self.timestamp),
                 ('{{ID}}', str(self.observation_id)),
                 ('{{BAUD}}', str(self.baud)),
-                ('{{SCRIPT_NAME}}', gnuradio_handler.get_flowgraph_script_name(self.mode)),
+                ('{{SCRIPT_NAME}}', script_name),
             ]
             pre_script = []
             for arg in shlex.split(settings.SATNOGS_PRE_OBSERVATION_SCRIPT):
@@ -144,12 +149,16 @@ class Observer(object):
         self.run_rig()
         sleep(1)
         LOGGER.info('Start gnuradio thread.')
-        self._gnu_proc = gnuradio_handler.exec_gnuradio(self.observation_raw_file,
-                                                        self.observation_waterfall_file,
-                                                        self.frequency, self.mode, self.baud,
-                                                        self.observation_decoded_data)
+        flowgraph = satnogsclient.radio.flowgraphs.Flowgraph(
+            settings.SATNOGS_SOAPY_RX_DEVICE, settings.SATNOGS_RX_SAMP_RATE, self.frequency,
+            self.mode, self.baud, {
+                'audio': self.observation_raw_file,
+                'waterfall': self.observation_waterfall_file,
+                'decoded': self.observation_decoded_data
+            })
+        flowgraph.enabled = True
         # Polling gnuradio process status
-        self.poll_gnu_proc_status()
+        self.poll_gnu_proc_status(flowgraph)
 
         # Rename files and create waterfall
         self.rename_ogg_file()
@@ -163,7 +172,7 @@ class Observer(object):
         url = urljoin(base_url, str(self.observation_id))
         if not url.endswith('/'):
             url += '/'
-        client_metadata = gnuradio_handler.get_gnuradio_info()
+        client_metadata = flowgraph.info
         client_metadata['latitude'] = settings.SATNOGS_STATION_LAT
         client_metadata['longitude'] = settings.SATNOGS_STATION_LON
         client_metadata['elevation'] = settings.SATNOGS_STATION_ELEV
@@ -194,7 +203,6 @@ class Observer(object):
                                        port=self.rot_port,
                                        frequency=self.frequency,
                                        time_to_stop=self.observation_end,
-                                       proc=self._gnu_proc,
                                        sleep_time=3)
         LOGGER.debug('TLE: %s', self.tle)
         LOGGER.debug('Observation end: %s', self.observation_end)
@@ -205,32 +213,35 @@ class Observer(object):
         self.tracker_freq = WorkerFreq(ip=self.rig_ip,
                                        port=self.rig_port,
                                        frequency=self.frequency,
-                                       time_to_stop=self.observation_end,
-                                       proc=self._gnu_proc)
+                                       time_to_stop=self.observation_end)
         LOGGER.debug('Rig Frequency %s', self.frequency)
         LOGGER.debug('Observation end: %s', self.observation_end)
         self.tracker_freq.trackobject(self.location, self.tle)
         self.tracker_freq.trackstart()
 
-    def poll_gnu_proc_status(self):
-        if self._gnu_proc:
-            while self._gnu_proc.poll() is None and datetime.now(pytz.utc) <= self.observation_end:
-                sleep(1)
-            self._gnu_proc.send_signal(signal.SIGINT)
-            _, _ = self._gnu_proc.communicate()
+    def poll_gnu_proc_status(self, flowgraph):
+        while flowgraph.enabled and datetime.now(pytz.utc) <= self.observation_end:
+            sleep(1)
+        flowgraph.enabled = False
         LOGGER.info('Tracking stopped.')
         self.tracker_freq.trackstop()
         self.tracker_rot.trackstop()
         LOGGER.info('Observation Finished')
         LOGGER.info('Executing post-observation script.')
         if settings.SATNOGS_POST_OBSERVATION_SCRIPT is not None:
+
+            script_name = flowgraphs.SATNOGS_FLOWGRAPH_MODES[
+                flowgraphs.SATNOGS_FLOWGRAPH_MODE_DEFAULT]['script_name']
+            if self.mode in flowgraphs.SATNOGS_FLOWGRAPH_MODES:
+                script_name = flowgraphs.SATNOGS_FLOWGRAPH_MODES[self.mode]['script_name']
+
             replacements = [
                 ('{{FREQ}}', str(self.frequency)),
                 ('{{TLE}}', json.dumps(self.tle)),
                 ('{{TIMESTAMP}}', self.timestamp),
                 ('{{ID}}', str(self.observation_id)),
                 ('{{BAUD}}', str(self.baud)),
-                ('{{SCRIPT_NAME}}', gnuradio_handler.get_flowgraph_script_name(self.mode)),
+                ('{{SCRIPT_NAME}}', script_name),
             ]
             post_script = []
             for arg in shlex.split(settings.SATNOGS_POST_OBSERVATION_SCRIPT):

@@ -35,12 +35,11 @@ class Worker(object):
 
     _azimuth = None
     _altitude = None
-    _gnu_proc = None
 
     observer_dict = {}
     satellite_dict = {}
 
-    def __init__(self, ip, port, time_to_stop=None, frequency=None, proc=None, sleep_time=None):
+    def __init__(self, ip, port, time_to_stop=None, frequency=None, sleep_time=None):
         """Initialize worker class."""
         self._ip = ip
         self._port = port
@@ -48,8 +47,6 @@ class Worker(object):
             self._frequency = frequency
         if time_to_stop:
             self._observation_end = time_to_stop
-        if proc:
-            self._gnu_proc = proc
         if sleep_time:
             self._sleep_time = sleep_time
         self.track = None
