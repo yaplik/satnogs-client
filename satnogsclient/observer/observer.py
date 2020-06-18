@@ -27,8 +27,6 @@ LOGGER = logging.getLogger(__name__)
 
 class Observer(object):
 
-    _gnu_proc = None
-
     # Variables from settings
     # Mainly present so we can support multiple ground stations from the client
 
