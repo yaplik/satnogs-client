@@ -43,10 +43,10 @@ Modules reference
 .. automodule:: satnogsclient.observer.worker
 
 
-:mod:`satnogsclient.radio`
+:mod:`satnogsclient.rig`
 --------------------------
 
-.. automodule:: satnogsclient.radio
+.. automodule:: satnogsclient.rig
 
 
 :mod:`satnogsclient.rotator`
@@ -67,7 +67,7 @@ Modules reference
 .. automodule:: satnogsclient.settings
 
 
-:mod:`satnogsclient.upsat.gnuradio_handler`
+:mod:`satnogsclient.radio.flowgraphs`
 -------------------------------------------
 
-.. automodule:: satnogsclient.upsat.gnuradio_handler
+.. automodule:: satnogsclient.radio.flowgraphs
