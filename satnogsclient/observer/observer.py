@@ -2,10 +2,10 @@ from __future__ import absolute_import, division, print_function
 
 import json
 import logging
-import os
 import shlex
 import subprocess
 from datetime import datetime
+from pathlib import Path
 from time import sleep
 
 import pytz
@@ -249,18 +249,17 @@ class Observer(object):
             subprocess.call(post_script)
 
     def rename_ogg_file(self):
-        try:
-            os.rename(self.observation_raw_file, self.observation_ogg_file)
+        observation_raw_file_path = Path(self.observation_raw_file)
+        if observation_raw_file_path.exists():
+            observation_raw_file_path.rename(Path(self.observation_ogg_file))
             LOGGER.info('Rename encoded file for uploading finished')
-        except FileNotFoundError:
-            LOGGER.error('Failed to rename encoded file')
 
     def rename_data_file(self):
-        try:
-            os.rename(self.observation_receiving_decoded_data, self.observation_done_decoded_data)
+        observation_receiving_decoded_data_path = Path(self.observation_receiving_decoded_data)
+        if observation_receiving_decoded_data_path.exists():
+            observation_receiving_decoded_data_path.rename(Path(
+                self.observation_done_decoded_data))
             LOGGER.info('Rename data file for uploading finished')
-        except FileNotFoundError:
-            LOGGER.error('Failed to rename data file')
 
     def plot_waterfall(self):
         try:
@@ -273,6 +272,6 @@ class Observer(object):
 
     def remove_waterfall_file(self):
         try:
-            os.remove(self.observation_waterfall_file)
+            Path(self.observation_waterfall_file).unlink()
         except FileNotFoundError:
             LOGGER.error('Failed to remove waterfall file')
