@@ -21,8 +21,8 @@ ${SATNOGS_SOAPY_RX_DEVICE}    driver=rtlsdr
 ${SATNOGS_RX_SAMP_RATE}    2.048e6
 ${SATNOGS_ANTENNA}    RX
 ${SATNOGS_LOG_LEVEL}    DEBUG
-${SATNOGS_NETWORK_API_QUERY_INTERVAL}    1
-${SATNOGS_NETWORK_API_POST_INTERVAL}    1
+${SATNOGS_NETWORK_API_QUERY_INTERVAL}    3
+${SATNOGS_NETWORK_API_POST_INTERVAL}    3
 
 *** Test Cases ***
 No Crash At Startup
@@ -31,11 +31,11 @@ No Crash At Startup
     Should Be Equal As Integers    ${Result.rc}    -15
 
 Request For Jobs Returning No Scheduled Jobs
-    Request For Jobs
+    Wait For Request For Jobs
     Reply By    200    []
 
 Post Observation Data
-    Request For Jobs
+    Wait For Request For Jobs
     ${start} =    Get Current Date    time_zone=UTC    increment=1 second    result_format=%Y-%m-%dT%H:%M:%SZ
     ${end} =    Get Current Date    time_zone=UTC    increment=2 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
     ${tle_date} =    Get Current Date    time_zone=UTC    increment=1 second    result_format=datetime
@@ -58,10 +58,10 @@ Post Observation Data
     ...    }
     ...    \]
     Reply By    200    ${response}
-    Wait For Post Data
+    Wait For Post Data    timeout=7
 
 Concurrent Observations
-    Request For Jobs
+    Wait For Request For Jobs
     ${start} =    Get Current Date    time_zone=UTC    increment=1 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
     ${end} =    Get Current Date    time_zone=UTC    increment=2 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
     ${tle_date} =    Get Current Date    time_zone=UTC    increment=1 seconds    result_format=datetime
@@ -98,8 +98,8 @@ Concurrent Observations
     ...    }
     ...    \]
     Reply By    200    ${response}
-    Wait For Post Data
-    Wait For Post Data
+    Wait For Post Data    timeout=7
+    Wait For Post Data    timeout=7
 
 *** Keywords ***
 Start SatNOGS Client
@@ -126,7 +126,7 @@ Terminate Client And Server
     Stop Server
 
 Request For Jobs
-    [Arguments]    ${timeout}=60
+    [Arguments]    @{}    ${timeout}=60
     Wait For Request    timeout=${timeout}
     ${method} =    Get Request Method
     ${url} =    Get Request Url
@@ -136,8 +136,12 @@ Request For Jobs
     Should Be Equal    ${url}    /jobs/?ground_station=${SATNOGS_STATION_ID}&lat=${SATNOGS_STATION_LAT}&lon=${SATNOGS_STATION_LON}&alt=${SATNOGS_STATION_ELEV}
     Should Be Equal    ${body}    ${None}
 
+Wait For Request For Jobs
+    [Arguments]    @{}    ${timeout}=60
+    Wait Until Keyword Succeeds    ${timeout}    1 second    Request For Jobs    timeout=${timeout}
+
 Post Data
-    [Arguments]    ${timeout}=60
+    [Arguments]    @{}    ${timeout}=60
     Wait For Request    timeout=${timeout}
     ${method} =    Get Request Method
     ${url} =    Get Request Url
@@ -146,4 +150,5 @@ Post Data
     Should Be Equal    ${method}    PUT
 
 Wait For Post Data
-    Wait Until Keyword Succeeds    60 seconds    1 second    Post Data
+    [Arguments]    @{}    ${timeout}=60
+    Wait Until Keyword Succeeds    ${timeout}    1 second    Post Data    timeout=${timeout}
