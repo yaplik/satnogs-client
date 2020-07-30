@@ -21,8 +21,8 @@ ${SATNOGS_SOAPY_RX_DEVICE}    driver=rtlsdr
 ${SATNOGS_RX_SAMP_RATE}    2.048e6
 ${SATNOGS_ANTENNA}    RX
 ${SATNOGS_LOG_LEVEL}    DEBUG
-${SATNOGS_NETWORK_API_QUERY_INTERVAL}    10
-${SATNOGS_NETWORK_API_POST_INTERVAL}    10
+${SATNOGS_NETWORK_API_QUERY_INTERVAL}    1
+${SATNOGS_NETWORK_API_POST_INTERVAL}    1
 
 *** Test Cases ***
 No Crash At Startup
@@ -36,9 +36,9 @@ Request For Jobs Returning No Scheduled Jobs
 
 Post Observation Data
     Request For Jobs
-    ${start} =    Get Current Date    time_zone=UTC    increment=5 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
-    ${end} =    Get Current Date    time_zone=UTC    increment=15 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
-    ${tle_date} =    Get Current Date    time_zone=UTC    increment=10 seconds    result_format=datetime
+    ${start} =    Get Current Date    time_zone=UTC    increment=1 second    result_format=%Y-%m-%dT%H:%M:%SZ
+    ${end} =    Get Current Date    time_zone=UTC    increment=2 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
+    ${tle_date} =    Get Current Date    time_zone=UTC    increment=1 second    result_format=datetime
     @{tle} =    Generate Fake Tle    ${SATNOGS_STATION_LAT}    ${SATNOGS_STATION_LON}    ${SATNOGS_STATION_ELEV}    ${tle_date}
     ${transmitter} =    Generate Random String    length=22
     ${response} =    Catenate
@@ -58,6 +58,47 @@ Post Observation Data
     ...    }
     ...    \]
     Reply By    200    ${response}
+    Wait For Post Data
+
+Concurrent Observations
+    Request For Jobs
+    ${start} =    Get Current Date    time_zone=UTC    increment=1 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
+    ${end} =    Get Current Date    time_zone=UTC    increment=2 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
+    ${tle_date} =    Get Current Date    time_zone=UTC    increment=1 seconds    result_format=datetime
+    @{tle} =    Generate Fake Tle    ${SATNOGS_STATION_LAT}    ${SATNOGS_STATION_LON}    ${SATNOGS_STATION_ELEV}    ${tle_date}
+    ${transmitter1} =    Generate Random String    length=22
+    ${transmitter2} =    Generate Random String    length=22
+    ${response} =    Catenate
+    ...    \[
+    ...    {
+    ...    "id" : 1,
+    ...    "ground_station": ${SATNOGS_STATION_ID},
+    ...    "start" : "${start}",
+    ...    "end" : "${end}",
+    ...    "transmitter" : "${transmitter1}",
+    ...    "frequency" : 435791000,
+    ...    "tle0" : "${tle}[0]",
+    ...    "tle1" : "${tle}[1]",
+    ...    "tle2" : "${tle}[2]",
+    ...    "mode" : "CW",
+    ...    "baud" : 15
+    ...    },
+    ...    {
+    ...    "id" : 2,
+    ...    "ground_station": ${SATNOGS_STATION_ID},
+    ...    "start" : "${start}",
+    ...    "end" : "${end}",
+    ...    "transmitter" : "${transmitter2}",
+    ...    "frequency" : 435792000,
+    ...    "tle0" : "${tle}[0]",
+    ...    "tle1" : "${tle}[1]",
+    ...    "tle2" : "${tle}[2]",
+    ...    "mode" : "FSK",
+    ...    "baud" : 9600
+    ...    }
+    ...    \]
+    Reply By    200    ${response}
+    Wait For Post Data
     Wait For Post Data
 
 *** Keywords ***
