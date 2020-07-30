@@ -4,7 +4,10 @@ import base64
 import json
 import logging
 import os
+import threading
+from datetime import datetime, timedelta
 
+import pytz
 import requests
 from dateutil import parser
 
@@ -19,6 +22,7 @@ except ImportError:
     from urlparse import urljoin
 
 LOGGER = logging.getLogger(__name__)
+OBSERVER_LOCK = threading.Lock()
 
 
 def spawn_observer(**kwargs):
@@ -52,7 +56,14 @@ def spawn_observer(**kwargs):
 
     if setup:
         LOGGER.info('Spawning observer worker.')
+        timeout_timedelta = end - datetime.now(pytz.utc)
+        if timeout_timedelta.total_seconds() == 0:
+            timeout_timedelta = timedelta()
+        if not OBSERVER_LOCK.acquire(timeout=timeout_timedelta.total_seconds()):
+            LOGGER.error('Observer job lock acquiring timed out.')
+            return
         observer.observe()
+        OBSERVER_LOCK.release()
     else:
         raise RuntimeError('Error in observer setup.')
 

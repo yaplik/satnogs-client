@@ -60,7 +60,7 @@ Post Observation Data
     Reply By    200    ${response}
     Wait For Post Data    timeout=7
 
-Concurrent Observations
+Prevent Concurrent Observations
     Wait For Request For Jobs
     ${start} =    Get Current Date    time_zone=UTC    increment=1 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
     ${end} =    Get Current Date    time_zone=UTC    increment=2 seconds    result_format=%Y-%m-%dT%H:%M:%SZ
@@ -99,7 +99,7 @@ Concurrent Observations
     ...    \]
     Reply By    200    ${response}
     Wait For Post Data    timeout=7
-    Wait For Post Data    timeout=7
+    Fail On Post Data    timeout=7
 
 *** Keywords ***
 Start SatNOGS Client
@@ -152,3 +152,7 @@ Post Data
 Wait For Post Data
     [Arguments]    @{}    ${timeout}=60
     Wait Until Keyword Succeeds    ${timeout}    1 second    Post Data    timeout=${timeout}
+
+Fail On Post Data
+    [Arguments]    @{}    ${timeout}=60
+    Run Keyword And Expect Error    STARTS: Keyword 'Post Data' failed    Wait For Post Data    timeout=${timeout}
