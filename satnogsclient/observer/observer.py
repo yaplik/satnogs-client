@@ -14,8 +14,8 @@ import requests
 import satnogsclient.config
 import satnogsclient.radio.flowgraphs as flowgraphs
 from satnogsclient import settings
-from satnogsclient.observer.waterfall import plot_waterfall
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
+from satnogsclient.waterfall import Waterfall
 
 try:
     from urllib.parse import urljoin
@@ -263,8 +263,13 @@ class Observer(object):
 
     def plot_waterfall(self):
         try:
-            plot_waterfall(waterfall_file=self.observation_waterfall_file,
-                           waterfall_png=self.observation_waterfall_png)
+            waterfall = Waterfall(self.observation_waterfall_file)
+            vmin = None
+            vmax = None
+            if not settings.SATNOGS_WATERFALL_AUTORANGE:
+                vmin = settings.SATNOGS_WATERFALL_MIN_VALUE
+                vmax = settings.SATNOGS_WATERFALL_MAX_VALUE
+            waterfall.plot(self.observation_waterfall_png, vmin, vmax)
             if settings.SATNOGS_REMOVE_RAW_FILES:
                 self.remove_waterfall_file()
         except FileNotFoundError:
