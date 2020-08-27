@@ -14,7 +14,9 @@ import requests
 import satnogsclient.config
 import satnogsclient.radio.flowgraphs as flowgraphs
 from satnogsclient import settings
+from satnogsclient.artifacts import Artifacts
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
+from satnogsclient.scheduler import SCHEDULER
 from satnogsclient.waterfall import Waterfall
 
 try:
@@ -108,7 +110,7 @@ class Observer(object):
             self.observation_waterfall_png, self.observation_decoded_data
         ])
 
-    def observe(self):
+    def observe(self):  # pylint: disable=R0915
         """Starts threads for rotcrl and rigctl."""
         if settings.SATNOGS_PRE_OBSERVATION_SCRIPT is not None:
             LOGGER.info('Executing pre-observation script.')
@@ -162,7 +164,14 @@ class Observer(object):
         self.rename_ogg_file()
         self.rename_data_file()
         LOGGER.info('Creating waterfall plot.')
-        self.plot_waterfall()
+        waterfall = None
+        try:
+            waterfall = Waterfall(self.observation_waterfall_file)
+            self.plot_waterfall(waterfall)
+            if settings.SATNOGS_REMOVE_RAW_FILES:
+                self.remove_waterfall_file()
+        except FileNotFoundError:
+            LOGGER.error('No waterfall data file found')
 
         # PUT client version and metadata
         base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
@@ -195,6 +204,11 @@ class Observer(object):
             LOGGER.error(http_error)
         except requests.exceptions.RequestException as err:
             LOGGER.error('%s: Unexpected error: %s', url, err)
+
+        if settings.ARTIFACTS_ENABLED:
+            artifact = Artifacts(waterfall)
+            SCHEDULER.add_job('post_artifacts',
+                              args=(artifact.artifacts_file, self.observation_id))
 
     def run_rot(self):
         self.tracker_rot = WorkerTrack(ip=None,
@@ -261,19 +275,13 @@ class Observer(object):
                 self.observation_done_decoded_data))
             LOGGER.info('Rename data file for uploading finished')
 
-    def plot_waterfall(self):
-        try:
-            waterfall = Waterfall(self.observation_waterfall_file)
-            vmin = None
-            vmax = None
-            if not settings.SATNOGS_WATERFALL_AUTORANGE:
-                vmin = settings.SATNOGS_WATERFALL_MIN_VALUE
-                vmax = settings.SATNOGS_WATERFALL_MAX_VALUE
-            waterfall.plot(self.observation_waterfall_png, vmin, vmax)
-            if settings.SATNOGS_REMOVE_RAW_FILES:
-                self.remove_waterfall_file()
-        except FileNotFoundError:
-            LOGGER.error('No waterfall data file found')
+    def plot_waterfall(self, waterfall):
+        vmin = None
+        vmax = None
+        if not settings.SATNOGS_WATERFALL_AUTORANGE:
+            vmin = settings.SATNOGS_WATERFALL_MIN_VALUE
+            vmax = settings.SATNOGS_WATERFALL_MAX_VALUE
+        waterfall.plot(self.observation_waterfall_png, vmin, vmax)
 
     def remove_waterfall_file(self):
         try:

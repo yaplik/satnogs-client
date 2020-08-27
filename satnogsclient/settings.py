@@ -98,6 +98,15 @@ ENABLE_IQ_DUMP = bool(strtobool(environ.get('ENABLE_IQ_DUMP', 'False')))
 IQ_DUMP_FILENAME = environ.get('IQ_DUMP_FILENAME', None)
 DISABLE_DECODED_DATA = bool(strtobool(environ.get('DISABLE_DECODED_DATA', 'False')))
 
+# Artifacts settings
+ARTIFACTS_ENABLED = bool(strtobool(environ.get('SATNOGS_ARTIFACTS_ENABLED', 'False')))
+ARTIFACTS_API_URL = environ.get('SATNOGS_ARTIFACTS_API_URL', 'https://db.satnogs.org/api/')
+ARTIFACTS_API_POST_INTERVAL = _cast_or_none(int,
+                                            environ.get('SATNOGS_ARTIFACTS_API_POST_INTERVAL',
+                                                        180))  # In seconds
+ARTIFACTS_API_TIMEOUT = 1800  # In seconds
+ARTIFACTS_API_TOKEN = environ.get('SATNOGS_ARTIFACTS_API_TOKEN', None)
+
 # Waterfall settings
 SATNOGS_WATERFALL_AUTORANGE = bool(strtobool(environ.get('SATNOGS_WATERFALL_AUTORANGE', 'True')))
 SATNOGS_WATERFALL_MIN_VALUE = int(environ.get('SATNOGS_WATERFALL_MIN_VALUE', -100))
