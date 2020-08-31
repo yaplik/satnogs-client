@@ -9,7 +9,7 @@ LOGGER = logging.getLogger(__name__)
 class Artifacts():
     def __init__(self, waterfall):
         self.artifacts_file = None
-        self._waterfall = waterfall
+        self._waterfall_data = waterfall.data
 
     def create(self):
         self.artifacts_file = h5py.File(tempfile.TemporaryFile(), 'w')
@@ -18,7 +18,7 @@ class Artifacts():
 
         # Store waterfall attributes
         wf_group.attrs['artifact_version'] = 1
-        wf_group.attrs['start_time'] = self._waterfall['timestamp']
+        wf_group.attrs['start_time'] = self._waterfall_data['timestamp']
         wf_group.attrs['offset_in_stds'] = -2.0
         wf_group.attrs['scale_in_stds'] = 8.0
 
@@ -34,19 +34,21 @@ class Artifacts():
 
         # Store waterfall datasets
         wf_group.create_dataset('offset',
-                                data=self._waterfall['compressed']['offset'],
+                                data=self._waterfall_data['compressed']['offset'],
                                 compression='gzip')
         wf_group.create_dataset('scale',
-                                data=self._waterfall['compressed']['scale'],
+                                data=self._waterfall_data['compressed']['scale'],
                                 compression='gzip')
         wf_group.create_dataset('data',
-                                data=self._waterfall['compressed']['values'],
+                                data=self._waterfall_data['compressed']['values'],
                                 compression='gzip')
-        wf_group.create_dataset('relative_time', data=self._waterfall['trel'], compression='gzip')
+        wf_group.create_dataset('relative_time',
+                                data=self._waterfall_data['trel'],
+                                compression='gzip')
         wf_group.create_dataset('absolute_time',
-                                data=self._waterfall['data']['tabs'],
+                                data=self._waterfall_data['data']['tabs'],
                                 compression='gzip')
-        wf_group.create_dataset('frequency', data=self._waterfall['freq'], compression='gzip')
+        wf_group.create_dataset('frequency', data=self._waterfall_data['freq'], compression='gzip')
 
         # Store waterfall labels
 
