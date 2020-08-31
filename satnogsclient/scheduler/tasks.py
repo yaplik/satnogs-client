@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import threading
+import uuid
 from datetime import datetime, timedelta
 
 import pytz
@@ -157,7 +158,10 @@ def post_artifacts(artifacts_file, observation_id):
     try:
         response = requests.post(url,
                                  headers=headers,
-                                 files={'artifact_file': artifacts_file},
+                                 files={
+                                     'artifact_file': (str(uuid.uuid4()) + '.h5', artifacts_file,
+                                                       'application/x-hdf5')
+                                 },
                                  verify=settings.SATNOGS_VERIFY_SSL,
                                  stream=True,
                                  timeout=settings.ARTIFACTS_API_TIMEOUT)
