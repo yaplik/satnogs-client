@@ -155,12 +155,12 @@ def post_artifacts(artifacts_file, observation_id):
         url += '/'
 
     try:
-        response = requests.put(url,
-                                headers=headers,
-                                files={'artifacts': artifacts_file},
-                                verify=settings.SATNOGS_VERIFY_SSL,
-                                stream=True,
-                                timeout=settings.ARTIFACTS_API_TIMEOUT)
+        response = requests.post(url,
+                                 headers=headers,
+                                 files={'artifact_file': artifacts_file},
+                                 verify=settings.SATNOGS_VERIFY_SSL,
+                                 stream=True,
+                                 timeout=settings.ARTIFACTS_API_TIMEOUT)
         response.raise_for_status()
 
         LOGGER.info('Artifacts upload successful.')
