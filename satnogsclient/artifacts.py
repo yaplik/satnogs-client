@@ -12,9 +12,10 @@ class Artifacts():
         self._waterfall_data = waterfall.data
 
     def create(self):
-        self.artifacts_file = h5py.File(tempfile.TemporaryFile(), 'w')
+        self.artifacts_file = tempfile.TemporaryFile()
+        hdf5_file = h5py.File(self.artifacts_file, 'w')
         # Create waterfall group
-        wf_group = self.artifacts_file.create_group('waterfall')
+        wf_group = hdf5_file.create_group('waterfall')
 
         # Store waterfall attributes
         wf_group.attrs['artifact_version'] = 1
@@ -60,5 +61,4 @@ class Artifacts():
         wf_group['data'].dims[0].label = 'Frequency (kHz)'
         wf_group['data'].dims[1].label = 'Time (seconds)'
 
-    def close(self):
-        self.artifacts_file.close()
+        hdf5_file.close()
