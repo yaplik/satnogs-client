@@ -206,7 +206,7 @@ class Observer(object):
             LOGGER.error('%s: Unexpected error: %s', url, err)
 
         if settings.ARTIFACTS_ENABLED:
-            artifact = Artifacts(waterfall)
+            artifact = Artifacts(waterfall, self.observation_id)
             SCHEDULER.add_job('post_artifacts',
                               args=(artifact.artifacts_file, self.observation_id))
 

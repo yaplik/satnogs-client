@@ -7,18 +7,21 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Artifacts():
-    def __init__(self, waterfall):
+    def __init__(self, waterfall, observation_id):
         self.artifacts_file = None
         self._waterfall_data = waterfall.data
+        self._observation_id = observation_id
 
     def create(self):
         self.artifacts_file = tempfile.TemporaryFile()
         hdf5_file = h5py.File(self.artifacts_file, 'w')
+        hdf5_file.attrs['artifact_version'] = 1
+        hdf5_file.attrs['observation_id'] = self._observation_id
+
         # Create waterfall group
         wf_group = hdf5_file.create_group('waterfall')
 
         # Store waterfall attributes
-        wf_group.attrs['artifact_version'] = 1
         wf_group.attrs['start_time'] = self._waterfall_data['timestamp']
         wf_group.attrs['offset_in_stds'] = -2.0
         wf_group.attrs['scale_in_stds'] = 8.0
