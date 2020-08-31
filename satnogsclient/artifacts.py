@@ -65,3 +65,4 @@ class Artifacts():
         wf_group['data'].dims[1].label = 'Time (seconds)'
 
         hdf5_file.close()
+        self.artifacts_file.seek(0)
