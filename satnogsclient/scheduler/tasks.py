@@ -164,6 +164,7 @@ def post_artifacts(artifacts_file, observation_id):
         response.raise_for_status()
 
         LOGGER.info('Artifacts upload successful.')
+        artifacts_file.close()
 
     except requests.exceptions.Timeout:
         LOGGER.error('Upload of artifacts for observation %i failed '
