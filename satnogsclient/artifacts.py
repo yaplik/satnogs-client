@@ -6,7 +6,7 @@ import h5py
 LOGGER = logging.getLogger(__name__)
 
 
-class Artifacts():
+class Artifacts():  # pylint: disable=R0903
     def __init__(self, waterfall, observation_id):
         self.artifacts_file = None
         self._waterfall_data = waterfall.data
