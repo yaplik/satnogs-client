@@ -5,7 +5,6 @@ import json
 import logging
 import os
 import threading
-import uuid
 from datetime import datetime, timedelta
 
 import pytz
@@ -146,46 +145,6 @@ def post_data():
             else:
                 LOGGER.error('Upload of %s for observation %i failed, '
                              'response status code: %s', fil, observation_id, response.status_code)
-
-
-def post_artifacts(artifacts_file, observation_id):
-    base_url = urljoin(settings.ARTIFACTS_API_URL, 'artifacts/')
-    headers = {'Authorization': 'Token {0}'.format(settings.ARTIFACTS_API_TOKEN)}
-    url = urljoin(base_url, observation_id)
-    if not url.endswith('/'):
-        url += '/'
-
-    try:
-        response = requests.post(url,
-                                 headers=headers,
-                                 files={
-                                     'artifact_file': (str(uuid.uuid4()) + '.h5', artifacts_file,
-                                                       'application/x-hdf5')
-                                 },
-                                 verify=settings.SATNOGS_VERIFY_SSL,
-                                 stream=True,
-                                 timeout=settings.ARTIFACTS_API_TIMEOUT)
-        response.raise_for_status()
-
-        LOGGER.info('Artifacts upload successful.')
-        artifacts_file.close()
-
-    except requests.exceptions.Timeout:
-        LOGGER.error('Upload of artifacts for observation %i failed '
-                     'due to timeout.', observation_id)
-    except requests.exceptions.HTTPError:
-        if response.status_code == 404:
-            LOGGER.error(
-                "Upload of artifacts for observation %i failed, %s doesn't exist (404)."
-                'Probably the observation was deleted.', observation_id, url)
-
-        if response.status_code == 403 and 'has already been uploaded' in response.text:
-            LOGGER.error('Upload of artifacts for observation %i is forbidden, %s\n URL: %s',
-                         observation_id, response.text, url)
-        else:
-            LOGGER.error(
-                'Upload of artifacts for observation %i failed, '
-                'response status code: %s', observation_id, response.status_code)
 
 
 def get_jobs():
