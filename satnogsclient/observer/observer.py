@@ -50,20 +50,20 @@ def post_artifacts(artifacts_file, observation_id):
         artifacts_file.close()
 
     except requests.exceptions.Timeout:
-        LOGGER.error('Upload of artifacts for observation %i failed '
+        LOGGER.error('Upload of artifacts for observation %s failed '
                      'due to timeout.', observation_id)
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
             LOGGER.error(
-                "Upload of artifacts for observation %i failed, %s doesn't exist (404)."
+                "Upload of artifacts for observation %s failed, %s doesn't exist (404)."
                 'Probably the observation was deleted.', observation_id, url)
 
         if response.status_code == 403 and 'has already been uploaded' in response.text:
-            LOGGER.error('Upload of artifacts for observation %i is forbidden, %s\n URL: %s',
+            LOGGER.error('Upload of artifacts for observation %s is forbidden, %s\n URL: %s',
                          observation_id, response.text, url)
         else:
             LOGGER.error(
-                'Upload of artifacts for observation %i failed, '
+                'Upload of artifacts for observation %s failed, '
                 'response status code: %s', observation_id, response.status_code)
 
 
