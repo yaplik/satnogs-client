@@ -247,6 +247,7 @@ class Observer(object):
 
         if settings.ARTIFACTS_ENABLED:
             artifact = Artifacts(waterfall, self.observation_id)
+            artifact.create()
             SCHEDULER.add_job(post_artifacts,
                               args=(artifact.artifacts_file, str(self.observation_id)))
 
