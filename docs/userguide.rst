@@ -48,7 +48,7 @@ SATNOGS_API_TOKEN
 :Default: *None*
 :Required: *Yes*
 :Description:
-   SatNOGS API token associated with an account in SatNOGS Network.
+   SatNOGS Network API token associated with an account in SatNOGS Network.
    This token is secret.
    It can be found in SatNOGS Network user page.
 
@@ -521,6 +521,47 @@ SATNOGS_WATERFALL_MAX_VALUE
 :Required: *No*
 :Description:
    Maximum power level of waterfall images.
+
+
+SATNOGS_ARTIFACTS_ENABLED
+~~~~~~~~~~~~~~~~~~~~~~~~~
+:Type: *boolean*
+:Default: *False*
+:Required: *No*
+:Description:
+   Enable generation and uploading of HDF5 artifacts files to SatNOGS DB.
+
+
+SATNOGS_ARTIFACTS_API_URL
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Type: *url*
+:Default: ``https://db.satnogs.org/api/``
+:Required: *No*
+:Description:
+   URL pointing to API of SatNOGS DB for uploading artifacts.
+
+
+SATNOGS_ARTIFACTS_API_POST_INTERVAL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:Type: *integer*
+:Default: ``180``
+:Required: *No*
+:Description:
+   Interval (in seconds) for posting artifacts to SatNOGS DB.
+
+
+SATNOGS_ARTIFACTS_API_TOKEN
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Type: *string*
+:Default: *None*
+:Required: *No*
+:Description:
+   SatNOGS DB API token associated with an account in SatNOGS DB.
+   This token is secret.
+   It is used to upload artifacts to SatNOGS DB.
+   It can be found in SatNOGS DB user page.
 
 
 LOG_LEVEL
