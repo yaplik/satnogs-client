@@ -31,10 +31,16 @@ Modules reference
 .. automodule:: satnogsclient.observer.orbital
 
 
-:mod:`satnogsclient.observer.waterfall`
----------------------------------------
+:mod:`satnogsclient.artifacts`
+------------------------------
 
-.. automodule:: satnogsclient.observer.waterfall
+.. automodule:: satnogsclient.artifacts
+
+
+:mod:`satnogsclient.waterfall`
+------------------------------
+
+.. automodule:: satnogsclient.waterfall
 
 
 :mod:`satnogsclient.observer.worker`
