@@ -21,6 +21,7 @@ stages:
   - test
   - deploy
   - sentry_release
+  - security
 
 # 'static' stage
 static:
@@ -122,3 +123,27 @@ sentry_release:
     variables:
       - $SENTRY_AUTH_TOKEN
       - $SENTRY_ORG
+
+# 'security' stage
+include:
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
+dependency_scanning:
+  stage: security
+  needs: []
+  variables:
+    DS_DEFAULT_ANALYZERS: 'gemnasium,gemnasium-python'
+sast:
+  stage: security
+  needs: []
+secret_detection:
+  stage: security
+  needs: []
+secret_detection_default_branch:
+  stage: security
+  needs: []
+license_scanning:
+  stage: security
+  needs: []
