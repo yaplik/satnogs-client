@@ -21,16 +21,22 @@ stages:
   - test
   - deploy
   - sentry_release
+
+# 'static' stage
 static:
   stage: static
+  needs: []
   image: ${GITLAB_CI_IMAGE_DEBIAN}
   before_script:
     - apt-get -y update
     - apt-get -y install $GITLAB_CI_APT_PACKAGES
   script:
     - tox -e "flake8,isort,yapf,pylint,robot-lint"
+
+# 'build' stage
 docs:
   stage: build
+  needs: []
   image: ${GITLAB_CI_IMAGE_DEBIAN}
   before_script:
     - apt-get -y update
@@ -45,6 +51,7 @@ docs:
       - docs/_build/html
 build:
   stage: build
+  needs: []
   image: ${GITLAB_CI_IMAGE_DEBIAN}
   before_script:
     - apt-get -y update
@@ -57,8 +64,11 @@ build:
     when: always
     paths:
       - dist
+
+# 'test' stage
 test:
   stage: test
+  needs: []
   image: ${GITLAB_CI_IMAGE_DEBIAN}
   before_script:
     - apt-get -y update
@@ -71,6 +81,8 @@ test:
     when: always
     paths:
       - robot/output
+
+# 'deploy' stage
 deploy:
   stage: deploy
   image: ${GITLAB_CI_IMAGE_DEBIAN}
@@ -96,6 +108,8 @@ pages:
       - public
   only:
     - tags
+
+# 'sentry_release' stage
 sentry_release:
   stage: sentry_release
   image: ${GITLAB_CI_IMAGE_SENTRY_CLI}
