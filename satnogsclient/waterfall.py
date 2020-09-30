@@ -114,10 +114,10 @@ class Waterfall():  # pylint: disable=R0903
             vmax = -50
             c_idx = self.data['data']['spec'] > -200.0
             if np.sum(c_idx) > 100:
-                c_idx_mean = np.mean(self.data['data']['spec'][c_idx])
-                c_idx_std = np.std(c_idx)
-                vmin = c_idx_mean - 2.0 * c_idx_std
-                vmax = c_idx_mean + 6.0 * c_idx_std
+                data_mean = np.mean(self.data['data']['spec'][c_idx])
+                data_std = np.std(self.data['data']['spec'][c_idx])
+                vmin = data_mean - 2.0 * data_std
+                vmax = data_mean + 6.0 * data_std
         plt.figure(figsize=(10, 20))
         plt.imshow(self.data['data']['spec'],
                    origin='lower',
