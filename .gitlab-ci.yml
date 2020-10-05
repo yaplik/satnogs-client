@@ -76,7 +76,7 @@ test:
     - apt-get -y install $GITLAB_CI_APT_PACKAGES
   script:
     - rm -rf robot/output
-    - tox -e "robot"
+    - tox -e "deps,robot"
   artifacts:
     expire_in: 1 week
     when: always
