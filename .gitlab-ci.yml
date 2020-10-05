@@ -5,14 +5,8 @@ variables:
   GITLAB_CI_APT_PACKAGES: >-
     git
     tox
-    python3-requests
-    python3-dateutil
-    python3-ephem
-    python3-tz
-    python3-matplotlib
     python3-numpy
-    python3-decorator
-    python3-funcsigs
+    python3-gps
     python3-libhamlib2
 # debian:buster --> tox~=3.7.0
 stages:
