@@ -164,6 +164,8 @@ class Flowgraph():
             'bw': client_settings.SATNOGS_RX_BANDWIDTH,
             'enable-iq-dump': str(int(client_settings.ENABLE_IQ_DUMP is True)),
             'iq-file-path': client_settings.IQ_DUMP_FILENAME,
+            'udp-dump-host': client_settings.UDP_DUMP_HOST,
+            'udp-dump-port': client_settings.UDP_DUMP_PORT,
             'wpm': None,
             'baudrate': None,
             'framing': None

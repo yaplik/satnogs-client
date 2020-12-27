@@ -97,6 +97,8 @@ SATNOGS_BB_FREQ = environ.get('SATNOGS_BB_FREQ', None)
 ENABLE_IQ_DUMP = bool(strtobool(environ.get('ENABLE_IQ_DUMP', 'False')))
 IQ_DUMP_FILENAME = environ.get('IQ_DUMP_FILENAME', None)
 DISABLE_DECODED_DATA = bool(strtobool(environ.get('DISABLE_DECODED_DATA', 'False')))
+UDP_DUMP_HOST = environ.get('UDP_DUMP_HOST', None)
+UDP_DUMP_PORT = int(environ.get('UDP_DUMP_PORT', 7355))
 
 # Artifacts settings
 ARTIFACTS_ENABLED = bool(strtobool(environ.get('SATNOGS_ARTIFACTS_ENABLED', 'False')))
