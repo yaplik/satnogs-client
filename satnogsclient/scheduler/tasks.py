@@ -202,7 +202,10 @@ def status_listener():
     SCHEDULER.remove_all_jobs()
     LOGGER.info('Registering `get_jobs` periodic task (%d sec. interval)',
                 settings.SATNOGS_NETWORK_API_QUERY_INTERVAL)
-    SCHEDULER.add_job(get_jobs, 'interval', seconds=settings.SATNOGS_NETWORK_API_QUERY_INTERVAL)
+    SCHEDULER.add_job(get_jobs,
+                      'interval',
+                      seconds=settings.SATNOGS_NETWORK_API_QUERY_INTERVAL,
+                      next_run_time=datetime.now(pytz.utc))
     LOGGER.info('Registering `post_data` periodic task (%d sec. interval)',
                 settings.SATNOGS_NETWORK_API_POST_INTERVAL)
     SCHEDULER.add_job(post_data, 'interval', seconds=settings.SATNOGS_NETWORK_API_POST_INTERVAL)
