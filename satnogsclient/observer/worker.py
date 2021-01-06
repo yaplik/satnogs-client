@@ -30,21 +30,11 @@ class Worker(object):
     # end when this timestamp is reached
     _observation_end = None
 
-    # frequency of original signal
-    _frequency = None
-
-    _azimuth = None
-    _altitude = None
-
     observer_dict = {}
     satellite_dict = {}
 
-    def __init__(self, ip, port, time_to_stop=None, frequency=None, sleep_time=None):
+    def __init__(self, time_to_stop=None, sleep_time=None):
         """Initialize worker class."""
-        self._ip = ip
-        self._port = port
-        if frequency:
-            self._frequency = frequency
         if time_to_stop:
             self._observation_end = time_to_stop
         if sleep_time:
@@ -65,6 +55,11 @@ class Worker(object):
         """
         Sets tracking object.
         Can also be called while tracking to manipulate observation.
+
+        :param observer_dict: Location of the Observer,
+                              example: {'lon': 0.0, 'lat': 0.0, 'elev':0.0}
+        :param satellite_dict: TLE of the satellite,
+                               example: {'tle0': '', 'tle1': '', 'tle2': ''}
         """
         self.observer_dict = observer_dict
         self.satellite_dict = satellite_dict
@@ -102,8 +97,23 @@ class Worker(object):
 
 
 class WorkerTrack(Worker):
+    _azimuth = None
+    _altitude = None
+
     _midpoint = None
     _flip = False
+
+    def __init__(self, port, **kwargs):
+        """
+        Initialize WorkerTrack class.
+
+        :param port: Serial port for Hamlib-controlled rotator OR the network address
+                     of a rotctld instance (e.g. 'localhost:4533')
+        :param *kwargs: Keyword arguments of parent class Worker
+        """
+        self._port = port
+
+        super().__init__(**kwargs)
 
     def _communicate_tracking_info(self):
         """
@@ -168,11 +178,15 @@ class WorkerTrack(Worker):
             return (WorkerTrack.normalize_angle(azi), WorkerTrack.normalize_angle(alt))
         return (azi, alt)
 
-    def trackobject(self, observer_dict, satellite_dict):
-        super(WorkerTrack, self).trackobject(observer_dict, satellite_dict)
+    def trackobject(self, *args):
+        """
+        :param *args: Positional Arguments of parent class Worker
+        """
+
+        super().trackobject(*args)
 
         if settings.SATNOGS_ROT_FLIP and settings.SATNOGS_ROT_FLIP_ANGLE:
-            self._midpoint = WorkerTrack.find_midpoint(observer_dict, satellite_dict,
+            self._midpoint = WorkerTrack.find_midpoint(self.observer_dict, self.satellite_dict,
                                                        datetime.now(pytz.utc))
             LOGGER.info('Antenna midpoint: AZ%.2f EL%.2f %s', *self._midpoint)
             self._flip = (self._midpoint[1] >= settings.SATNOGS_ROT_FLIP_ANGLE)
@@ -200,6 +214,23 @@ class WorkerTrack(Worker):
 
 
 class WorkerFreq(Worker):
+    # frequency of original signal
+    _frequency = None
+
+    def __init__(self, ip, port, **kwargs):
+        """
+        Initialize WorkerFreq class.
+
+        :param ip: Hamlib rigctld ip
+        :param port: Hamlib rigctld port
+        :param *kwargs: Keyword arguments of parent class Worker
+        """
+
+        self._ip = ip
+        self._port = port
+
+        super().__init__(**kwargs)
+
     def _communicate_tracking_info(self):
         """
         Runs as a daemon thread, communicating tracking info to remote socket.
@@ -218,6 +249,18 @@ class WorkerFreq(Worker):
                 time.sleep(self._sleep_time)
 
         rig.close()
+
+    def trackobject(self, frequency, observer_dict, satellite_dict):
+        """
+        :param frequency: Frequency of original signal in Hz
+        :param observer_dict: Location of the Observer
+                              example: {'lon': 0.0, 'lat': 0.0, 'elev:0.0}
+        :param satellite_dict: TLE of the satellite
+                               example: {'tle0': '', 'tle1': '', 'tle2': ''}
+        """
+        self._frequency = frequency
+
+        super().trackobject(observer_dict, satellite_dict)
 
     def send_to_socket(self, pin, sock):
         doppler_calc_freq = self._frequency * (1 - (pin['rng_vlct'] / ephem.c))

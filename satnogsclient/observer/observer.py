@@ -254,9 +254,7 @@ class Observer(object):
                               args=(artifact.artifacts_file, str(self.observation_id)))
 
     def run_rot(self):
-        self.tracker_rot = WorkerTrack(ip=None,
-                                       port=self.rot_port,
-                                       frequency=self.frequency,
+        self.tracker_rot = WorkerTrack(port=self.rot_port,
                                        time_to_stop=self.observation_end,
                                        sleep_time=3)
         LOGGER.debug('TLE: %s', self.tle)
@@ -267,11 +265,10 @@ class Observer(object):
     def run_rig(self):
         self.tracker_freq = WorkerFreq(ip=self.rig_ip,
                                        port=self.rig_port,
-                                       frequency=self.frequency,
                                        time_to_stop=self.observation_end)
         LOGGER.debug('Rig Frequency %s', self.frequency)
         LOGGER.debug('Observation end: %s', self.observation_end)
-        self.tracker_freq.trackobject(self.location, self.tle)
+        self.tracker_freq.trackobject(self.frequency, self.location, self.tle)
         self.tracker_freq.trackstart()
 
     def poll_gnu_proc_status(self, flowgraph):

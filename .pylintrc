@@ -12,3 +12,4 @@ disable=
     R0913, # too-many-arguments
     R0914, # too-many-locals
     R0205, # useless-object-inheritance
+    W0221, # arguments-differ (due to https://github.com/PyCQA/pylint/issues/1482, fixed in pylint>=2.5.0)
