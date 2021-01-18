@@ -209,13 +209,3 @@ def status_listener():
     LOGGER.info('Registering `post_data` periodic task (%d sec. interval)',
                 settings.SATNOGS_NETWORK_API_POST_INTERVAL)
     SCHEDULER.add_job(post_data, 'interval', seconds=settings.SATNOGS_NETWORK_API_POST_INTERVAL)
-
-
-def get_observation_list():
-    obs_list = SCHEDULER.get_jobs()
-    return obs_list
-
-
-def get_observation(job_id):
-    obs = SCHEDULER.get_job(job_id)
-    return obs
