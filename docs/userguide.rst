@@ -502,17 +502,16 @@ UDP_DUMP_HOST
 :Default: *None*
 :Required: *No*
 :Description:
-   IP destination of UDP data with audio and doppler corrected I/Q.
+   IP destination of UDP data with doppler corrected I/Q.
 
 
 UDP_DUMP_PORT
 ~~~~~~~~~~~~~
 :Type: *integer*
-:Default: ``7355``
+:Default: ``57356``
 :Required: *No*
 :Description:
-   Base port for UDP data with audio and doppler corrected I/Q.
-   Audio will be at this port and I/Q will be at port+1.
+   Port for UDP data with doppler corrected I/Q.
 
 
 SATNOGS_WATERFALL_AUTORANGE
