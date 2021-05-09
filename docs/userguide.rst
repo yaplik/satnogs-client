@@ -338,7 +338,8 @@ SATNOGS_SOAPY_RX_DEVICE
 :Default: *None*
 :Required: *Yes*
 :Description:
-   FIXME
+   SoapySDR device driver to use for RX.
+   This setting must be defined in the form ``driver=<name>`` where ``<name>`` is the name of the SoapySDR device driver to use.
 
 
 SATNOGS_RX_SAMP_RATE
@@ -347,43 +348,47 @@ SATNOGS_RX_SAMP_RATE
 :Default: *None*
 :Required: *Yes*
 :Description:
-   FIXME
+   SoapySDR device sample rate.
+   Valid sample rates for attached devices can be queried using ``SoapySDRUtil --probe``.
 
 
 SATNOGS_RX_BANDWIDTH
 ~~~~~~~~~~~~~~~~~~~~
 :Type: *integer*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR device RF bandwidth.
+   This setting configures the RF filter on devices that support it.
 
 
 SATNOGS_DOPPLER_CORR_PER_SEC
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :Type: *integer*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   Number of Doppler corrections per second requested by SatNOGS Radio.
 
 
 SATNOGS_LO_OFFSET
 ~~~~~~~~~~~~~~~~~
 :Type: *integer*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR device local oscillator offset to apply.
+   This setting is used to shift the carrier away from the DC spike.
 
 
 SATNOGS_PPM_ERROR
 ~~~~~~~~~~~~~~~~~
 :Type: *float*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR device oscillator frequency error correction to apply.
+   This setting is defined in parts per million.
 
 
 SATNOGS_GAIN_MODE
@@ -392,16 +397,18 @@ SATNOGS_GAIN_MODE
 :Default: ``Overall``
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR device gain mode.
+   Valid values are: ``Overall``, ``Specific``, ``Settings Field``.
 
 
 SATNOGS_RF_GAIN
 ~~~~~~~~~~~~~~~
 :Type: *float*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR device overall gain, in dB.
+   Device drivers set individual, device specific gains to approximate linearity on the overall gain.
 
 
 SATNOGS_ANTENNA
@@ -410,61 +417,64 @@ SATNOGS_ANTENNA
 :Default: *None*
 :Required: *Yes*
 :Description:
-   FIXME
+   SoapySDR device antenna to use for RX.
+   Valid antennas for attached devices can be queried using ``SoapySDRUtil --probe``.
 
 
 SATNOGS_DEV_ARGS
 ~~~~~~~~~~~~~~~~
 :Type: *string*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR device arguments.
+   Valid device arguments for attached devices can be queried using ``SoapySDRUtil --probe``.
 
 
 SATNOGS_STREAM_ARGS
 ~~~~~~~~~~~~~~~~~~~
 :Type: *string*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR stream arguments.
+   Valid stream arguments for attached devices can be queried using ``SoapySDRUtil --probe``.
 
 
 SATNOGS_TUNE_ARGS
 ~~~~~~~~~~~~~~~~~
 :Type: *string*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR channel tune arguments.
 
 
 SATNOGS_OTHER_SETTINGS
 ~~~~~~~~~~~~~~~~~~~~~~
 :Type: *string*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR channel other settings.
 
 
 SATNOGS_DC_REMOVAL
 ~~~~~~~~~~~~~~~~~~
-:Default: *None*
 :Type: *boolean*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR device automatic DC offset suppression.
 
 
 SATNOGS_BB_FREQ
 ~~~~~~~~~~~~~~~
 :Type: *string*
-:Default: *None*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
-   FIXME
+   SoapySDR device baseband CORDIC frequency for devices that support it.
 
 
 ENABLE_IQ_DUMP
@@ -480,8 +490,8 @@ ENABLE_IQ_DUMP
 
 IQ_DUMP_FILENAME
 ~~~~~~~~~~~~~~~~
-:Default: *False*
 :Type: *path*
+:Default: *None*
 :Required: *No*
 :Description:
    Path to file for storing I/Q data dumps.
@@ -498,8 +508,8 @@ DISABLE_DECODED_DATA
 
 UDP_DUMP_HOST
 ~~~~~~~~~~~~~
-:Default: *None*
 :Type: *host*
+:Default: *Flowgraph-defined*
 :Required: *No*
 :Description:
    IP destination of UDP data with Doppler corrected I/Q.
