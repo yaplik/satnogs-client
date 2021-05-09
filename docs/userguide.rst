@@ -94,7 +94,7 @@ SATNOGS_STATION_LAT
 :Required: *Yes*
 :Description:
    Latitude of the station location.
-   Higher precision of this value increases accuracy of doppler correcton while lower precision increases station location privacy.
+   Higher precision of this value increases accuracy of Doppler correction while lower precision increases station location privacy.
 
 
 SATNOGS_STATION_LON
@@ -105,7 +105,7 @@ SATNOGS_STATION_LON
 :Required: *Yes*
 :Description:
    Longitude of the station location.
-   Higher precision of this value increases accuracy of doppler correcton while lower precision increases station location privacy.
+   Higher precision of this value increases accuracy of Doppler correction while lower precision increases station location privacy.
 
 
 SATNOGS_STATION_ELEV
@@ -116,7 +116,7 @@ SATNOGS_STATION_ELEV
 :Required: *Yes*
 :Description:
    Elevation of the station location.
-   Higher precision of this value increases accuracy of doppler correcton while lower precision increases station location privacy.
+   Higher precision of this value increases accuracy of Doppler correction while lower precision increases station location privacy.
 
 
 SATNOGS_GPSD_CLIENT_ENABLED
@@ -137,7 +137,7 @@ SATNOGS_GPSD_HOST
 :Default: ``127.0.0.1``
 :Required: *No*
 :Description:
-   Hostname or IP address of GPSd to connecct to for pulling positional information.
+   Hostname or IP address of GPSd to connect to for pulling positional information.
 
 
 SATNOGS_GPSD_PORT
@@ -502,7 +502,7 @@ UDP_DUMP_HOST
 :Default: *None*
 :Required: *No*
 :Description:
-   IP destination of UDP data with doppler corrected I/Q.
+   IP destination of UDP data with Doppler corrected I/Q.
 
 
 UDP_DUMP_PORT
@@ -511,7 +511,7 @@ UDP_DUMP_PORT
 :Default: ``57356``
 :Required: *No*
 :Description:
-   Port for UDP data with doppler corrected I/Q.
+   Port for UDP data with Doppler corrected I/Q.
 
 
 SATNOGS_WATERFALL_AUTORANGE
