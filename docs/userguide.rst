@@ -153,7 +153,7 @@ SATNOGS_GPSD_PORT
 SATNOGS_GPSD_TIMEOUT
 ~~~~~~~~~~~~~~~~~~~~
 
-:Type: *port*
+:Type: *integer*
 :Default: ``0``
 :Required: *No*
 :Description:
@@ -451,8 +451,8 @@ SATNOGS_OTHER_SETTINGS
 
 SATNOGS_DC_REMOVAL
 ~~~~~~~~~~~~~~~~~~
-:Type: *string*
 :Default: *None*
+:Type: *boolean*
 :Required: *No*
 :Description:
    FIXME
@@ -480,8 +480,8 @@ ENABLE_IQ_DUMP
 
 IQ_DUMP_FILENAME
 ~~~~~~~~~~~~~~~~
-:Type: *boolean*
 :Default: *False*
+:Type: *path*
 :Required: *No*
 :Description:
    Path to file for storing I/Q data dumps.
@@ -498,8 +498,8 @@ DISABLE_DECODED_DATA
 
 UDP_DUMP_HOST
 ~~~~~~~~~~~~~
-:Type: *string*
 :Default: *None*
+:Type: *host*
 :Required: *No*
 :Description:
    IP destination of UDP data with Doppler corrected I/Q.
@@ -507,7 +507,7 @@ UDP_DUMP_HOST
 
 UDP_DUMP_PORT
 ~~~~~~~~~~~~~
-:Type: *integer*
+:Type: *port*
 :Default: ``57356``
 :Required: *No*
 :Description:
