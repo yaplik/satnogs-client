@@ -127,23 +127,23 @@ def post_data():
 
             keep_or_remove_file(fil)
         except requests.exceptions.Timeout:
-            LOGGER.error('Upload of %s for observation %i failed '
+            LOGGER.error('Upload of %s for observation %s failed '
                          'due to timeout.', fil, observation_id)
         except requests.exceptions.HTTPError:
             if response.status_code == 404:
                 LOGGER.error(
-                    "Upload of %s for observation %i failed, %s doesn't exist (404)."
+                    "Upload of %s for observation %s failed, %s doesn't exist (404)."
                     'Probably the observation was deleted.', fil, observation_id, url)
 
                 # Move file to `SATNOGS_INCOMPLETE_OUTPUT_PATH`
                 os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
                           os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
             if response.status_code == 403 and 'has already been uploaded' in response.text:
-                LOGGER.error('Upload of %s for observation %i is forbidden, %s\n URL: %s', fil,
+                LOGGER.error('Upload of %s for observation %s is forbidden, %s\n URL: %s', fil,
                              observation_id, response.text, url)
                 keep_or_remove_file(fil)
             else:
-                LOGGER.error('Upload of %s for observation %i failed, '
+                LOGGER.error('Upload of %s for observation %s failed, '
                              'response status code: %s', fil, observation_id, response.status_code)
 
 
