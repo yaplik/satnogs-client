@@ -13,6 +13,12 @@ OFFSET_IN_STDS = -2.0
 SCALE_IN_STDS = 8.0
 
 
+class EmptyArrayError(Exception):
+    """
+    Empty data array exception
+    """
+
+
 def _read_waterfall(datafile_path):
     """
     Read waterfall data file
@@ -36,6 +42,8 @@ def _read_waterfall(datafile_path):
     }
     data_dtypes = np.dtype([('tabs', 'int64'), ('spec', 'float32', (waterfall['nchan'], ))])
     waterfall['data'] = np.fromfile(datafile, dtype=data_dtypes)
+    if waterfall['data'].size == 0:
+        raise EmptyArrayError
 
     datafile.close()
 

@@ -18,7 +18,7 @@ from satnogsclient import settings
 from satnogsclient.artifacts import Artifacts
 from satnogsclient.observer.worker import WorkerFreq, WorkerTrack
 from satnogsclient.scheduler import SCHEDULER
-from satnogsclient.waterfall import Waterfall
+from satnogsclient.waterfall import EmptyArrayError, Waterfall
 
 try:
     from urllib.parse import urljoin
@@ -212,6 +212,8 @@ class Observer(object):
                 self.remove_waterfall_file()
         except FileNotFoundError:
             LOGGER.error('No waterfall data file found')
+        except EmptyArrayError:
+            LOGGER.error('Waterfall data array is empty')
 
         # PUT client version and metadata
         base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
