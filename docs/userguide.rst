@@ -524,6 +524,26 @@ UDP_DUMP_PORT
    Port for UDP data with Doppler corrected I/Q.
 
 
+SATNOGS_UPLOAD_AUDIO_FILES
+~~~~~~~~~~~~~~~~~~
+
+:Type: *boolean*
+:Default: *True*
+:Required: *No*
+:Description:
+   Enable/Disable uploading audio files to SatNOGS network.
+
+
+SATNOGS_UPLOAD_WATERFALL_FILES
+~~~~~~~~~~~~~~~~~~
+
+:Type: *boolean*
+:Default: *True*
+:Required: *No*
+:Description:
+   Enable/Disable uploading waterfalls to SatNOGS network.
+
+
 SATNOGS_WATERFALL_AUTORANGE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :Type: *boolean*

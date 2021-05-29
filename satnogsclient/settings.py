@@ -100,6 +100,11 @@ DISABLE_DECODED_DATA = bool(strtobool(environ.get('DISABLE_DECODED_DATA', 'False
 UDP_DUMP_HOST = environ.get('UDP_DUMP_HOST', None)
 UDP_DUMP_PORT = int(environ.get('UDP_DUMP_PORT', 57356))
 
+# Upload settings
+SATNOGS_UPLOAD_AUDIO_FILES = bool(strtobool(environ.get('SATNOGS_UPLOAD_AUDIO_FILES', 'True')))
+SATNOGS_UPLOAD_WATERFALL_FILES = bool(
+    strtobool(environ.get('SATNOGS_UPLOAD_WATERFALL_FILES', 'True')))
+
 # Artifacts settings
 ARTIFACTS_ENABLED = bool(strtobool(environ.get('SATNOGS_ARTIFACTS_ENABLED', 'False')))
 ARTIFACTS_API_URL = environ.get('SATNOGS_ARTIFACTS_API_URL', 'https://db.satnogs.org/api/')

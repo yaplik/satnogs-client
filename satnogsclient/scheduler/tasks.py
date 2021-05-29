@@ -81,8 +81,6 @@ def keep_or_remove_file(filename):
 def post_data():
     """PUT observation data back to Network API."""
     LOGGER.info('Post data started')
-    base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
-    headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
 
     for fil in next(os.walk(settings.SATNOGS_OUTPUT_PATH))[2]:
         file_path = os.path.join(*[settings.SATNOGS_OUTPUT_PATH, fil])
@@ -90,8 +88,14 @@ def post_data():
                 or fil.startswith('receiving_data') or os.stat(file_path).st_size == 0):
             continue
         if fil.startswith('satnogs'):
+            if not settings.SATNOGS_UPLOAD_AUDIO_FILES:
+                keep_or_remove_file(fil)
+                continue
             observation = {'payload': open(file_path, 'rb')}
         elif fil.startswith('waterfall'):
+            if not settings.SATNOGS_UPLOAD_WATERFALL_FILES:
+                keep_or_remove_file(fil)
+                continue
             observation = {'waterfall': open(file_path, 'rb')}
         elif fil.startswith('data'):
             try:
@@ -106,45 +110,53 @@ def post_data():
         if '_' not in fil:
             continue
         observation_id = fil.split('_')[1]
-        LOGGER.info('Trying to PUT observation data for id: %s', observation_id)
-        url = urljoin(base_url, observation_id)
-        if not url.endswith('/'):
-            url += '/'
-        LOGGER.debug('PUT file %s to network API', fil)
-        LOGGER.debug('URL: %s', url)
-        LOGGER.debug('Headers: %s', headers)
-        LOGGER.debug('Observation file: %s', observation)
-        try:
-            response = requests.put(url,
-                                    headers=headers,
-                                    files=observation,
-                                    verify=settings.SATNOGS_VERIFY_SSL,
-                                    stream=True,
-                                    timeout=settings.SATNOGS_NETWORK_API_TIMEOUT)
-            response.raise_for_status()
+        upload_observation_data(observation_id, observation, fil)
 
-            LOGGER.info('Upload successful.')
 
+def upload_observation_data(observation_id, observation, fil):
+    """Upload observation data to SatNOGS Network API."""
+    base_url = urljoin(settings.SATNOGS_NETWORK_API_URL, 'observations/')
+    headers = {'Authorization': 'Token {0}'.format(settings.SATNOGS_API_TOKEN)}
+
+    LOGGER.info('Trying to PUT observation data for id: %s', observation_id)
+    url = urljoin(base_url, observation_id)
+    if not url.endswith('/'):
+        url += '/'
+    LOGGER.debug('PUT file %s to network API', fil)
+    LOGGER.debug('URL: %s', url)
+    LOGGER.debug('Headers: %s', headers)
+    LOGGER.debug('Observation file: %s', observation)
+    try:
+        response = requests.put(url,
+                                headers=headers,
+                                files=observation,
+                                verify=settings.SATNOGS_VERIFY_SSL,
+                                stream=True,
+                                timeout=settings.SATNOGS_NETWORK_API_TIMEOUT)
+        response.raise_for_status()
+
+        LOGGER.info('Upload successful.')
+
+        keep_or_remove_file(fil)
+    except requests.exceptions.Timeout:
+        LOGGER.error('Upload of %s for observation %s failed '
+                     'due to timeout.', fil, observation_id)
+    except requests.exceptions.HTTPError:
+        if response.status_code == 404:
+            LOGGER.error(
+                "Upload of %s for observation %s failed, %s doesn't exist (404)."
+                'Probably the observation was deleted.', fil, observation_id, url)
+
+            # Move file to `SATNOGS_INCOMPLETE_OUTPUT_PATH`
+            os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
+                      os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
+        if response.status_code == 403 and 'has already been uploaded' in response.text:
+            LOGGER.error('Upload of %s for observation %s is forbidden, %s\n URL: %s', fil,
+                         observation_id, response.text, url)
             keep_or_remove_file(fil)
-        except requests.exceptions.Timeout:
-            LOGGER.error('Upload of %s for observation %s failed '
-                         'due to timeout.', fil, observation_id)
-        except requests.exceptions.HTTPError:
-            if response.status_code == 404:
-                LOGGER.error(
-                    "Upload of %s for observation %s failed, %s doesn't exist (404)."
-                    'Probably the observation was deleted.', fil, observation_id, url)
-
-                # Move file to `SATNOGS_INCOMPLETE_OUTPUT_PATH`
-                os.rename(os.path.join(settings.SATNOGS_OUTPUT_PATH, fil),
-                          os.path.join(settings.SATNOGS_INCOMPLETE_OUTPUT_PATH, fil))
-            if response.status_code == 403 and 'has already been uploaded' in response.text:
-                LOGGER.error('Upload of %s for observation %s is forbidden, %s\n URL: %s', fil,
-                             observation_id, response.text, url)
-                keep_or_remove_file(fil)
-            else:
-                LOGGER.error('Upload of %s for observation %s failed, '
-                             'response status code: %s', fil, observation_id, response.status_code)
+        else:
+            LOGGER.error('Upload of %s for observation %s failed, '
+                         'response status code: %s', fil, observation_id, response.status_code)
 
 
 def get_jobs():
