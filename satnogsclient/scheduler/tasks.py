@@ -164,11 +164,14 @@ def get_jobs():
     LOGGER.debug('Params: %s', params)
     LOGGER.debug('Headers: %s', headers)
     LOGGER.info('Trying to GET observation jobs from the network')
-    response = requests.get(url,
-                            params=params,
-                            headers=headers,
-                            verify=settings.SATNOGS_VERIFY_SSL,
-                            timeout=45)
+    try:
+        response = requests.get(url,
+                                params=params,
+                                headers=headers,
+                                verify=settings.SATNOGS_VERIFY_SSL,
+                                timeout=45)
+    except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects):
+        LOGGER.exception('An error occurred trying to GET observation jobs from network')
 
     try:
         response.raise_for_status()
