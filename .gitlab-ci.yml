@@ -158,9 +158,6 @@ sast:
 secret_detection:
   stage: security
   needs: []
-secret_detection_default_branch:
-  stage: security
-  needs: []
 license_scanning:
   stage: security
   needs: []
