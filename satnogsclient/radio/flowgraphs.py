@@ -17,6 +17,7 @@ SATNOGS_FLOWGRAPH_SCRIPTS = {
     'FM': 'satnogs_fm.py',
     'FSK': 'satnogs_fsk.py',
     'GFSK_RKTR': 'satnogs_reaktor_hello_world_fsk9600_decoder.py',
+    'GFSK/BPSK': 'satnogs_qubik_telem.py',
     'SSTV': 'satnogs_sstv_pd120_demod.py'
 }
 
@@ -85,6 +86,10 @@ SATNOGS_FLOWGRAPH_MODES = {
         'script_name': SATNOGS_FLOWGRAPH_SCRIPTS['GFSK_RKTR'],
         'has_baudrate': True,
         'has_framing': False
+    },
+    'GFSK/BPSK': {
+        'script_name': SATNOGS_FLOWGRAPH_SCRIPTS['GFSK/BPSK'],
+        'has_baudrate': True,
     },
     'GMSK': {
         'script_name': SATNOGS_FLOWGRAPH_SCRIPTS['FSK'],
