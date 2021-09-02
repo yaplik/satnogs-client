@@ -90,6 +90,7 @@ SATNOGS_FLOWGRAPH_MODES = {
     'GFSK/BPSK': {
         'script_name': SATNOGS_FLOWGRAPH_SCRIPTS['GFSK/BPSK'],
         'has_baudrate': True,
+        'has_framing': False,
     },
     'GMSK': {
         'script_name': SATNOGS_FLOWGRAPH_SCRIPTS['FSK'],
