@@ -1,3 +1,4 @@
+import json
 import logging
 import tempfile
 
@@ -7,22 +8,42 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Artifacts():  # pylint: disable=R0903
-    def __init__(self, waterfall, observation_id):
+    def __init__(self, waterfall, metadata):
+        """
+        Constructor.
+
+        Arguments:
+            waterfall_data: The Waterfall object to be stored
+            metadata: A JSON-serializeable dictionary, structure:
+                      {
+                        'observation_id': integer number,
+                        'tle': 3-line string,
+                        'frequency': integer number,
+                        'location': {
+                          'latitude': number,
+                          'longitude': number,
+                          'altitude': self.location['elev']
+                        }
+                      }
+        """
         self.artifacts_file = None
         self._waterfall_data = waterfall.data
-        self._observation_id = observation_id
+        self._metadata = json.dumps(metadata)
 
     def create(self):
         self.artifacts_file = tempfile.TemporaryFile()
         hdf5_file = h5py.File(self.artifacts_file, 'w')
-        hdf5_file.attrs['artifact_version'] = 1
-        hdf5_file.attrs['observation_id'] = self._observation_id
+        hdf5_file.attrs['artifact_version'] = 2
 
         # Create waterfall group
         wf_group = hdf5_file.create_group('waterfall')
 
-        # Store waterfall attributes
+        # Store observation metadata
+        # NOTE: start_time is not equal to observation start time
         wf_group.attrs['start_time'] = self._waterfall_data['timestamp']
+        wf_group.attrs['metadata'] = self._metadata
+
+        # Store waterfall attributes
         wf_group.attrs['offset_in_stds'] = -2.0
         wf_group.attrs['scale_in_stds'] = 8.0
 

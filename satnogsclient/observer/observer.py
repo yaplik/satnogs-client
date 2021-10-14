@@ -248,7 +248,17 @@ class Observer(object):
             LOGGER.error('%s: Unexpected error: %s', url, err)
 
         if settings.ARTIFACTS_ENABLED:
-            artifact = Artifacts(waterfall, self.observation_id)
+            metadata = {
+                'observation_id': self.observation_id,
+                'frequency': str(self.frequency),
+                'tle': '{}\n{}\n{}\n'.format(self.tle['tle0'], self.tle['tle1'], self.tle['tle2']),
+                'location': {
+                    'latitude': self.location['lat'],
+                    'longitude': self.location['lon'],
+                    'altitude': self.location['elev']
+                }
+            }
+            artifact = Artifacts(waterfall, metadata)
             artifact.create()
             SCHEDULER.add_job(post_artifacts,
                               args=(artifact.artifacts_file, str(self.observation_id)))
