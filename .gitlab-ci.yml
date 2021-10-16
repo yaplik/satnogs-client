@@ -89,7 +89,7 @@ test:
     - apt-get -y install $GITLAB_CI_APT_PACKAGES
   script:
     - rm -rf robot/output
-    - tox -e "deps,robot"
+    - tox -e "pytest,deps,robot"
   artifacts:
     expire_in: 1 week
     when: always
