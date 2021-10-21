@@ -34,6 +34,7 @@ class Artifacts():  # pylint: disable=R0903
         self.artifacts_file = tempfile.TemporaryFile()
         hdf5_file = h5py.File(self.artifacts_file, 'w')
         hdf5_file.attrs['artifact_version'] = 2
+        hdf5_file.attrs['metadata'] = self._metadata
 
         # Create waterfall group
         wf_group = hdf5_file.create_group('waterfall')
@@ -41,7 +42,6 @@ class Artifacts():  # pylint: disable=R0903
         # Store observation metadata
         # NOTE: start_time is not equal to observation start time
         wf_group.attrs['start_time'] = self._waterfall_data['timestamp']
-        wf_group.attrs['metadata'] = self._metadata
 
         # Store waterfall attributes
         wf_group.attrs['offset_in_stds'] = -2.0
