@@ -73,7 +73,7 @@ SATNOGS_ROT_BAUD = int(environ.get('SATNOGS_ROT_BAUD', 19200))
 SATNOGS_ROT_PORT = environ.get('SATNOGS_ROT_PORT', '/dev/ttyUSB0')
 SATNOGS_RIG_IP = environ.get('SATNOGS_RIG_IP', '127.0.0.1')
 SATNOGS_RIG_PORT = int(environ.get('SATNOGS_RIG_PORT', 4532))
-SATNOGS_ROT_THRESHOLD = int(environ.get('SATNOGS_ROT_THRESHOLD', 4))
+SATNOGS_ROT_THRESHOLD = float(environ.get('SATNOGS_ROT_THRESHOLD', 4))
 SATNOGS_ROT_FLIP = bool(strtobool(environ.get('SATNOGS_ROT_FLIP', 'False')))
 SATNOGS_ROT_FLIP_ANGLE = int(environ.get('SATNOGS_ROT_FLIP_ANGLE', 75))
 
