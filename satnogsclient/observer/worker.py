@@ -131,6 +131,7 @@ class WorkerTrack(Worker):
             pin = pinpoint(self.observer_dict, self.satellite_dict)
             if pin['ok']:
                 self.send_to_socket(pin, rotator)
+                self._sleep_time = 0.25
                 time.sleep(self._sleep_time)
 
         rotator.close()
