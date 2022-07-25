@@ -138,6 +138,9 @@ def upload_observation_data(observation_id, observation, fil):
         LOGGER.info('Upload successful.')
 
         keep_or_remove_file(fil)
+
+        import sys
+        sys.exit(0)
     except requests.exceptions.Timeout:
         LOGGER.error('Upload of %s for observation %s failed '
                      'due to timeout.', fil, observation_id)
